@@ -1,0 +1,90 @@
+---
+title: "GLM task"
+author: "Sam Clifford and Megan Verma"
+date: "20/05/2022"
+output: html_document
+---
+
+``` {r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+## Introduction
+
+This R Markdown document is designed to get you used to working with the type of data that we'll need to do the modelling in the MSc project itself. Clone the repository and make sure you commit changes regularly.
+
+## Loading packages
+
+``` {r, eval = TRUE}
+library(tidyverse)
+```
+
+## Data preparation
+
+We'll use the Our World in Data COVID-19 data set. Download the full data set [here](https://ourworldindata.org/covid-vaccinations) as a CSV file and save it in a new folder called `data` within the working directory of this R Markdown file. Load this data in.
+
+``` {r}
+owid <- read_csv(NULL) # replace NULL with file name
+```
+
+Filter the data so that we only have the rows with the most recent date in the data set.
+
+``` {r}
+owid_latest <- filter(owid, NULL)
+```
+
+We also want to make sure that we only have rows from real countries, rather than aggregated values. So we'll omit any rows that begin with "OWID" in the `iso_code` field. 
+
+``` {r, eval = FALSE}
+owid_latest <- filter(owid_latest, !grepl(pattern = '^OWID', x = iso_code))
+```
+
+You should have 215 rows (as of 2022-05-19) in `owid_latest`.
+
+## Exploratory data analysis
+
+Using the rnaturalearth package, we'll make a map of the total COVID-19 cases per million in each country.
+
+``` {r, eval = TRUE}
+library(rnaturalearth)
+library(rnaturalearthdata)
+```
+
+``` {r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+```
+
+Plot the world map. If using ggplot2, `geom_sf()` will give you a plot of a simple features object (class `sf`).
+
+``` {r}
+ggplot(data = world) + geom_sf() + theme_void()
+```
+
+Make a data frame consisting of the `iso_code` and total cases per million, then merge it with the `world` data frame. You'll need to make sure you tell whatever merge/join function you use which column in each data frame contains the country code to merge on.
+
+``` {r}
+world_with_cases <- NULL
+```
+
+Plot the world map, filling each country by the total cases per million. You may need to transform the cases variable to improve the contrast in the plot.
+
+``` {r}
+NULL
+```
+
+Make a scatter plot of the cases per million and per capita gross domestic product.
+
+``` {r}
+NULL
+```
+
+## Model fitting
+
+Fit a logistic GLM of the total number of cases (not per million) as a function of the log of GDP. As each country has a different population, we'll need to ensure that we use the estimated population as though it was a number of "trials", $n$, and the number of cases as a number of "successes", $y$, in our GLM. This is done by specifying the left hand side of the regression formula as `cbind(y, n-y)` with appropriate variable names in place of `n` and `y`.
+
+``` {r}
+case_glm <- glm(data    = owid_latest,
+                formula = cbind(y, n - y) ~ NULL,
+                family  = "binomial")
+``` 
+
