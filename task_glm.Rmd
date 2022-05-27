@@ -2,7 +2,12 @@
 title: "GLM task"
 author: "Sam Clifford and Megan Verma"
 date: "20/05/2022"
-output: html_document
+output: 
+  html_document:
+      citation_package: natbib
+bibliography: "MeganVerma.bib"
+biblio-style: "chicago"
+link-citations: true
 ---
 
 ``` {r setup, include=FALSE}
@@ -87,4 +92,104 @@ case_glm <- glm(data    = owid_latest,
                 formula = cbind(y, n - y) ~ NULL,
                 family  = "binomial")
 ``` 
+
+Is there an association between the log of GDP and a country's case numbers?
+
+## Extracting Gini index from WDI
+
+Load the WDI R package and use the `WDIsearch()` function to figure out the variable indicator in the WDI database corresponding to the Gini index [@gini1936measure].
+
+Make a new object that contains the latest value of the Gini index variable. You may need to read the help file on `WDI()`.
+
+``` {r}
+NULL
+```
+
+Merge this new object with the data frame you used to fit the model. Ensure that you use a merge which doesn't drop rows where there is no Gini index data.
+
+## Incorporating household data from UN
+
+Download the UN Population Division's data on [Household size and composition](https://www.un.org/development/desa/pd/data/household-size-and-composition) and read it in to R, ensuring you only read the rows and columns pertaining to average household size and the relevant data source. Hint: `readxl::read_xlsx()` allows you to specify a range.
+
+``` {r}
+NULL
+```
+
+Make a new variable in this data frame that contains the three-letter ISO code, by converting from the numeric ISO code. Hint: the countrycode package has a function, `countrycode()`, which can do this.
+
+``` {r, eval = FALSE}
+library(countrycode)
+
+NULL <- mutate(NULL, 
+               iso_code = countrycode(sourcevar   = NULL, 
+                                      origin      = 'iso3n',
+                                      destination = 'iso3c'))
+```
+
+Filter the data frame to contain only the last non-missing value for each country. Hint: use `parse_number()` to convert from character to number, as the presence of `..` in a few cells in the data column makes it a character vector.
+
+``` {r}
+NULL
+```
+
+Summarise the data by country (`iso_code`) so that where there are multiple data sources with the same (latest) date, the resulting value is the average of the average household sizes.
+
+``` {r}
+NULL
+```
+
+Make a visualisation showing average household size for each country. Ensure you have appropriate labels.
+
+``` {r}
+NULL
+```
+
+There appear to be spatial trends. Using `countrycode()`, convert to either a UN subregion or World Bank region scheme and calculate the average household size, weighting for national population.
+
+``` {r}
+NULL
+```
+
+## Model fitting (revisited)
+
+Create a new data frame that contains the variables required for fitting a model where the explanatory variables are log GDP, Gini index and household size. Drop any rows where there are missing values.
+
+``` {r}
+NULL
+```
+
+Fit the model described above.
+
+``` {r}
+NULL
+```
+
+
+Re-fit the earlier model that contains log GDP and Gini index using the new data set you just generated.
+
+``` {r}
+NULL
+```
+
+``` {r}
+NULL
+```
+
+## Model comparison
+
+Does the addition of average household size improve model fit substantially? What makes you say so?
+
+What happens to the estimates of the effect of GDP and inequality when adding in household size?
+
+
+## Adding in region
+
+Fit a model that also includes the subregion variable derived through `countrycode()` before. What happens to the effects of the other covariates when this spatial information is included?
+
+``` {r}
+NULL
+```
+
+## References
+
 
