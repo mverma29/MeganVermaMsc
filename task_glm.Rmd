@@ -118,10 +118,13 @@ ggplot(data = mutate(world_with_cases,
 Make a scatter plot of the cases per million and per capita gross domestic product.
 
 ``` {r}
-ggplot(owid_latest, aes(total_cases_per_million, gdp_per_capita)) + 
+ggplot(owid_latest, aes(y = total_cases_per_million,x = gdp_per_capita)) + 
   geom_point (size=2) + 
-  xlab ("Total Cases per Million") + 
-  ylab ("GDP per capita ")
+  ylab ("Total Cases per Million") + 
+  xlab ("GDP per capita ") +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_smooth(method = 'lm')
 ```
 
 ## Model fitting
