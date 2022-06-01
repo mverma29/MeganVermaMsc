@@ -29,13 +29,13 @@ library(tidyverse)
 We'll use the Our World in Data COVID-19 data set. Download the full data set [here](https://ourworldindata.org/covid-vaccinations) as a CSV file and save it in a new folder called `data` within the working directory of this R Markdown file. Load this data in.
 
 ``` {r}
-owid <- read_csv(NULL) # replace NULL with file name
+owid <- read_csv("/Users/meganverma/Desktop/R/Msc_project/owid_covid.csv") # replace NULL with file name
 ```
 
 Filter the data so that we only have the rows with the most recent date in the data set.
 
 ``` {r}
-owid_latest <- filter(owid, NULL)
+owid_latest <- filter(owid, date=="2022-05-29")
 ```
 
 We also want to make sure that we only have rows from real countries, rather than aggregated values. So we'll omit any rows that begin with "OWID" in the `iso_code` field. 
@@ -68,19 +68,57 @@ ggplot(data = world) + geom_sf() + theme_void()
 Make a data frame consisting of the `iso_code` and total cases per million, then merge it with the `world` data frame. You'll need to make sure you tell whatever merge/join function you use which column in each data frame contains the country code to merge on.
 
 ``` {r}
-world_with_cases <- NULL
+iso_cases <- tibble(owid_latest$iso_code, owid_latest$total_cases_per_million) 
+world_with_cases <- merge (x=iso_cases, y=world, by.x= "owid_latest$iso_code", by.y = "iso_a3")
+
+world_with_cases <- rename (world_with_cases, iso_code ="owid_latest$iso_code" )
+world_with_cases <- rename (world_with_cases, total_cases_per_million ="owid_latest$total_cases_per_million" )
+
 ```
 
 Plot the world map, filling each country by the total cases per million. You may need to transform the cases variable to improve the contrast in the plot.
 
 ``` {r}
-NULL
+library ("sf")
+library ("maps")
+
+st_crs(world_with_cases$geometry) #CRS is WGS84 
+
+ggplot(data = world_with_cases$geometry) +  #world map geometry (polygons)
+  geom_sf(aes(fill= world_with_cases$total_cases_per_million)) + #color map w/ cont. values of total cases
+  scale_fill_gradient(low="yellow", high="red") + #set color fill 
+  theme_bw() #theme of dark text on light background 
+
+# diff fill
+ggplot(data = world_with_cases$geometry) +  #world map geometry (polygons)
+  geom_sf(aes(fill= world_with_cases$total_cases_per_million)) + #color map w/ cont. values of total cases
+  scale_fill_distiller(palette= "YlGnBu") + #set color fill 
+  theme_bw() #theme of dark text on light background 
+  
+
+
+# try transforming cases variable to improve contrast 
+world_with_cases <- world_with_cases %>% 
+  mutate(log_total_cases= log(total_cases_per_million))
+
+names (world_with_cases)
+
+# plot this 
+ggplot(data = world_with_cases$geometry) +  #world map geometry (polygons)
+  geom_sf(aes(fill= world_with_cases$log_total_cases)) + #color map w/ cont. values of LOG total cases
+  scale_fill_gradient(low="yellow", high="red") + #set color fill 
+  theme_bw() #theme of dark text on light background 
+## contrast is not better 
+
 ```
 
 Make a scatter plot of the cases per million and per capita gross domestic product.
 
 ``` {r}
-NULL
+ggplot(owid_latest, aes(total_cases_per_million, gdp_per_capita)) + 
+  geom_point (size=2) + 
+  xlab ("Total Cases per Million") + 
+  ylab ("GDP per capita ")
 ```
 
 ## Model fitting
@@ -88,12 +126,20 @@ NULL
 Fit a logistic GLM of the total number of cases (not per million) as a function of the log of GDP. As each country has a different population, we'll need to ensure that we use the estimated population as though it was a number of "trials", $n$, and the number of cases as a number of "successes", $y$, in our GLM. This is done by specifying the left hand side of the regression formula as `cbind(y, n-y)` with appropriate variable names in place of `n` and `y`.
 
 ``` {r}
+library (epiDisplay)
+
 case_glm <- glm(data    = owid_latest,
-                formula = cbind(y, n - y) ~ NULL,
+                formula = cbind(total_cases, owid_latest$population - total_cases) ~ log(gdp_per_capita),
                 family  = "binomial")
+
+
+
+epiDisplay::logistic.display(case_glm)
 ``` 
 
 Is there an association between the log of GDP and a country's case numbers?
+# i cant read it without epiDisplay-- is it an OR of 1.37??
+# if so, yes but can't see p-values 
 
 ## Extracting Gini index from WDI
 
@@ -102,17 +148,26 @@ Load the WDI R package and use the `WDIsearch()` function to figure out the vari
 Make a new object that contains the latest value of the Gini index variable. You may need to read the help file on `WDI()`.
 
 ``` {r}
-NULL
+library(WDI)
+WDIsearch(string = "gini") # Gini coeff indicator is called "3.0.Gini"
+
+gini_latest <- WDI(country="all", indicator= "3.0.Gini", latest=1, language = "en")
 ```
 
 Merge this new object with the data frame you used to fit the model. Ensure that you use a merge which doesn't drop rows where there is no Gini index data.
+
+```{r}
+owid_gini_latest <- merge(x=gini_latest, y=owid_latest, by.x="country", by.y="location", all.y = TRUE)
+```
 
 ## Incorporating household data from UN
 
 Download the UN Population Division's data on [Household size and composition](https://www.un.org/development/desa/pd/data/household-size-and-composition) and read it in to R, ensuring you only read the rows and columns pertaining to average household size and the relevant data source. Hint: `readxl::read_xlsx()` allows you to specify a range.
 
 ``` {r}
-NULL
+un_data <- readxl::read_xlsx ("/Users/meganverma/Desktop/R/Msc_project/un_hh.xlsx", sheet= 4, range= "A5:E819", col_names = TRUE)
+
+un_data
 ```
 
 Make a new variable in this data frame that contains the three-letter ISO code, by converting from the numeric ISO code. Hint: the countrycode package has a function, `countrycode()`, which can do this.
@@ -120,34 +175,72 @@ Make a new variable in this data frame that contains the three-letter ISO code, 
 ``` {r, eval = FALSE}
 library(countrycode)
 
-NULL <- mutate(NULL, 
-               iso_code = countrycode(sourcevar   = NULL, 
+un_data$'ISO Code' <- as.factor(un_data$`ISO Code`)
+un_data <- mutate(un_data, 
+               iso_code_l = countrycode(sourcevar   = `ISO Code`, 
                                       origin      = 'iso3n',
                                       destination = 'iso3c'))
+un_data
 ```
 
 Filter the data frame to contain only the last non-missing value for each country. Hint: use `parse_number()` to convert from character to number, as the presence of `..` in a few cells in the data column makes it a character vector.
 
 ``` {r}
-NULL
+un_data <- mutate (un_data, parse_number(`Average household size (number of members)`, na = c("", "NA")))
+
+un_data
+
+un_data_filt <- un_data %>% 
+  group_by(`Country or area`) %>% 
+   mutate(refdate = as.Date(`Reference date (dd/mm/yyyy)`, format= "%d/%m/%y"))%>% 
+  filter(refdate==max(refdate))
+
+un_data_filt
 ```
 
 Summarise the data by country (`iso_code`) so that where there are multiple data sources with the same (latest) date, the resulting value is the average of the average household sizes.
 
 ``` {r}
-NULL
+un_data_filt$`Average household size (number of members)` <- as.numeric(un_data_filt$`Average household size (number of members)`)
+
+un_hh_iso <- un_data_filt %>% 
+  group_by(`iso_code_l`) %>% 
+  summarise (mean_hh= mean(`Average household size (number of members)`), na.rm = TRUE)
 ```
 
 Make a visualisation showing average household size for each country. Ensure you have appropriate labels.
 
 ``` {r}
-NULL
+ggplot(un_hh_iso, aes(x=`iso_code_l`, y=`mean_hh`)) + 
+  geom_point (size=2) + 
+  xlab ("Country (ISO)") + 
+  ylab ("Average household size")
 ```
 
 There appear to be spatial trends. Using `countrycode()`, convert to either a UN subregion or World Bank region scheme and calculate the average household size, weighting for national population.
 
 ``` {r}
-NULL
+un_hh_iso <- mutate(un_hh_iso, 
+               un_subregion = countrycode(sourcevar   = `iso_code_l`, 
+                                      origin      = 'iso3c',
+                                      destination = 'un.regionsub.name'))
+
+un_hh_iso %>% arrange(un_subregion)
+
+names(world)
+world$iso_a3
+##
+
+un_hh_world <- merge(x=un_hh_iso, y=world, all.x = TRUE)
+un_hh_world <- un_hh_world %>% dplyr:: select (1:4, 39) %>% 
+  mutate (hh_per_pop= `mean_hh`/`pop_est`)
+
+un_hh_world_summ <- un_hh_world %>% 
+  group_by(`un_subregion`) %>% 
+  summarise (hh_pop_reg= mean(`hh_per_pop`))
+
+un_hh_world_summ ## whyyyyyy is this not working 
+
 ```
 
 ## Model fitting (revisited)
@@ -155,13 +248,41 @@ NULL
 Create a new data frame that contains the variables required for fitting a model where the explanatory variables are log GDP, Gini index and household size. Drop any rows where there are missing values.
 
 ``` {r}
-NULL
+# merge UN hh size dataset w/ OWID Gini dataset (latest values for both)
+mod_1df <- merge (x=un_hh_iso, y=owid_gini_latest, by.x= "iso_code_l", by.y = "iso_code") %>% 
+  dplyr::select(1:7)
+
+# merge this dataset with world dataset to get GDP, total cases per million (outcome)
+mod_1df <- merge (x=mod_1df, y=world_with_cases, by.x="country", by.y = "name") 
+names (mod_1df)
+mod_1df <-mod_1df %>% dplyr::select (1:9,44)
+
+mod_1df <- mod_1df %>% mutate(log_gdp= log(`gdp_md_est`))
+
+mod_1df <- drop_na(mod_1df) ## only left with 16 SA countries if using the filtered & aggregated UN dataset
+
+
+## again with the filtered only (but this leaves in multiple obs per country)
+# merge UN hh size dataset w/ OWID Gini dataset (latest values for both)
+mod_1.1df <- merge (x=un_data_filt, y=owid_gini_latest, by.x= "iso_code_l", by.y = "iso_code") %>%dplyr::select(1:11)
+
+# merge this dataset with world dataset to get GDP, total cases per million (outcome)
+mod_1.1df <- merge (x=mod_1.1df, y=world_with_cases, by.x="Country or area", by.y = "name") 
+names (mod_1.1df)
+mod_1.1df <- mod_1.1df %>% dplyr::select (1:13,48)
+
+mod_1.1df <- mod_1.1df %>% mutate(log_gdp= log(`gdp_md_est`))
+
+mod_1.1df <- drop_na(mod_1.1df) ## only 20 total South/Central American countries this way?? 
+
+
 ```
 
 Fit the model described above.
 
 ``` {r}
-NULL
+mod_1.1 <- glm(data    = mod_1.1df, formula = `total_cases_per_million` ~ `log_gdp` + `Average household size (number of members)` + `3.0.Gini`,
+                family  = "poisson") 
 ```
 
 
