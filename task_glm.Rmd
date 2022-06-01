@@ -177,7 +177,7 @@ owid_gini_latest <- merge(x=gini_latest, y=owid_latest, by.x="country", by.y="lo
 Download the UN Population Division's data on [Household size and composition](https://www.un.org/development/desa/pd/data/household-size-and-composition) and read it in to R, ensuring you only read the rows and columns pertaining to average household size and the relevant data source. Hint: `readxl::read_xlsx()` allows you to specify a range.
 
 ``` {r}
-un_data <- readxl::read_xlsx ("/Users/meganverma/Desktop/R/Msc_project/un_hh.xlsx", sheet= 4, range= "A5:E819", col_names = TRUE)
+un_data <- readxl::read_xlsx ("data/un_hh.xlsx", sheet= 4, range= "A5:E819", col_names = TRUE)
 
 un_data
 ```
@@ -187,7 +187,7 @@ Make a new variable in this data frame that contains the three-letter ISO code, 
 ``` {r, eval = FALSE}
 library(countrycode)
 
-un_data$'ISO Code' <- as.factor(un_data$`ISO Code`)
+# un_data$'ISO Code' <- as.factor(un_data$`ISO Code`)
 un_data <- mutate(un_data, 
                iso_code_l = countrycode(sourcevar   = `ISO Code`, 
                                       origin      = 'iso3n',
@@ -198,7 +198,7 @@ un_data
 Filter the data frame to contain only the last non-missing value for each country. Hint: use `parse_number()` to convert from character to number, as the presence of `..` in a few cells in the data column makes it a character vector.
 
 ``` {r}
-un_data <- mutate (un_data, parse_number(`Average household size (number of members)`, na = c("", "NA")))
+un_data <- mutate (un_data, average_hh = parse_number(`Average household size (number of members)`, na = c("", "NA")))
 
 un_data
 
@@ -213,16 +213,17 @@ un_data_filt
 Summarise the data by country (`iso_code`) so that where there are multiple data sources with the same (latest) date, the resulting value is the average of the average household sizes.
 
 ``` {r}
-un_data_filt$`Average household size (number of members)` <- as.numeric(un_data_filt$`Average household size (number of members)`)
+#un_data_filt$`Average household size (number of members)` <- as.numeric(un_data_filt$`Average household size (number of members)`)
 
 un_hh_iso <- un_data_filt %>% 
   group_by(`iso_code_l`) %>% 
-  summarise (mean_hh= mean(`Average household size (number of members)`), na.rm = TRUE)
+  summarise (mean_hh= mean(average_hh, na.rm = TRUE))
 ```
 
 Make a visualisation showing average household size for each country. Ensure you have appropriate labels.
 
 ``` {r}
+# maybe a map?
 ggplot(un_hh_iso, aes(x=`iso_code_l`, y=`mean_hh`)) + 
   geom_point (size=2) + 
   xlab ("Country (ISO)") + 
@@ -243,13 +244,12 @@ names(world)
 world$iso_a3
 ##
 
-un_hh_world <- merge(x=un_hh_iso, y=world, all.x = TRUE)
-un_hh_world <- un_hh_world %>% dplyr:: select (1:4, 39) %>% 
-  mutate (hh_per_pop= `mean_hh`/`pop_est`)
+un_hh_world <- merge(x=un_hh_iso, y = world, all.x = TRUE) # i don't think all.x is what we want. i'd suggest making a new data frame containing geom, pop, isocode.
+un_hh_world <- un_hh_world %>% dplyr::select(iso_code_l, mean_hh, un_subregion, pop_est)
 
 un_hh_world_summ <- un_hh_world %>% 
   group_by(`un_subregion`) %>% 
-  summarise (hh_pop_reg= mean(`hh_per_pop`))
+  summarise (hh_pop_reg= weighted.mean(x = mean_hh, w = pop_est, na.rm = T))
 
 un_hh_world_summ ## whyyyyyy is this not working 
 
