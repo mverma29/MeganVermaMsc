@@ -122,7 +122,7 @@ ggplot(owid_latest, aes(y = total_cases_per_million,x = gdp_per_capita)) +
   geom_point (size=2) + 
   ylab ("Total Cases per Million") + 
   xlab ("GDP per capita ") +
-  scale_x_log10() +
+  scale_x_log10() + #log-log scale, looks like there may be a relationship 
   scale_y_log10() +
   geom_smooth(method = 'lm')
 ```
@@ -150,8 +150,7 @@ confint(case_glm)
 
 Is there an association between the log of GDP and a country's case numbers?
 
-<!-- i cant read it without epiDisplay-- is it an OR of 1.37?? -->
-<!-- if so, yes but can't see p-values  -->
+<!-- Epidisplay still broken but yes, for every 10-fold increase in GDP, there is a 3-fold increase in cases  -->
 
 ## Extracting Gini index from WDI
 
