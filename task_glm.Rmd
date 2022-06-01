@@ -179,7 +179,7 @@ owid_gini_latest <- merge(x=gini_latest, y=owid_latest,
 Download the UN Population Division's data on [Household size and composition](https://www.un.org/development/desa/pd/data/household-size-and-composition) and read it in to R, ensuring you only read the rows and columns pertaining to average household size and the relevant data source. Hint: `readxl::read_xlsx()` allows you to specify a range.
 
 ``` {r}
-un_data <- readxl::read_xlsx ("data/un_hh.xlsx", sheet= 4, range= "A5:E819", col_names = TRUE)
+un_data <- readxl::read_xlsx ("un_hh.xlsx", sheet= 4, range= "A5:E819", col_names = TRUE)
 
 un_data
 ```
