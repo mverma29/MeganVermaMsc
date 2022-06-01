@@ -29,7 +29,7 @@ library(tidyverse)
 We'll use the Our World in Data COVID-19 data set. Download the full data set [here](https://ourworldindata.org/covid-vaccinations) as a CSV file and save it in a new folder called `data` within the working directory of this R Markdown file. Load this data in.
 
 ``` {r}
-owid <- read_csv("/Users/meganverma/Desktop/R/Msc_project/owid_covid.csv") # replace NULL with file name
+owid <- read_csv("data/owid-covid-data.csv") # replace NULL with file name
 ```
 
 Filter the data so that we only have the rows with the most recent date in the data set.
@@ -68,11 +68,12 @@ ggplot(data = world) + geom_sf() + theme_void()
 Make a data frame consisting of the `iso_code` and total cases per million, then merge it with the `world` data frame. You'll need to make sure you tell whatever merge/join function you use which column in each data frame contains the country code to merge on.
 
 ``` {r}
-iso_cases <- tibble(owid_latest$iso_code, owid_latest$total_cases_per_million) 
-world_with_cases <- merge (x=iso_cases, y=world, by.x= "owid_latest$iso_code", by.y = "iso_a3")
+iso_cases <- tibble(iso_code = owid_latest$iso_code, 
+                    total_cases_per_million = owid_latest$total_cases_per_million) 
 
-world_with_cases <- rename (world_with_cases, iso_code ="owid_latest$iso_code" )
-world_with_cases <- rename (world_with_cases, total_cases_per_million ="owid_latest$total_cases_per_million" )
+world_with_cases <- merge (x=iso_cases, y=world, 
+                           by.x = "iso_code", 
+                           by.y = "iso_a3")
 
 ```
 
