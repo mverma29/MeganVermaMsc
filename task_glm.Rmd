@@ -9,7 +9,7 @@ bibliography: "MeganVerma.bib"
 biblio-style: "chicago"
 link-citations: true
 ---
-<!-- hello -->
+
 ``` {r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 ```
@@ -29,7 +29,7 @@ library(tidyverse)
 We'll use the Our World in Data COVID-19 data set. Download the full data set [here](https://ourworldindata.org/covid-vaccinations) as a CSV file and save it in a new folder called `data` within the working directory of this R Markdown file. Load this data in.
 
 ``` {r}
-owid <- read_csv("data/owid-covid-data.csv") # replace NULL with file name
+owid <- read_csv("owid_covid.csv") # replace NULL with file name
 ```
 
 Filter the data so that we only have the rows with the most recent date in the data set.
@@ -85,33 +85,33 @@ library ("maps")
 
 st_crs(world_with_cases$geometry) #CRS is WGS84 
 
-ggplot(data = world_with_cases$geometry) +  #world map geometry (polygons)
-  geom_sf(aes(fill= world_with_cases$total_cases_per_million)) + #color map w/ cont. values of total cases
+ggplot(data = world_with_cases) +  
+  geom_sf(aes(geometry= geometry, #world map geometry (polygons)
+              fill=total_cases_per_million)) + #color map w/ cont. values of total cases
   scale_fill_gradient(low="yellow", high="red") + #set color fill 
   theme_bw() #theme of dark text on light background 
 
-# diff fill
-ggplot(data = world_with_cases$geometry) +  #world map geometry (polygons)
-  geom_sf(aes(fill= world_with_cases$total_cases_per_million)) + #color map w/ cont. values of total cases
-  scale_fill_distiller(palette= "YlGnBu") + #set color fill 
-  theme_bw() #theme of dark text on light background 
-  
+# # diff fill
+# ggplot(data = world_with_cases$geometry) +  #world map geometry (polygons)
+#   geom_sf(aes(fill= world_with_cases$total_cases_per_million)) + #color map w/ cont. values of total cases
+#   scale_fill_distiller(palette= "YlGnBu") + #set color fill 
+#   theme_bw() #theme of dark text on light background 
+
 
 
 # try transforming cases variable to improve contrast 
 world_with_cases <- world_with_cases %>% 
-  mutate(log_total_cases= log(total_cases_per_million))
+  mutate(log_total_cases= log10(total_cases_per_million))
 
 names (world_with_cases)
 
 # plot this 
 ggplot(data = mutate(world_with_cases,
-                     log_total_cases = ifelse(iso_code == "PRK", NA, log_total_cases))) +  #world map geometry (polygons)
-  geom_sf(aes(geometry = geometry, 
-              fill     = log_total_cases)) + #color map w/ cont. values of LOG total cases
+                     log_total_cases = ifelse(iso_code == "PRK", NA, log_total_cases))) + geom_sf(aes(geometry = geometry, #world map geometry (polygons)
+              fill     = log_total_cases)) + #color map w/ cont. values of LOG total cases (except N Korea)
   scale_fill_gradient(low="yellow", high="red") + #set color fill 
   theme_bw() #theme of dark text on light background 
-## contrast is not better 
+## contrast is much better 
 
 ```
 
