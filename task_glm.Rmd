@@ -105,8 +105,10 @@ world_with_cases <- world_with_cases %>%
 names (world_with_cases)
 
 # plot this 
-ggplot(data = world_with_cases$geometry) +  #world map geometry (polygons)
-  geom_sf(aes(fill= world_with_cases$log_total_cases)) + #color map w/ cont. values of LOG total cases
+ggplot(data = mutate(world_with_cases,
+                     log_total_cases = ifelse(iso_code == "PRK", NA, log_total_cases))) +  #world map geometry (polygons)
+  geom_sf(aes(geometry = geometry, 
+              fill     = log_total_cases)) + #color map w/ cont. values of LOG total cases
   scale_fill_gradient(low="yellow", high="red") + #set color fill 
   theme_bw() #theme of dark text on light background 
 ## contrast is not better 
