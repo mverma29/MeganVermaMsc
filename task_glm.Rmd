@@ -226,10 +226,16 @@ Make a visualisation showing average household size for each country. Ensure you
 
 ``` {r}
 # maybe a map?
-ggplot(un_hh_iso, aes(x=`iso_code_l`, y=`mean_hh`)) + 
-  geom_point (size=2) + 
-  xlab ("Country (ISO)") + 
-  ylab ("Average household size")
+# plot this on map 
+# first merge datasets to get geometry from world
+un_hh_iso_plot <- merge (x=un_hh_iso, y=world, by.x="iso_code_l", by.y="iso_a3") 
+
+ggplot(data = un_hh_iso_plot) + 
+  geom_sf(aes(geometry = geometry, #world map geometry (polygons)
+              fill     = mean_hh)) + #color map w/ cont. values mean hh size (except N Korea)
+  scale_fill_gradient(low="yellow", high="red") + #set color fill 
+  theme_bw() #theme of dark text on light background 
+
 ```
 
 There appear to be spatial trends. Using `countrycode()`, convert to either a UN subregion or World Bank region scheme and calculate the average household size, weighting for national population.
