@@ -169,7 +169,9 @@ gini_latest <- WDI(country="all", indicator= "SI.POV.GINI", latest=1, language =
 Merge this new object with the data frame you used to fit the model. Ensure that you use a merge which doesn't drop rows where there is no Gini index data.
 
 ```{r}
-owid_gini_latest <- merge(x=gini_latest, y=owid_latest, by.x="country", by.y="location", all.y = TRUE)
+# i'd probably merge on iso_codes rather than names
+owid_gini_latest <- merge(x=gini_latest, y=owid_latest,
+                          by.x="country", by.y="location", all.y = TRUE)
 ```
 
 ## Incorporating household data from UN
