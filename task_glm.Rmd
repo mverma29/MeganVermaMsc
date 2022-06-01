@@ -161,9 +161,9 @@ Make a new object that contains the latest value of the Gini index variable. You
 
 ``` {r}
 library(WDI)
-WDIsearch(string = "gini") # Gini coeff indicator is called "3.0.Gini"
+WDIsearch(string = "gini") # Gini coeff indicator is called "SI.POV.GINI"
 
-gini_latest <- WDI(country="all", indicator= "3.0.Gini", latest=1, language = "en")
+gini_latest <- WDI(country="all", indicator= "SI.POV.GINI", latest=1, language = "en")
 ```
 
 Merge this new object with the data frame you used to fit the model. Ensure that you use a merge which doesn't drop rows where there is no Gini index data.
