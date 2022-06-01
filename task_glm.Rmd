@@ -134,18 +134,24 @@ Fit a logistic GLM of the total number of cases (not per million) as a function 
 ``` {r}
 library (epiDisplay)
 
+owid_latest <- mutate(owid_latest, log10gdp = log10(gdp_per_capita))
+
 case_glm <- glm(data    = owid_latest,
-                formula = cbind(total_cases, owid_latest$population - total_cases) ~ log(gdp_per_capita),
+                formula = cbind(total_cases, population - total_cases) ~ log10gdp,
                 family  = "binomial")
 
 
 
-epiDisplay::logistic.display(case_glm)
+epiDisplay::logistic.display(case_glm) # currently broken
+
+confint(case_glm)
+
 ``` 
 
 Is there an association between the log of GDP and a country's case numbers?
-# i cant read it without epiDisplay-- is it an OR of 1.37??
-# if so, yes but can't see p-values 
+
+<!-- i cant read it without epiDisplay-- is it an OR of 1.37?? -->
+<!-- if so, yes but can't see p-values  -->
 
 ## Extracting Gini index from WDI
 
