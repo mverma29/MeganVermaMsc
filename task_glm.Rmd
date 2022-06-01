@@ -169,6 +169,7 @@ Merge this new object with the data frame you used to fit the model. Ensure that
 
 ```{r}
 # i'd probably merge on iso_codes rather than names
+# iso code for WDI-derived dataset is only 2-letter code, while it's only a 3-letter code for OWID dataset 
 owid_gini_latest <- merge(x=gini_latest, y=owid_latest,
                           by.x="country", by.y="location", all.y = TRUE)
 ```
