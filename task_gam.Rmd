@@ -1,0 +1,54 @@
+---
+title: "GAM task"
+author: "Sam Clifford and Megan Verma"
+date: "07/06/2022"
+output: 
+  html_document:
+      citation_package: natbib
+bibliography: "MeganVerma.bib"
+biblio-style: "chicago"
+link-citations: true
+---
+
+``` {r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+## Introduction
+
+This R Markdown document is designed to get you used to working with the type of data that we'll need to do the modelling in the MSc project itself. Clone the repository and make sure you commit changes regularly.
+
+## Loading packages
+
+``` {r, eval = TRUE}
+library(tidyverse)
+library(mgcv)
+```
+
+## Data preparation
+
+Load the data that you used to fit the GLM models in the previous task. Ensure that you have a data frame containing the Gini coefficient, UN subregion, cases per million, population, average household size, and GDP per capita.
+
+## Modelling with splines
+
+Splines are a member of the class of functions called 'scatterplot smoothers'. They provide a way to estimate the association between an outcome variable and an explanatory variable without specifying what the form of the function will be (e.g. linear, polynomial, sinusoidal) which improves flexibility but at the cost of direct interpretability [@gamair]. 
+
+The mgcv package in R provides a way to fit Generalised Additive Models, an extension to GLMs where we replace the linear terms in the model with scatterplot smoothers. The model fitting syntax of mgcv's `gam()` function is based on `glm()` but the formula uses `s(x, ...)` to represent a smooth function of `x` rather than just a linear function of it, e.g.
+
+``` {r, eval=FALSE}
+
+gam(data = my_data, y ~ s(x))
+
+```
+
+## Fitting a model
+
+In the previous GLM task we fit a Binomial regression model where the explanatory variable was the log of per capita GDP, a linear effect of log-GDP. Replace the linear effect of log-GDP with a smooth function of log-GDP.
+
+``` {r}
+NULL
+```
+
+## References
+
+
