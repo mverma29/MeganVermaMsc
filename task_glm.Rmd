@@ -275,12 +275,12 @@ Create a new data frame that contains the variables required for fitting a model
 ``` {r}
 # merge UN hh size dataset w/ OWID Gini dataset (latest values for both)
 mod_1df <- merge (x=un_hh_iso, y=owid_gini_latest, by.x= "iso_code_l", by.y = "iso_code") %>% 
-  dplyr::select(1:7)
+  dplyr::select(1:7) # use names, not numbers, in case the input data changes
 
 # merge this dataset with world dataset to get GDP, total cases per million (outcome)
 mod_1df <- merge (x=mod_1df, y=world_with_cases, by.x="country", by.y = "name") 
 names (mod_1df)
-mod_1df <-mod_1df %>% dplyr::select (1:9,44)
+mod_1df <-mod_1df %>% dplyr::select (1:9,44) # use names, not numbers, in case the input data changes
 
 mod_1df <- mod_1df %>% mutate(log_gdp= log(`gdp_md_est`))
 
@@ -289,12 +289,14 @@ mod_1df <- drop_na(mod_1df) ## only left with 16 SA countries if using the filte
 
 ## again with the filtered only (but this leaves in multiple obs per country)
 # merge UN hh size dataset w/ OWID Gini dataset (latest values for both)
-mod_1.1df <- merge (x=un_data_filt, y=owid_gini_latest, by.x= "iso_code_l", by.y = "iso_code") %>%dplyr::select(1:11)
+mod_1.1df <- merge(x=un_data_filt, y=owid_gini_latest,
+                    by.x= "iso_code_l", by.y = "iso_code") %>%
+  dplyr::select(1:11) # use names, not numbers, in case the input data changes
 
 # merge this dataset with world dataset to get GDP, total cases per million (outcome)
 mod_1.1df <- merge (x=mod_1.1df, y=world_with_cases, by.x="Country or area", by.y = "name") 
 names (mod_1.1df)
-mod_1.1df <- mod_1.1df %>% dplyr::select (1:13,48)
+mod_1.1df <- mod_1.1df %>% dplyr::select (1:13,48) # use names, not numbers, in case the input data changes
 
 mod_1.1df <- mod_1.1df %>% mutate(log_gdp= log(`gdp_md_est`))
 
