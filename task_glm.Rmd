@@ -80,8 +80,8 @@ world_with_cases <- merge (x=iso_cases, y=world,
 Plot the world map, filling each country by the total cases per million. You may need to transform the cases variable to improve the contrast in the plot.
 
 ``` {r}
-library ("sf")
-library ("maps")
+library(sf)
+library(maps)
 
 st_crs(world_with_cases$geometry) #CRS is WGS84 
 
