@@ -132,7 +132,10 @@ ggplot(owid_latest, aes(y = total_cases_per_million,x = gdp_per_capita)) +
 Fit a logistic GLM of the total number of cases (not per million) as a function of the log of GDP. As each country has a different population, we'll need to ensure that we use the estimated population as though it was a number of "trials", $n$, and the number of cases as a number of "successes", $y$, in our GLM. This is done by specifying the left hand side of the regression formula as `cbind(y, n-y)` with appropriate variable names in place of `n` and `y`.
 
 ``` {r}
-library (epiDisplay)
+library(epiDisplay)
+library(conflicted)
+conflict_prefer('select', 'dplyr')
+
 
 owid_latest <- mutate(owid_latest, log10gdp = log10(gdp_per_capita))
 
