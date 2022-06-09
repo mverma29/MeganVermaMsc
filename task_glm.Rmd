@@ -283,7 +283,7 @@ names(world)
 world$iso_a3
 ##
 
-un_hh_world <- merge(x=un_hh_iso, y = world) # i don't think all.x is what we want. i'd suggest making a new data frame containing geom, pop, isocode, mean cases.
+un_hh_world <- merge(x=un_hh_iso, y = world, by.x = "iso_code_l", by.y = "iso_a3") 
 un_hh_world <- un_hh_world %>% dplyr::select(iso_code_l, mean_hh, un_subregion, pop_est)
 # unsure why we have so many obs
 
@@ -292,7 +292,7 @@ un_hh_world_summ <- un_hh_world %>%
   group_by(`un_subregion`) %>% 
   summarise (hh_pop_reg= weighted.mean(x = mean_hh, w = pop_est, na.rm = T))
 
-un_hh_world_summ  # still broken
+un_hh_world_summ  # no longer broken
 
 ```
 
