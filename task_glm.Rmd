@@ -338,6 +338,10 @@ Fit a model that also includes the subregion variable derived through `countryco
 NULL
 ```
 
+## Tidying up
+
+It may be worth saving the data object at this point as it will be reused in different models. Give it a meaningful name so that it's clear what's in it and maybe when it was created (see Data Management in @goodenough).
+
 ## References
 
 
