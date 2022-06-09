@@ -212,7 +212,7 @@ owid_gini_latest <- merge(x=gini_latest, y=owid_latest,
 Download the UN Population Division's data on [Household size and composition](https://www.un.org/development/desa/pd/data/household-size-and-composition) and read it in to R, ensuring you only read the rows and columns pertaining to average household size and the relevant data source. Hint: `readxl::read_xlsx()` allows you to specify a range.
 
 ``` {r}
-un_data <- readxl::read_xlsx ("un_hh.xlsx", sheet= 4, range= "A5:E819", col_names = TRUE)
+un_data <- readxl::read_xlsx("un_hh.xlsx", sheet= 4, range= "A5:E819", col_names = TRUE)
 
 un_data
 ```
@@ -233,9 +233,7 @@ un_data
 Filter the data frame to contain only the last non-missing value for each country. Hint: use `parse_number()` to convert from character to number, as the presence of `..` in a few cells in the data column makes it a character vector.
 
 ``` {r}
-un_data <- mutate (un_data, average_hh = parse_number(`Average household size (number of members)`, na = c("", "NA")))
-
-un_data
+un_data <- mutate(un_data, average_hh = parse_number(`Average household size (number of members)`, na = c("", "NA")))
 
 un_data_filt <- un_data %>% 
   group_by(`Country or area`) %>% 
@@ -245,14 +243,14 @@ un_data_filt <- un_data %>%
 un_data_filt
 ```
 
-Summarise the data by country (`iso_code`) so that where there are multiple data sources with the same (latest) date, the resulting value is the average of the average household sizes.
+Summarise the data by country (ISO code) so that where there are multiple data sources with the same (latest) date, the resulting value is the average of the average household sizes.
 
 ``` {r}
 #un_data_filt$`Average household size (number of members)` <- as.numeric(un_data_filt$`Average household size (number of members)`)
 
 un_hh_iso <- un_data_filt %>% 
   group_by(`iso_code_l`) %>% 
-  summarise (mean_hh= mean(average_hh, na.rm = TRUE))
+  summarise(mean_hh = mean(average_hh, na.rm = TRUE))
 ```
 
 Make a visualisation showing average household size for each country. Ensure you have appropriate labels.
@@ -261,7 +259,7 @@ Make a visualisation showing average household size for each country. Ensure you
 # maybe a map?
 # plot this on map 
 # first merge datasets to get geometry from world
-un_hh_iso_plot <- merge (x=un_hh_iso, y=world, by.x="iso_code_l", by.y="iso_a3") 
+un_hh_iso_plot <- merge(x=un_hh_iso, y=world, by.x="iso_code_l", by.y="iso_a3") 
 
 ggplot(data = un_hh_iso_plot) + 
   geom_sf(aes(geometry = geometry, #world map geometry (polygons)
