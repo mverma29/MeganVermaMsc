@@ -151,6 +151,9 @@ Fit a logistic GLM of the total number of cases (not per million) as a function 
 library(epiDisplay)
 library(conflicted)
 conflict_prefer('select', 'dplyr')
+conflict_prefer('filter', 'dplyr')
+conflict_prefer('alpha', 'ggplot2')
+conflict_prefer('multinom', 'mgcv')
 
 
 owid_latest <- mutate(owid_latest, log10gdp = log10(gdp_per_capita))
