@@ -162,13 +162,24 @@ case_glm <- glm(data    = owid_latest,
                 formula = cbind(total_cases, population - total_cases) ~ log10gdp,
                 family  = "binomial")
 
+case_glm <- glm(data    = owid_latest %>% mutate(p = total_cases/population),
+                formula = p ~ log10gdp,
+                family  = "binomial", weights = population)
 
 
-epiDisplay::logistic.display(case_glm) # currently broken
+# fixed by passing in data as (p,N) rather than (y, N-y)
+epiDisplay::logistic.display(case_glm)
 
 confint(case_glm)
 
 ``` 
+
+Alternatively, we can get a tidy data frame of the confidence intervals (and more)
+
+``` {r}
+library(broom)
+tidy(case_glm, conf.int = T)
+```
 
 Is there an association between the log of GDP and a country's case numbers?
 
