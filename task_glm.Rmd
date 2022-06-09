@@ -103,28 +103,44 @@ ggplot(data = world_with_cases) +
 world_with_cases <- world_with_cases %>% 
   mutate(log_total_cases= log10(total_cases_per_million))
 
-names (world_with_cases)
+names(world_with_cases)
 
 # plot this 
 ggplot(data = mutate(world_with_cases,
                      log_total_cases = ifelse(iso_code == "PRK", NA, log_total_cases))) + geom_sf(aes(geometry = geometry, #world map geometry (polygons)
               fill     = log_total_cases)) + #color map w/ cont. values of LOG total cases (except N Korea)
-  scale_fill_gradient(low="yellow", high="red") + #set color fill 
+  scale_fill_gradient(low="yellow", high="red", name = 'log10 cases\nper million') + #set color fill 
   theme_bw() #theme of dark text on light background 
 ## contrast is much better 
 
+## another alternative is to transform the colour scale
+mutate(world_with_cases,
+       total_cases_per_million = ifelse(iso_code == "PRK", NA, total_cases_per_million)) %>%
+  
+  ggplot(data = .) + 
+  geom_sf(aes(geometry = geometry, #world map geometry (polygons)
+              fill     = total_cases_per_million)) + #color map w/ cont. values of LOG total cases (except N Korea)
+  scale_fill_gradient(low="yellow", high="red",
+                      name = 'Cases per\nmillion', 
+                      trans = 'log10') + #set color fill 
+  theme_bw() #theme of dark text on light background 
+
 ```
+
+
 
 Make a scatter plot of the cases per million and per capita gross domestic product.
 
 ``` {r}
 ggplot(owid_latest, aes(y = total_cases_per_million,x = gdp_per_capita)) + 
-  geom_point (size=2) + 
-  ylab ("Total Cases per Million") + 
-  xlab ("GDP per capita ") +
-  scale_x_log10() + #log-log scale, looks like there may be a relationship 
-  scale_y_log10() +
-  geom_smooth(method = 'lm')
+    geom_point(size=2) + 
+    ylab("Total Cases per Million") + 
+    xlab("GDP per capita ") +
+    scale_x_log10() + #log-log scale, looks like there may be a relationship 
+    scale_y_log10() +
+    geom_smooth(method = 'lm') +
+    geom_text(data = filter(owid_latest, iso_code == "MAC"), 
+              aes(label = iso_code), hjust = 1, vjust = -1)
 ```
 
 ## Model fitting
