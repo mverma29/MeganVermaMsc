@@ -141,7 +141,7 @@ Calculate the AIC for all four of the models. Which model is preferred?
 NULL
 ```
 
-Using functional programming in the purrr we can simplify the calculation a little if you want.
+Using functional programming in the purrr package we can simplify the calculation a little if you want, reducing the number of times we copy-paste the same code.
 
 ``` {r}
 list(`log-GDP`           = NULL, # replace NULL with model object name
@@ -152,6 +152,7 @@ list(`log-GDP`           = NULL, # replace NULL with model object name
   dplyr::select(Model, logLik, df, AIC)
 ```
 
+The above code says 'make a list of models' and then 'apply the `glance()` function to everything in the list', returning the results as a data frame with a column called `Model` that contains the names from the list, and then 'select only these columns'.
 
 ## References
 
