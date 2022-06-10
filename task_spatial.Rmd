@@ -1,0 +1,55 @@
+---
+title: "Spatial task"
+author: "Sam Clifford and Megan Verma"
+date: "09/06/2022"
+output: 
+  html_document:
+      citation_package: natbib
+bibliography: "MeganVerma.bib"
+biblio-style: "chicago"
+link-citations: true
+---
+
+``` {r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+## Introduction
+
+This R Markdown document is designed to get you used to working with the type of data that we'll need to do the modelling in the MSc project itself. Clone the repository and make sure you commit changes regularly.
+
+## Loading packages
+
+``` {r, eval = TRUE}
+library(tidyverse)
+library(mgcv)
+library(sf)
+```
+
+## Data preparation
+
+Load the data that you used to fit the GLM models in the previous task. Ensure that you have a data frame containing the Gini coefficient, UN subregion, cases per million, population, average household size, and GDP per capita.
+
+## Spatial modelling
+
+The type of spatial modelling we will do here is an extension to GLMs that fit into the GAM framework. We can think of spatial models as a Generalised Linear Mixed effects Model (GLMM) with structure on the random effects. For example, a simple spatial model that looks at the average value of some outcome within regions (indexed $j$) based on repeat measurements (indexed $i$) but assumes that each region's average value is independent of the values in other countries may be written
+
+$$
+g^{-1}\left(\mathbb{E}\left[y_{ij}\right]\right) = \beta_0 + u_j
+$$
+where the $\boldsymbol{u}$ are independent and identically distributed $\boldsymbol{u} \sim \mathcal{N}\left( \boldsymbol{0}, \sigma^2 I \right)$.
+
+We can encode spatial information in our assumption about the covariance of $\boldsymbol{u}$, that is, how related $u_k$ and $u_l$ are with a variance-covariance matrix, $\Sigma$ where $\Sigma_{kl}$ describes the covariance between $u_k$ and $u_l$. This is the basic idea behind how kriging works, where the covariance is usually a function of the distance between locations (at least within a Gaussian Process framework), but we are working with discrete space here so must define the relationship slightly differently. The general form of a GLMM is 
+
+$$
+g^{-1}\left(\mathbb{E}\left[\boldsymbol{y}\right]\right) = X \boldsymbol{\beta} + Z \boldsymbol{u}
+$$
+and in our spatial example we are assuming that the elements of $Z$, $z_{ij}$, are 1 if the corresponding observation is in location $j$ and 0 otherwise. Our spatial random effect values, $\boldsymbol{u}$, are therefore distributed $\boldsymbol{u} \sim \mathcal{N}\left( \boldsymbol{0}, \Sigma\right)$.
+
+One of the simplest ways to approach this is the Conditional Autoregressive (CAR) model which assumes that two regions are neighbours if their polygons share either an edge or a vertex. The value of $\Sigma$ is such that $\Sigma^{-1} = Q = \tau R$ and $R_{kl} = 1$ if regions $k$ and $l$ share an edge and/or vertex, otherwise $R_{kl} = 0$. The value of $\tau$ describes how strong the spatial correlation is, and is estimated from the data. So for our spatial models, we will use a map of the world, extract information about neighbourhood structure and pass that information to `gam()` in order to fit our spatial random effect.
+
+At this point, you should read over the notes on [Areal modelling](https://isair2021.netlify.app/04_models/models/) from the 2021 offering of the ISAIR course.
+
+## References
+
+
