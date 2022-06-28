@@ -29,7 +29,7 @@ library(tidyverse)
 We'll use the Our World in Data COVID-19 data set. Download the full data set [here](https://ourworldindata.org/covid-vaccinations) as a CSV file and save it in a new folder called `data` within the working directory of this R Markdown file. Load this data in.
 
 ``` {r}
-owid <- read_csv("owid_covid.csv") # replace NULL with file name
+owid <- read_csv("data/owid_covid.csv") # replace NULL with file name
 ```
 
 Filter the data so that we only have the rows with the most recent date in the data set.
@@ -168,7 +168,7 @@ case_glm <- glm(data    = owid_latest %>% mutate(p = total_cases/population),
 
 
 # fixed by passing in data as (p,N) rather than (y, N-y)
-epiDisplay::logistic.display(case_glm)
+epiDisplay::logistic.display(case_glm) #why is this an OR of 23.45?
 
 confint(case_glm)
 
@@ -183,7 +183,7 @@ tidy(case_glm, conf.int = T)
 
 Is there an association between the log of GDP and a country's case numbers?
 
-<!-- Epidisplay still broken but yes, for every 10-fold increase in GDP, there is a 3-fold increase in cases  -->
+<!-- yes, for every 10-fold increase in GDP, there is a ~3-fold increase in cases  -->
 
 ## Extracting Gini index from WDI
 
@@ -212,7 +212,7 @@ owid_gini_latest <- merge(x=gini_latest, y=owid_latest,
 Download the UN Population Division's data on [Household size and composition](https://www.un.org/development/desa/pd/data/household-size-and-composition) and read it in to R, ensuring you only read the rows and columns pertaining to average household size and the relevant data source. Hint: `readxl::read_xlsx()` allows you to specify a range.
 
 ``` {r}
-un_data <- readxl::read_xlsx("un_hh.xlsx", sheet= 4, range= "A5:E819", col_names = TRUE)
+un_data <- readxl::read_xlsx("data/un_hh.xlsx", sheet= 4, range= "A5:E819", col_names = TRUE)
 
 un_data
 ```
