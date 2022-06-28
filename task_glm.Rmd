@@ -238,7 +238,7 @@ un_data <- mutate(un_data, average_hh = parse_number(`Average household size (nu
 un_data_filt <- un_data %>% 
   group_by(`Country or area`) %>% 
    mutate(refdate = as.Date(`Reference date (dd/mm/yyyy)`, format= "%d/%m/%y"))%>% 
-  filter(refdate==max(refdate))
+  filter(refdate==max(refdate)) #lost 3 countries
 
 un_data_filt
 ```
@@ -250,7 +250,7 @@ Summarise the data by country (ISO code) so that where there are multiple data s
 
 un_hh_iso <- un_data_filt %>% 
   group_by(`iso_code_l`) %>% 
-  summarise(mean_hh = mean(average_hh, na.rm = TRUE))
+  summarise(mean_hh = mean(average_hh, na.rm = TRUE)) #lost 40 countries?? 
 ```
 
 Make a visualisation showing average household size for each country. Ensure you have appropriate labels.
@@ -259,7 +259,7 @@ Make a visualisation showing average household size for each country. Ensure you
 # maybe a map?
 # plot this on map 
 # first merge datasets to get geometry from world
-un_hh_iso_plot <- merge(x=un_hh_iso, y=world, by.x="iso_code_l", by.y="iso_a3") 
+un_hh_iso_plot <- merge(x=un_hh_iso, y=world, by.x="iso_code_l", by.y="iso_a3") #lost 6 countries
 
 ggplot(data = un_hh_iso_plot) + 
   geom_sf(aes(geometry = geometry, #world map geometry (polygons)
@@ -285,7 +285,7 @@ world$iso_a3
 
 un_hh_world <- merge(x=un_hh_iso, y = world, by.x = "iso_code_l", by.y = "iso_a3") 
 un_hh_world <- un_hh_world %>% dplyr::select(iso_code_l, mean_hh, un_subregion, pop_est)
-# unsure why we have so many obs
+# still missing those 6 countries (166 total)
 
 
 un_hh_world_summ <- un_hh_world %>% 
