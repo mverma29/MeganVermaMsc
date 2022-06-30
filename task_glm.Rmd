@@ -355,7 +355,8 @@ tidy(mod_1.1, conf.int = T)
 
 Does the addition of average household size improve model fit substantially? What makes you say so?
 ```{r}
-# it changes the estimates drastically, but p values seem similar (? no decimals?) and conf int are similarly tight so not sure 
+# it changes the estimates drastically, but p values seem similar (? no decimals?) and conf int are similarly tight so not sure how to determine this 
+
 ```
 
 
@@ -367,7 +368,13 @@ What happens to the estimates of the effect of GDP and inequality when adding in
 Fit a model that also includes the subregion variable derived through `countrycode()` before. What happens to the effects of the other covariates when this spatial information is included?
 
 ``` {r}
-NULL
+mod_1.2 <- glm(data    = mod_1df,
+                formula = p ~ `log_gdp` + `SI.POV.GINI` + `mean_hh` + `un_subregion`, 
+                family  = "binomial", weights = pop_est)
+
+tidy(mod_1.2, conf.int = T) 
+
+# gini makes more sense (more unequal = more cases (not negative estimate)), gdp has a more pronounced effect (higher log gdp has fewer cases), hh size still doesn't make a lot of sense (increasing hh size= fewer cases) but this is less pronounced than before 
 ```
 
 ## Tidying up
