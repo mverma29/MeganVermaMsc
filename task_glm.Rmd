@@ -322,24 +322,42 @@ mod_1df <- drop_na(mod_1df, "mean_hh") ## down to 120 countries from 125
 Fit the model described above.
 
 ``` {r}
-mod_1 <- glm(data    = mod_1df, formula = `total_cases_per_million` ~ `log_gdp` + `mean_hh` + `SI.POV.GINI`,
-                family  = "binomial") 
+
+mod_1df <- mod_1df %>% mutate (p= total_cases_per_million/pop_est)
+
+summary(mod_1df$p)
+which.max(mod_1df$p) #cyprus (row 27) has over 100% (but this is cases per million/pop- not actually over a 100% cases)
+mod_1df <- mod_1df[-c(27), ] #drop cyprus from analysis for now 
+
+mod_1 <- glm(data    = mod_1df,
+                formula = p ~ `log_gdp` + `mean_hh` + `SI.POV.GINI`,
+                family  = "binomial", weights = pop_est)
+
+tidy(mod_1, conf.int = T) 
+
 ```
 
 
 Re-fit the earlier model that contains log GDP and Gini index using the new data set you just generated.
 
 ``` {r}
-NULL
+
+mod_1.1 <- glm(data    = mod_1df,
+                formula = p ~ `log_gdp` + `SI.POV.GINI`,
+                family  = "binomial", weights = pop_est)
+
+tidy(mod_1.1, conf.int = T) 
+
 ```
 
-``` {r}
-NULL
-```
 
 ## Model comparison
 
 Does the addition of average household size improve model fit substantially? What makes you say so?
+```{r}
+# it changes the estimates drastically, but p values seem similar (? no decimals?) and conf int are similarly tight so not sure 
+```
+
 
 What happens to the estimates of the effect of GDP and inequality when adding in household size?
 
