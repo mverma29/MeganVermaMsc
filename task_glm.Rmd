@@ -28,19 +28,19 @@ library(tidyverse)
 
 We'll use the Our World in Data COVID-19 data set. Download the full data set [here](https://ourworldindata.org/covid-vaccinations) as a CSV file and save it in a new folder called `data` within the working directory of this R Markdown file. Load this data in.
 
-``` {r}
-owid <- read_csv("data/owid_covid.csv") # replace NULL with file name
+``` {r, eval = TRUE}
+owid <- read_csv("data/owid_covid.csv")
 ```
 
 Filter the data so that we only have the rows with the most recent date in the data set.
 
-``` {r}
+``` {r, eval = TRUE}
 owid_latest <- filter(owid, date=="2022-05-29")
 ```
 
 We also want to make sure that we only have rows from real countries, rather than aggregated values. So we'll omit any rows that begin with "OWID" in the `iso_code` field. 
 
-``` {r, eval = FALSE}
+``` {r, eval = TRUE}
 owid_latest <- filter(owid_latest, !grepl(pattern = '^OWID', x = iso_code))
 ```
 
@@ -53,21 +53,26 @@ Using the rnaturalearth package, we'll make a map of the total COVID-19 cases pe
 ``` {r, eval = TRUE}
 library(rnaturalearth)
 library(rnaturalearthdata)
+
 ```
 
-``` {r}
+``` {r, eval = TRUE}
+
 world <- ne_countries(scale = "medium", returnclass = "sf")
+
 ```
 
 Plot the world map. If using ggplot2, `geom_sf()` will give you a plot of a simple features object (class `sf`).
 
-``` {r}
+``` {r, eval = TRUE}
+
 ggplot(data = world) + geom_sf() + theme_void()
+
 ```
 
 Make a data frame consisting of the `iso_code` and total cases per million, then merge it with the `world` data frame. You'll need to make sure you tell whatever merge/join function you use which column in each data frame contains the country code to merge on.
 
-``` {r}
+``` {r, eval = TRUE}
 iso_cases <- tibble(iso_code = owid_latest$iso_code, 
                     total_cases_per_million = owid_latest$total_cases_per_million) 
 
@@ -79,7 +84,7 @@ world_with_cases <- merge (x=iso_cases, y=world,
 
 Plot the world map, filling each country by the total cases per million. You may need to transform the cases variable to improve the contrast in the plot.
 
-``` {r}
+``` {r, eval = TRUE}
 library(sf)
 #library(maps)
 
@@ -131,7 +136,7 @@ mutate(world_with_cases,
 
 Make a scatter plot of the cases per million and per capita gross domestic product.
 
-``` {r}
+``` {r, eval = TRUE}
 ggplot(owid_latest, aes(y = total_cases_per_million,x = gdp_per_capita)) + 
     geom_point(size=2) + 
     ylab("Total Cases per Million") + 
@@ -147,7 +152,7 @@ ggplot(owid_latest, aes(y = total_cases_per_million,x = gdp_per_capita)) +
 
 Fit a logistic GLM of the total number of cases (not per million) as a function of the log of GDP. As each country has a different population, we'll need to ensure that we use the estimated population as though it was a number of "trials", $n$, and the number of cases as a number of "successes", $y$, in our GLM. This is done by specifying the left hand side of the regression formula as `cbind(y, n-y)` with appropriate variable names in place of `n` and `y`.
 
-``` {r}
+``` {r, eval = TRUE}
 library(epiDisplay)
 library(conflicted)
 conflict_prefer('select', 'dplyr')
@@ -176,7 +181,7 @@ confint(case_glm)
 
 Alternatively, we can get a tidy data frame of the confidence intervals (and more)
 
-``` {r}
+``` {r, eval = TRUE}
 library(broom)
 tidy(case_glm, conf.int = T)
 ```
@@ -191,7 +196,7 @@ Load the WDI R package and use the `WDIsearch()` function to figure out the vari
 
 Make a new object that contains the latest value of the Gini index variable. You may need to read the help file on `WDI()`.
 
-``` {r}
+``` {r, eval = TRUE}
 library(WDI)
 WDIsearch(string = "gini") # Gini coeff indicator is called "SI.POV.GINI"
 
@@ -200,7 +205,7 @@ gini_latest <- WDI(country="all", indicator= "SI.POV.GINI", latest=1, language =
 
 Merge this new object with the data frame you used to fit the model. Ensure that you use a merge which doesn't drop rows where there is no Gini index data.
 
-```{r}
+```{r, eval = TRUE}
 # i'd probably merge on iso_codes rather than names
 # iso code for WDI-derived dataset is only 2-letter code, while it's only a 3-letter code for OWID dataset 
 owid_gini_latest <- merge(x=gini_latest, y=owid_latest,
@@ -211,7 +216,7 @@ owid_gini_latest <- merge(x=gini_latest, y=owid_latest,
 
 Download the UN Population Division's data on [Household size and composition](https://www.un.org/development/desa/pd/data/household-size-and-composition) and read it in to R, ensuring you only read the rows and columns pertaining to average household size and the relevant data source. Hint: `readxl::read_xlsx()` allows you to specify a range.
 
-``` {r}
+``` {r, eval = TRUE}
 un_data <- readxl::read_xlsx("data/un_hh.xlsx", sheet= 4, range= "A5:E819", col_names = TRUE)
 
 un_data
@@ -219,7 +224,7 @@ un_data
 
 Make a new variable in this data frame that contains the three-letter ISO code, by converting from the numeric ISO code. Hint: the countrycode package has a function, `countrycode()`, which can do this.
 
-``` {r, eval = FALSE}
+``` {r, eval = TRUE}
 library(countrycode)
 
 # un_data$'ISO Code' <- as.factor(un_data$`ISO Code`)
@@ -232,7 +237,7 @@ un_data
 
 Filter the data frame to contain only the last non-missing value for each country. Hint: use `parse_number()` to convert from character to number, as the presence of `..` in a few cells in the data column makes it a character vector.
 
-``` {r}
+``` {r, eval = TRUE}
 un_data <- mutate(un_data, average_hh = parse_number(`Average household size (number of members)`, na = c("", "NA")))
 
 un_data_filt <- un_data %>% 
@@ -245,7 +250,7 @@ un_data_filt
 
 Summarise the data by country (ISO code) so that where there are multiple data sources with the same (latest) date, the resulting value is the average of the average household sizes.
 
-``` {r}
+``` {r, eval = TRUE}
 #un_data_filt$`Average household size (number of members)` <- as.numeric(un_data_filt$`Average household size (number of members)`)
 
 un_hh_iso <- un_data_filt %>% 
@@ -255,7 +260,7 @@ un_hh_iso <- un_data_filt %>%
 
 Make a visualisation showing average household size for each country. Ensure you have appropriate labels.
 
-``` {r}
+``` {r, eval = TRUE}
 # maybe a map?
 # plot this on map 
 # first merge datasets to get geometry from world
@@ -271,7 +276,7 @@ ggplot(data = un_hh_iso_plot) +
 
 There appear to be spatial trends. Using `countrycode()`, convert to either a UN subregion or World Bank region scheme and calculate the average household size, weighting for national population.
 
-``` {r}
+``` {r, eval = TRUE}
 un_hh_iso <- mutate(un_hh_iso, 
                un_subregion = countrycode(sourcevar   = `iso_code_l`, 
                                       origin      = 'iso3c',
@@ -300,7 +305,7 @@ un_hh_world_summ  # no longer broken
 
 Create a new data frame that contains the variables required for fitting a model where the explanatory variables are log GDP, Gini index and household size. Drop any rows where there are missing values for GDP, population, Gini index, or household size.
 
-``` {r}
+``` {r, eval = TRUE}
 # merge UN hh size dataset w/ OWID Gini dataset (latest values for both)
 mod_1df <- merge(x=un_hh_iso, y=owid_gini_latest, by.x= "iso_code_l", by.y = "iso_code") %>% 
   dplyr::select("iso_code_l","mean_hh","un_subregion","country","iso2c","SI.POV.GINI","year") 
@@ -321,7 +326,7 @@ mod_1df <- drop_na(mod_1df, "mean_hh") ## down to 120 countries from 125
 
 Fit the model described above.
 
-``` {r}
+``` {r, eval = TRUE}
 
 mod_1df <- mod_1df %>% mutate (p= total_cases_per_million/pop_est)
 
@@ -334,19 +339,21 @@ mod_1 <- glm(data    = mod_1df,
                 family  = "binomial", weights = pop_est)
 
 tidy(mod_1, conf.int = T) 
+glance(mod_1) #shows AIC, deviance, etc
 
 ```
 
 
 Re-fit the earlier model that contains log GDP and Gini index using the new data set you just generated.
 
-``` {r}
+``` {r, eval = TRUE}
 
 mod_1.1 <- glm(data    = mod_1df,
                 formula = p ~ `log_gdp` + `SI.POV.GINI`,
                 family  = "binomial", weights = pop_est)
 
 tidy(mod_1.1, conf.int = T) 
+glance(mod_1.1)
 
 ```
 
@@ -354,9 +361,9 @@ tidy(mod_1.1, conf.int = T)
 ## Model comparison
 
 Does the addition of average household size improve model fit substantially? What makes you say so?
-```{r}
-# it changes the estimates drastically, but p values seem similar (? no decimals?) and conf int are similarly tight so not sure how to determine this 
-
+```{r, eval = FALSE}
+# much larger AIC in the model without mean hh size, so the model that includes mean hh size is a better model 
+# only interested in AICs between models of the same data (only interested in the difference)
 ```
 
 
@@ -367,14 +374,52 @@ What happens to the estimates of the effect of GDP and inequality when adding in
 
 Fit a model that also includes the subregion variable derived through `countrycode()` before. What happens to the effects of the other covariates when this spatial information is included?
 
-``` {r}
+``` {r, eval = TRUE}
 mod_1.2 <- glm(data    = mod_1df,
                 formula = p ~ `log_gdp` + `SI.POV.GINI` + `mean_hh` + `un_subregion`, 
                 family  = "binomial", weights = pop_est)
 
 tidy(mod_1.2, conf.int = T) 
+glance(mod_1.2)
 
+
+# further reduction in AIC with this model
 # gini makes more sense (more unequal = more cases (not negative estimate)), gdp has a more pronounced effect (higher log gdp has fewer cases), hh size still doesn't make a lot of sense (increasing hh size= fewer cases) but this is less pronounced than before 
+
+# make a plot including each covariate from the 3 models to show how it changes between them; don't include spatial stuff (not un subregions) 
+
+# first make a dataframe with the 3 models
+tidy_mod1 <- tidy(mod_1)
+tidy_mod1.1 <- tidy(mod_1.1)
+tidy_mod1.2 <- tidy(mod_1.2)
+
+all_models_df <-  merge(x=tidy_mod1, y=tidy_mod1.1,
+                          by.x="term", by.y="term", all.x = TRUE)
+all_models_df <-  merge(x=all_models_df, y=tidy_mod1.2,
+                          by.x="term", by.y="term", all.x = TRUE)
+all_models_df <- all_models_df %>% rename(estimate_mod1= estimate.x, 
+                                          std.error_mod1= std.error.x,
+                                          statistic_mod1= statistic.x,
+                                          p.value_mod1= p.value.x, 
+                                          estimate_mod1.1= estimate.y, 
+                                          std.error_mod1.1= std.error.y,
+                                          statistic_mod1.1= statistic.y,
+                                          p.value_mod1.1= p.value.y,
+                                          estimate_mod1.2= estimate, 
+                                          std.error_mod1.2= std.error,
+                                          statistic_mod1.2= statistic,
+                                          p.value_mod1.2= p.value)
+all_models_df <- all_models_df[-c(1),]
+
+ggplot(all_models_df, aes(x= term)) + 
+    geom_point(aes(y = estimate_mod1), color="blue") +
+    geom_point(aes(y = estimate_mod1.1), color="green") + 
+    geom_point(aes(y = estimate_mod1.2), color="red") + 
+    xlab("Variables") + 
+    ylab("Coefficient Estimate") + 
+    ggtitle("Model Comparison") + 
+    theme(plot.title = element_text(hjust=0.5)) 
+    
 ```
 
 ## Tidying up
