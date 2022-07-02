@@ -5,6 +5,7 @@ date: "07/06/2022"
 output: 
   html_document:
       citation_package: natbib
+      keep_md: yes
 bibliography: "MeganVerma.bib"
 biblio-style: "chicago"
 link-citations: true
@@ -38,7 +39,7 @@ The mgcv package in R provides a way to fit Generalised Additive Models, an exte
 ``` {r, eval=TRUE}
 
 covid_data <- read_csv("/Users/meganverma/Desktop/git/MeganVermaMsc/data/glmcoviddata.csv")
-gam(data = covid_data, y ~ s(x)) # should i put in the full model from the glm task here? 
+# gam(data = covid_data, y ~ s(x)) # should i put in the full model from the glm task here? 
 
 ```
 
@@ -74,7 +75,6 @@ Look at the summary of each of the two models. Can you tell whether or not the G
 First, let's look at the fitted smooth function. This is quite an ugly plot using the base R plotting tools, but it's still informative.
 
 ``` {r, eval=TRUE}
-# from summary of models, smoothed function is better fit (smaller AIC)
 
 plot(gam_gdp_smooth)
 ```
@@ -84,10 +84,6 @@ On the left hand $y$ axis you should see something of the form `s(x, edf)` where
 Is your smooth function a straight line?
 
 <!-- If it is not, it can be useful to use ANOVA on the fitted models to determine whether the more complex model does indeed perform better.  -->
-
-```{r}
-#insert ANOVA here 
-```
 
 
 ## Model comparison
@@ -115,41 +111,63 @@ Using the `glance()` function from the broom package, extract the AIC for the GA
 
 ``` {r}
 library(broom)
-NULL
+glance(gam_gdp)
+glance(gam_gdp_smooth)
+
+anova(gam_gdp, gam_gdp_smooth)
 ```
 
 Which model is preferred?
+```{r}
+# smoothed function is better fit (smaller AIC)
+```
+
 
 Now fit a GAM that relates the number of cases to a smooth function of the Gini coefficient.
 
-``` {r}
-NULL
+``` {r, eval=TRUE}
+gam_gini_smooth <- gam(data    = covid_data,
+                formula = p ~ s(`SI.POV.GINI`),
+                family  = "binomial", weights = pop_est)
+summary(gam_gini_smooth)
+plot(gam_gini_smooth)
 ```
 
 Using the AIC, which model is preferred out of the Gini coefficient GAM and the log-GDP GAM?
 
-``` {r}
-NULL
+``` {r, eval=TRUE}
+glance(gam_gini_smooth)
+# log-GDP is preferred (smaller AIC)
 ```
 
 
 Fit a GAM that contains smooth functions of all of the following: the Gini coefficient, log-GDP, and average household size. Ensure that you also have models that contain each of these individually.
 
-``` {r}
-NULL
+``` {r, eval=TRUE}
+gam_full_smooth <- gam(data    = covid_data,
+                formula = p ~ s(`SI.POV.GINI`) + s(`log_gdp`) + s(`mean_hh`),
+                family  = "binomial", weights = pop_est)
+
+gam_mean_hh_smooth <- gam(data    = covid_data,
+                formula = p ~ s(`mean_hh`),
+                family  = "binomial", weights = pop_est)
+summary(gam_full_smooth)
 ```
 
 
 For each of the models with only one smooth function, plot the fitted smooth function. Save these graphs.
 
 ``` {r}
-NULL
+plot_gdp <- plot(gam_gdp_smooth) 
+plot_gini <- plot(gam_gini_smooth)
+plot_mean_hh <- plot(gam_mean_hh_smooth)
+
 ```
 
 Plot the fitted smooths for the model with all three covariates. NB: setting `pages = 1` makes sure that all the smooths are contained in the same image rather than being printed separately.
 
 ``` {r, eval = FALSE}
-plot(NULL, pages = 1)
+plot(gam_full_smooth, pages = 1)
 ```
 
 What happens to the each of the fitted smooths when you compare each of the individual covariate models to the combined model? Think of both the overall shape, and the effective degrees of freedom.
