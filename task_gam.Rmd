@@ -171,20 +171,30 @@ plot(gam_full_smooth, pages = 1)
 ```
 
 What happens to the each of the fitted smooths when you compare each of the individual covariate models to the combined model? Think of both the overall shape, and the effective degrees of freedom.
+```{r, eval= FALSE}
+# gini shape of model is much less curved (closer to a line), edf increases very slightly 
+# log gdp shape of model is much less curved (closer to a line), edf decreases very slightly
+# mean hh is a little curvier but has a more gradual decline, and less of a steep drop at the end (same edf)
+```
 
 Calculate the AIC for all four of the models. Which model is preferred?
 
 ``` {r}
-NULL
+glance(gam_full_smooth) 
+glance(gam_gdp_smooth)
+glance(gam_gini_smooth)
+glance(gam_mean_hh_smooth)
+
+# full model has a MUCH lower AIC -- preferred 
 ```
 
 Using functional programming in the purrr package we can simplify the calculation a little if you want, reducing the number of times we copy-paste the same code.
 
 ``` {r}
-list(`log-GDP`           = NULL, # replace NULL with model object name
-     `Gini`              = NULL,
-     `Average household` = NULL,
-     `Combined`          = NULL) %>%
+list(`log-GDP`           = gam_gdp_smooth, # replace NULL with model object name
+     `Gini`              = gam_gini_smooth,
+     `Average household` = gam_mean_hh_smooth,
+     `Combined`          = gam_full_smooth) %>%
   map_df(~glance(.x), .id = "Model") %>%
   dplyr::select(Model, logLik, df, AIC)
 ```
