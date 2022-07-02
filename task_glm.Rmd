@@ -201,6 +201,7 @@ library(WDI)
 WDIsearch(string = "gini") # Gini coeff indicator is called "SI.POV.GINI"
 
 gini_latest <- WDI(country="all", indicator= "SI.POV.GINI", latest=1, language = "en")
+
 ```
 
 Merge this new object with the data frame you used to fit the model. Ensure that you use a merge which doesn't drop rows where there is no Gini index data.
@@ -427,6 +428,12 @@ ggplot(all_models_df, aes(x= term)) +
 ## Tidying up
 
 It may be worth saving the data object at this point as it will be reused in different models. Give it a meaningful name so that it's clear what's in it and maybe when it was created (see Data Management in @goodenough).
+
+```{r, eval=FALSE}
+
+write_csv(mod_1df, "glmcoviddata.csv")
+
+```
 
 ## References
 
