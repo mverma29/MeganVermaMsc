@@ -35,9 +35,10 @@ Splines are a member of the class of functions called 'scatterplot smoothers'. T
 
 The mgcv package in R provides a way to fit Generalised Additive Models, an extension to GLMs where we replace the linear terms in the model with scatterplot smoothers. The model fitting syntax of mgcv's `gam()` function is based on `glm()` but the formula uses `s(x, ...)` to represent a smooth function of `x` rather than just a linear function of it, e.g.
 
-``` {r, eval=FALSE}
+``` {r, eval=TRUE}
 
-gam(data = my_data, y ~ s(x))
+covid_data <- read_csv("/Users/meganverma/Desktop/git/MeganVermaMsc/data/glmcoviddata.csv")
+gam(data = covid_data, y ~ s(x)) # should i put in the full model from the glm task here? 
 
 ```
 
@@ -45,14 +46,25 @@ gam(data = my_data, y ~ s(x))
 
 In the previous GLM task we fit a Binomial regression model where the explanatory variable was the log of per capita GDP, a linear effect of log-GDP. Replace the linear effect of log-GDP with a smooth function of log-GDP.
 
-``` {r}
-NULL
+``` {r, eval=TRUE}
+
+gam_gdp_smooth <- gam(data = covid_data,
+                formula = p ~ s(`log_gdp`),
+                family  = "binomial", weights = pop_est)
+
+summary(gam_gdp_smooth) # is the output that for every 10-fold increase in gdp, the total cases per million decreases by 5 (percent?)? 
+
 ```
 
 All GLMs are GAMs. Re-fit the GLM model using the `gam()` function; everything internal should remain the same as in the GLM task.
 
-``` {r}
-NULL
+``` {r, eval=TRUE}
+gam_gdp <- gam(data    = covid_data,
+                formula = p ~ `log_gdp`,
+                family  = "binomial", weights = pop_est)
+
+summary(gam_gdp)
+
 ```
 
 ## Model diagnostics
@@ -61,8 +73,10 @@ Look at the summary of each of the two models. Can you tell whether or not the G
 
 First, let's look at the fitted smooth function. This is quite an ugly plot using the base R plotting tools, but it's still informative.
 
-``` {r}
-plot(NULL)
+``` {r, eval=TRUE}
+# from summary of models, smoothed function is better fit (smaller AIC)
+
+plot(gam_gdp_smooth)
 ```
 
 On the left hand $y$ axis you should see something of the form `s(x, edf)` where `x` is the variable name and `edf` is the effective degrees of freedom in the smooth function. We can think of this as how complex a polynomial would need to be to provide the same fit. If `edf` is 1, then the wiggliness penalty that is used on splines in mgcv suggests that a straight line is the most supported shape of the curve. In fact, passing `select=TRUE` as an argument to `gam()` allows the penalisation of the curve to be the zero function (i.e. $s(x) \equiv 0$), doing model selection on the fly to remove `s(x)` from the model.
@@ -70,6 +84,11 @@ On the left hand $y$ axis you should see something of the form `s(x, edf)` where
 Is your smooth function a straight line?
 
 <!-- If it is not, it can be useful to use ANOVA on the fitted models to determine whether the more complex model does indeed perform better.  -->
+
+```{r}
+#insert ANOVA here 
+```
+
 
 ## Model comparison
 
