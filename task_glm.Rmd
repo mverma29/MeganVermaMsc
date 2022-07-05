@@ -289,6 +289,10 @@ un_hh_iso_plot <- merge(y=un_hh_iso,
                         by.x="iso_a3", 
                         all.x = TRUE) #lost 6 dependent territories (of larger countries)
 
+# which countries get dropped?
+anti_join(un_hh_iso, world, by = c("iso_code_l" = "iso_a3")) %>% 
+  mutate(name = countrycode::countrycode(iso_code_l, "iso3c", "country.name"))
+
 ggplot(data = un_hh_iso_plot) + 
   geom_sf(aes(geometry = geometry, #world map geometry (polygons)
               fill     = mean_hh)) + #color map w/ cont. values mean hh size (except N Korea)
@@ -357,14 +361,7 @@ mod_1df <- mod_1df %>%
 
 mod_1df <- mod_1df %>% mutate(log_gdp = log(`gdp_md_est`))
 
-mod_1df <- drop_na(mod_1df, "SI.POV.GINI") ## 140 countries 
-mod_1df <- drop_na(mod_1df, "mean_hh") ## down to 134 countries from 140
-
-# sam: alternatively, this is doable by passing both column names to the one
-# drop_na call
-
-# megan: i did try that but im sure i got the syntax wrong because i 
-# couldn't get it to work
+mod_1df <- drop_na(mod_1df, SI.POV.GINI, mean_hh) 
 
 ```
 
@@ -503,8 +500,14 @@ ggplot(data = tidy_model_coefs,
 ggplot(data = tidy_model_coefs,
        aes(x = estimate, y = Model)) +
   geom_point() +
-  facet_wrap(~term, scales = 'free_x', ncol = 1) +
-  geom_vline(xintercept = 0, lty = 2)
+  facet_wrap(~term, scales = 'free_x', ncol = 1,
+             labeller = as_labeller(c("log_gdp" = "log GDP",
+                                      "mean_hh" = "Mean household size",
+                                      "SI.POV.GINI" = "Gini coefficient"))) +
+  geom_vline(xintercept = 0, lty = 2) +
+  theme_minimal() +
+  theme(axis.text.y = element_text(hjust = 0)) +
+  xlab("Marginal effect")
 ```
 
 ## Tidying up
