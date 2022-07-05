@@ -298,14 +298,20 @@ names(world)
 world$iso_a3
 ##
 
-un_hh_world <- merge(x=un_hh_iso, y = world, by.x = "iso_code_l", by.y = "iso_a3") 
+un_hh_world <- merge(x    = un_hh_iso,
+                     y    = world,
+                     by.x = "iso_code_l", 
+                     by.y = "iso_a3") 
+# sam: here i'm not so worried about the merge direction as we don't want to
+# carry across missing values into the calculation
+
 un_hh_world <- un_hh_world %>% dplyr::select(iso_code_l, mean_hh, un_subregion, pop_est)
 # still missing those 6 countries (166 total)
 
 
 un_hh_world_summ <- un_hh_world %>% 
   group_by(`un_subregion`) %>% 
-  summarise (hh_pop_reg= weighted.mean(x = mean_hh, w = pop_est, na.rm = T))
+  summarise(hh_pop_reg = weighted.mean(x = mean_hh, w = pop_est, na.rm = T))
 
 un_hh_world_summ  # no longer broken
 
@@ -317,20 +323,30 @@ Create a new data frame that contains the variables required for fitting a model
 
 ``` {r, eval = TRUE}
 # merge UN hh size dataset w/ OWID Gini dataset (latest values for both)
-mod_1df <- merge(x=un_hh_iso, y=owid_gini_latest, by.x= "iso_code_l", by.y = "iso_code") %>% 
-  dplyr::select("iso_code_l","mean_hh","un_subregion","country","iso2c","SI.POV.GINI","year") 
+mod_1df <- merge(x    = un_hh_iso, 
+                 y    = owid_gini_latest, 
+                 by.x = "iso_code_l",
+                 by.y = "iso_code") %>% 
+  dplyr::select("iso_code_l", "mean_hh", "un_subregion", "country",
+                "iso2c", "SI.POV.GINI", "year") 
 
 # merge this dataset with world dataset to get GDP, total cases per million (outcome)
 mod_1df <- merge(x=mod_1df, y=world_with_cases, by.x="iso_code_l", by.y = "iso_code") 
-names(mod_1df)
-mod_1df <- mod_1df %>% 
-  dplyr::select("iso_code_l","mean_hh","un_subregion","country","iso2c","SI.POV.GINI","year","total_cases_per_million","log_total_cases", "gdp_md_est","pop_est") 
 
-mod_1df <- mod_1df %>% mutate(log_gdp= log(`gdp_md_est`))
+names(mod_1df)
+
+mod_1df <- mod_1df %>% 
+  dplyr::select("iso_code_l","mean_hh","un_subregion","country",
+                "iso2c","SI.POV.GINI","year","total_cases_per_million",
+                "log_total_cases", "gdp_md_est","pop_est") 
+
+mod_1df <- mod_1df %>% mutate(log_gdp = log(`gdp_md_est`))
 
 mod_1df <- drop_na(mod_1df, "SI.POV.GINI") ## down to 125 countries from 166 
 mod_1df <- drop_na(mod_1df, "mean_hh") ## down to 120 countries from 125 
 
+# sam: alternatively, this is doable by passing both column names to the one
+# drop_na call
 
 ```
 
@@ -338,7 +354,7 @@ Fit the model described above.
 
 ``` {r, eval = TRUE}
 
-mod_1df <- mod_1df %>% mutate (p= total_cases_per_million/pop_est)
+mod_1df <- mod_1df %>% mutate(p = total_cases_per_million/pop_est)
 
 summary(mod_1df$p)
 which.max(mod_1df$p) #cyprus (row 27) has over 100% (but this is cases per million/pop- not actually over a 100% cases)
