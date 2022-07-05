@@ -112,9 +112,12 @@ names(world_with_cases)
 
 # plot this 
 ggplot(data = mutate(world_with_cases,
-                     log_total_cases = ifelse(iso_code == "PRK", NA, log_total_cases))) + geom_sf(aes(geometry = geometry, #world map geometry (polygons)
+                     log_total_cases = ifelse(iso_code == "PRK", NA, log_total_cases))) +
+  geom_sf(aes(geometry = geometry, #world map geometry (polygons)
               fill     = log_total_cases)) + #color map w/ cont. values of LOG total cases (except N Korea)
-  scale_fill_gradient(low="yellow", high="red", name = 'log10 cases\nper million') + #set color fill 
+  scale_fill_gradient(low  = "yellow",
+                      high = "red",
+                      name = 'log10 cases\nper million') + #set color fill 
   theme_bw() #theme of dark text on light background 
 ## contrast is much better 
 
@@ -188,7 +191,11 @@ tidy(case_glm, conf.int = T)
 
 Is there an association between the log of GDP and a country's case numbers?
 
-<!-- yes, for every 10-fold increase in GDP, there is a ~3-fold increase in cases  -->
+Megan: Yes, for every 10-fold increase in GDP, there is a ~3-fold increase in cases
+
+Sam: For interpreting output of a logistic model we often transform the coefficient, $\beta$, and report $e^{\beta}$, an odds ratio. So rather than a `r coef(case_glm)["log10gdp"]`-fold increase we see a `r exp(coef(case_glm)["log10gdp"])`-fold one.
+
+
 
 ## Extracting Gini index from WDI
 
@@ -209,8 +216,15 @@ Merge this new object with the data frame you used to fit the model. Ensure that
 ```{r, eval = TRUE}
 # i'd probably merge on iso_codes rather than names
 # iso code for WDI-derived dataset is only 2-letter code, while it's only a 3-letter code for OWID dataset 
+library(countrycode)
+gini_latest <- mutate(gini_latest, 
+               iso_code = countrycode(sourcevar   = `iso2c`, 
+                                      origin      = 'iso2c',
+                                      destination = 'iso3c')) 
+# kosovo doesn't have an official iso code-- what are implications for nations that are younger than datasets in RESPICAR? 
+
 owid_gini_latest <- merge(x=gini_latest, y=owid_latest,
-                          by.x="country", by.y="location", all.y = TRUE)
+                          by="iso_code")
 ```
 
 ## Incorporating household data from UN
@@ -226,7 +240,6 @@ un_data
 Make a new variable in this data frame that contains the three-letter ISO code, by converting from the numeric ISO code. Hint: the countrycode package has a function, `countrycode()`, which can do this.
 
 ``` {r, eval = TRUE}
-library(countrycode)
 
 # un_data$'ISO Code' <- as.factor(un_data$`ISO Code`)
 un_data <- mutate(un_data, 
@@ -265,7 +278,7 @@ Make a visualisation showing average household size for each country. Ensure you
 # maybe a map?
 # plot this on map 
 # first merge datasets to get geometry from world
-un_hh_iso_plot <- merge(x=un_hh_iso, y=world, by.x="iso_code_l", by.y="iso_a3") #lost 6 countries
+un_hh_iso_plot <- merge(y=un_hh_iso, x=world, by.y="iso_code_l", by.x="iso_a3", all.x = TRUE) #lost 6 countries
 
 ggplot(data = un_hh_iso_plot) + 
   geom_sf(aes(geometry = geometry, #world map geometry (polygons)
@@ -274,6 +287,8 @@ ggplot(data = un_hh_iso_plot) +
   theme_bw() #theme of dark text on light background 
 
 ```
+
+Sam: We should make sure that we source a value for China's average household size.
 
 There appear to be spatial trends. Using `countrycode()`, convert to either a UN subregion or World Bank region scheme and calculate the average household size, weighting for national population.
 
@@ -289,14 +304,20 @@ names(world)
 world$iso_a3
 ##
 
-un_hh_world <- merge(x=un_hh_iso, y = world, by.x = "iso_code_l", by.y = "iso_a3") 
+un_hh_world <- merge(x    = un_hh_iso,
+                     y    = world,
+                     by.x = "iso_code_l", 
+                     by.y = "iso_a3") 
+# sam: here i'm not so worried about the merge direction as we don't want to
+# carry across missing values into the calculation
+
 un_hh_world <- un_hh_world %>% dplyr::select(iso_code_l, mean_hh, un_subregion, pop_est)
 # still missing those 6 countries (166 total)
 
 
 un_hh_world_summ <- un_hh_world %>% 
   group_by(`un_subregion`) %>% 
-  summarise (hh_pop_reg= weighted.mean(x = mean_hh, w = pop_est, na.rm = T))
+  summarise(hh_pop_reg = weighted.mean(x = mean_hh, w = pop_est, na.rm = T))
 
 un_hh_world_summ  # no longer broken
 
@@ -308,20 +329,30 @@ Create a new data frame that contains the variables required for fitting a model
 
 ``` {r, eval = TRUE}
 # merge UN hh size dataset w/ OWID Gini dataset (latest values for both)
-mod_1df <- merge(x=un_hh_iso, y=owid_gini_latest, by.x= "iso_code_l", by.y = "iso_code") %>% 
-  dplyr::select("iso_code_l","mean_hh","un_subregion","country","iso2c","SI.POV.GINI","year") 
+mod_1df <- merge(x    = un_hh_iso, 
+                 y    = owid_gini_latest, 
+                 by.x = "iso_code_l",
+                 by.y = "iso_code") %>% 
+  dplyr::select("iso_code_l", "mean_hh", "un_subregion", "country",
+                "iso2c", "SI.POV.GINI", "year") 
 
 # merge this dataset with world dataset to get GDP, total cases per million (outcome)
 mod_1df <- merge(x=mod_1df, y=world_with_cases, by.x="iso_code_l", by.y = "iso_code") 
+
 names(mod_1df)
+
 mod_1df <- mod_1df %>% 
-  dplyr::select("iso_code_l","mean_hh","un_subregion","country","iso2c","SI.POV.GINI","year","total_cases_per_million","log_total_cases", "gdp_md_est","pop_est") 
+  dplyr::select("iso_code_l","mean_hh","un_subregion","country",
+                "iso2c","SI.POV.GINI","year","total_cases_per_million",
+                "log_total_cases", "gdp_md_est","pop_est") 
 
-mod_1df <- mod_1df %>% mutate(log_gdp= log(`gdp_md_est`))
+mod_1df <- mod_1df %>% mutate(log_gdp = log(`gdp_md_est`))
 
-mod_1df <- drop_na(mod_1df, "SI.POV.GINI") ## down to 125 countries from 166 
-mod_1df <- drop_na(mod_1df, "mean_hh") ## down to 120 countries from 125 
+mod_1df <- drop_na(mod_1df, "SI.POV.GINI") ## 140 countries 
+mod_1df <- drop_na(mod_1df, "mean_hh") ## down to 134 countries from 140
 
+# sam: alternatively, this is doable by passing both column names to the one
+# drop_na call
 
 ```
 
@@ -329,23 +360,28 @@ Fit the model described above.
 
 ``` {r, eval = TRUE}
 
-mod_1df <- mod_1df %>% mutate (p= total_cases_per_million/pop_est)
+mod_1df <- mod_1df %>% mutate(p = total_cases_per_million/1e6)
+mod_1df <- mod_1df %>% mutate (p= total_cases/pop_est)
 
+# sam: better to use a condition to be met rather than hard-coding a row given
+# the position of this row may change
 summary(mod_1df$p)
-which.max(mod_1df$p) #cyprus (row 27) has over 100% (but this is cases per million/pop- not actually over a 100% cases)
-mod_1df <- mod_1df[-c(27), ] #drop cyprus from analysis for now 
+
+mod_1df <- filter(mod_1df, p <= 1, p >= 0)
 
 mod_1 <- glm(data    = mod_1df,
-                formula = p ~ `log_gdp` + `mean_hh` + `SI.POV.GINI`,
-                family  = "binomial", weights = pop_est)
+             formula = p ~ `log_gdp` + `mean_hh` + `SI.POV.GINI`,
+             family  = "binomial", weights = pop_est)
 
 tidy(mod_1, conf.int = T) 
 glance(mod_1) #shows AIC, deviance, etc
 
-## should i redo all models but in total cases (not per million) so that we can put cyprus back in? 
-
 ```
 
+
+Megan: should i redo all models but in total cases (not per million) so that we can put cyprus back in? 
+
+Sam: Cases per million is already a per-capita measure, so don't divide it by the total population. To convert it to $p \in [0,1]$ just divide by a million.
 
 Re-fit the earlier model that contains log GDP and Gini index using the new data set you just generated.
 
@@ -364,6 +400,7 @@ glance(mod_1.1)
 ## Model comparison
 
 Does the addition of average household size improve model fit substantially? What makes you say so?
+
 ```{r, eval = FALSE}
 # much larger AIC in the model without mean hh size, so the model that includes mean hh size is a better model 
 # only interested in AICs between models of the same data (only interested in the difference)
@@ -387,7 +424,7 @@ glance(mod_1.2)
 
 
 # further reduction in AIC with this model
-# gini makes more sense (more unequal = more cases (not negative estimate)), gdp has a more pronounced effect (higher log gdp has fewer cases), hh size still doesn't make a lot of sense (increasing hh size= fewer cases) but this is less pronounced than before 
+# gini makes more sense (more unequal = more cases (not negative estimate)), gdp also makes more sense (higher log gdp has fewer cases), hh size still doesn't make a lot of sense (increasing hh size= fewer cases) but this is less pronounced than before 
 
 # make a plot including each covariate from the 3 models to show how it changes between them; don't include spatial stuff (not un subregions) 
 
@@ -425,13 +462,41 @@ ggplot(all_models_df, aes(x= term)) +
     
 ```
 
+Sam: how do we know which dot is from which model?
+
+Sam: another way to do this is to bind by rows rather than merging columns
+
+``` {r}
+
+# as before, but with model identifiers 
+tidy_mod1   <- tidy(mod_1)   %>% mutate(Model = 'Gini + log GDP + HH size')
+tidy_mod1.1 <- tidy(mod_1.1) %>% mutate(Model = 'Gini + log GDP')
+tidy_mod1.2 <- tidy(mod_1.2) %>% mutate(Model = 'Gini + log GDP + HH size + subregion')
+
+tidy_model_coefs <- bind_rows(tidy_mod1, tidy_mod1.1, tidy_mod1.2) %>%
+  filter(term %in% c("log_gdp", "mean_hh", "SI.POV.GINI"))
+
+ggplot(data = tidy_model_coefs,
+       aes(x = estimate, y = term)) +
+  geom_point(aes(color = Model)) +
+  theme(legend.position = 'bottom')
+
+# or
+
+ggplot(data = tidy_model_coefs,
+       aes(x = estimate, y = Model)) +
+  geom_point() +
+  facet_wrap(~term, scales = 'free_x', ncol = 1) +
+  geom_vline(xintercept = 0, lty = 2)
+```
+
 ## Tidying up
 
 It may be worth saving the data object at this point as it will be reused in different models. Give it a meaningful name so that it's clear what's in it and maybe when it was created (see Data Management in @goodenough).
 
-```{r, eval=FALSE}
+``` {r, eval=FALSE}
 
-write_csv(mod_1df, "glmcoviddata.csv")
+write_csv(mod_1df, "data/glmcoviddata.csv")
 
 ```
 
