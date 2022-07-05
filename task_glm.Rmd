@@ -272,7 +272,7 @@ Make a visualisation showing average household size for each country. Ensure you
 # maybe a map?
 # plot this on map 
 # first merge datasets to get geometry from world
-un_hh_iso_plot <- merge(x=un_hh_iso, y=world, by.x="iso_code_l", by.y="iso_a3") #lost 6 countries
+un_hh_iso_plot <- merge(y=un_hh_iso, x=world, by.y="iso_code_l", by.x="iso_a3", all.x = TRUE) #lost 6 countries
 
 ggplot(data = un_hh_iso_plot) + 
   geom_sf(aes(geometry = geometry, #world map geometry (polygons)
