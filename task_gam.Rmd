@@ -55,7 +55,7 @@ gam_gdp_smooth <- gam(data = covid_data,
 
 summary(gam_gdp_smooth)
 
-# Megan: is the output that for every 10-fold increase in gdp, the total cases per million decreases by 5 (percent?)? 
+# Megan: is the output that for every 10-fold increase in gdp, the total cases per million decreases by 3.4 (percent?)? 
 
 # Sam: let's discuss
 
