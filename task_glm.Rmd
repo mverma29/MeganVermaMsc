@@ -191,7 +191,7 @@ tidy(case_glm, conf.int = T)
 
 Is there an association between the log of GDP and a country's case numbers?
 
-Megan: Yes, for every 10-fold increase in GDP, there is a ~3-fold increase in cases
+Megan: Yes, for every 10-fold increase in GDP, there is a ~3-fold increase in cases #reinterpret!
 
 Sam: For interpreting output of a logistic model we often transform the coefficient, $\beta$, and report $e^{\beta}$, an odds ratio. So rather than a `r coef(case_glm)["log10gdp"]`-fold increase we see a `r exp(coef(case_glm)["log10gdp"])`-fold one.
 
@@ -275,20 +275,19 @@ Summarise the data by country (ISO code) so that where there are multiple data s
 
 un_hh_iso <- un_data_filt %>% 
   group_by(`iso_code_l`) %>% 
-  summarise(mean_hh = mean(average_hh, na.rm = TRUE)) #lost 40 countries?? 
+  summarise(mean_hh = mean(average_hh, na.rm = TRUE)) #lost 40 rows because multiple data sources
 ```
 
 Make a visualisation showing average household size for each country. Ensure you have appropriate labels.
 
 ``` {r, eval = TRUE}
-# maybe a map?
 # plot this on map 
 # first merge datasets to get geometry from world
 un_hh_iso_plot <- merge(y=un_hh_iso, 
                         x=world, 
                         by.y="iso_code_l", 
                         by.x="iso_a3", 
-                        all.x = TRUE) #lost 6 countries
+                        all.x = TRUE) #lost 6 dependent territories (of larger countries)
 
 ggplot(data = un_hh_iso_plot) + 
   geom_sf(aes(geometry = geometry, #world map geometry (polygons)
@@ -374,7 +373,8 @@ Fit the model described above.
 ``` {r, eval = TRUE}
 
 # mod_1df <- mod_1df %>% mutate(p = total_cases_per_million/1e6)
-mod_1df <- mod_1df %>% mutate (p= total_cases/pop_est)
+
+mod_1df <- mod_1df %>% mutate (p= `total_cases`/`pop_est`)
 
 # sam: better to use a condition to be met rather than hard-coding a row given
 # the position of this row may change
