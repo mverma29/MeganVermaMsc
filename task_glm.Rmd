@@ -363,7 +363,7 @@ mod_1df <- filter(mod_1df, p <= 1, p >= 0)
 
 mod_1 <- glm(data    = mod_1df,
              formula = p ~ `log_gdp` + `mean_hh` + `SI.POV.GINI`,
-                family  = "binomial", weights = pop_est)
+             family  = "binomial", weights = pop_est)
 
 tidy(mod_1, conf.int = T) 
 glance(mod_1) #shows AIC, deviance, etc
@@ -452,6 +452,34 @@ ggplot(all_models_df, aes(x= term)) +
     ggtitle("Model Comparison") + 
     theme(plot.title = element_text(hjust=0.5)) 
     
+```
+
+Sam: how do we know which dot is from which model?
+
+Sam: another way to do this is to bind by rows rather than merging columns
+
+``` {r}
+
+# as before, but with model identifiers 
+tidy_mod1   <- tidy(mod_1)   %>% mutate(Model = 'Gini + log GDP + HH size')
+tidy_mod1.1 <- tidy(mod_1.1) %>% mutate(Model = 'Gini + log GDP')
+tidy_mod1.2 <- tidy(mod_1.2) %>% mutate(Model = 'Gini + log GDP + HH size + subregion')
+
+tidy_model_coefs <- bind_rows(tidy_mod1, tidy_mod1.1, tidy_mod1.2) %>%
+  filter(term %in% c("log_gdp", "mean_hh", "SI.POV.GINI"))
+
+ggplot(data = tidy_model_coefs,
+       aes(x = estimate, y = term)) +
+  geom_point(aes(color = Model)) +
+  theme(legend.position = 'bottom')
+
+# or
+
+ggplot(data = tidy_model_coefs,
+       aes(x = estimate, y = Model)) +
+  geom_point() +
+  facet_wrap(~term, scales = 'free_x', ncol = 1) +
+  geom_vline(xintercept = 0, lty = 2)
 ```
 
 ## Tidying up
