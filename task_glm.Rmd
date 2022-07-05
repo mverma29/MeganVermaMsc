@@ -290,6 +290,10 @@ un_hh_iso_plot <- merge(y=un_hh_iso,
                         by.x="iso_a3", 
                         all.x = TRUE) #lost 6 countries
 
+# which countries get dropped?
+anti_join(un_hh_iso, world, by = c("iso_code_l" = "iso_a3")) %>% 
+  mutate(name = countrycode::countrycode(iso_code_l, "iso3c", "country.name"))
+
 ggplot(data = un_hh_iso_plot) + 
   geom_sf(aes(geometry = geometry, #world map geometry (polygons)
               fill     = mean_hh)) + #color map w/ cont. values mean hh size (except N Korea)
