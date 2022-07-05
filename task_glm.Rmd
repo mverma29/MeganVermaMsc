@@ -478,8 +478,14 @@ ggplot(data = tidy_model_coefs,
 ggplot(data = tidy_model_coefs,
        aes(x = estimate, y = Model)) +
   geom_point() +
-  facet_wrap(~term, scales = 'free_x', ncol = 1) +
-  geom_vline(xintercept = 0, lty = 2)
+  facet_wrap(~term, scales = 'free_x', ncol = 1,
+             labeller = as_labeller(c("log_gdp" = "log GDP",
+                                      "mean_hh" = "Mean household size",
+                                      "SI.POV.GINI" = "Gini coefficient"))) +
+  geom_vline(xintercept = 0, lty = 2) +
+  theme_minimal() +
+  theme(axis.text.y = element_text(hjust = 0)) +
+  xlab("Marginal effect")
 ```
 
 ## Tidying up
