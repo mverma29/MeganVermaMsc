@@ -282,6 +282,8 @@ ggplot(data = un_hh_iso_plot) +
 
 ```
 
+Sam: We should make sure that we source a value for China's average household size.
+
 There appear to be spatial trends. Using `countrycode()`, convert to either a UN subregion or World Bank region scheme and calculate the average household size, weighting for national population.
 
 ``` {r, eval = TRUE}
