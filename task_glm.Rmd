@@ -392,6 +392,7 @@ glance(mod_1.1)
 ## Model comparison
 
 Does the addition of average household size improve model fit substantially? What makes you say so?
+
 ```{r, eval = FALSE}
 # much larger AIC in the model without mean hh size, so the model that includes mean hh size is a better model 
 # only interested in AICs between models of the same data (only interested in the difference)
@@ -457,7 +458,7 @@ ggplot(all_models_df, aes(x= term)) +
 
 It may be worth saving the data object at this point as it will be reused in different models. Give it a meaningful name so that it's clear what's in it and maybe when it was created (see Data Management in @goodenough).
 
-```{r, eval=FALSE}
+``` {r, eval=FALSE}
 
 write_csv(mod_1df, "glmcoviddata.csv")
 
