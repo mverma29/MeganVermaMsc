@@ -207,7 +207,9 @@ Make a new object that contains the latest value of the Gini index variable. You
 library(WDI)
 WDIsearch(string = "gini") # Gini coeff indicator is called "SI.POV.GINI"
 
-gini_latest <- WDI(country="all", indicator= "SI.POV.GINI", latest=1, language = "en")
+gini_latest <- WDI(country="all", 
+                   indicator= "SI.POV.GINI", 
+                   latest=1, language = "en")
 
 ```
 
@@ -216,8 +218,16 @@ Merge this new object with the data frame you used to fit the model. Ensure that
 ```{r, eval = TRUE}
 # i'd probably merge on iso_codes rather than names
 # iso code for WDI-derived dataset is only 2-letter code, while it's only a 3-letter code for OWID dataset 
-owid_gini_latest <- merge(x=gini_latest, y=owid_latest,
-                          by.x="country", by.y="location", all.y = TRUE)
+library(countrycode)
+gini_latest <- mutate(gini_latest, 
+               iso_code = countrycode(sourcevar   = `iso2c`, 
+                                      origin      = 'iso2c',
+                                      destination = 'iso3c')) 
+# kosovo doesn't have an official iso code-- what are implications for nations that are younger than datasets in RESPICAR? 
+
+owid_gini_latest <- merge(x=gini_latest, 
+                          y=owid_latest,
+                          by="iso_code")
 ```
 
 ## Incorporating household data from UN
@@ -225,7 +235,10 @@ owid_gini_latest <- merge(x=gini_latest, y=owid_latest,
 Download the UN Population Division's data on [Household size and composition](https://www.un.org/development/desa/pd/data/household-size-and-composition) and read it in to R, ensuring you only read the rows and columns pertaining to average household size and the relevant data source. Hint: `readxl::read_xlsx()` allows you to specify a range.
 
 ``` {r, eval = TRUE}
-un_data <- readxl::read_xlsx("data/un_hh.xlsx", sheet= 4, range= "A5:E819", col_names = TRUE)
+un_data <- readxl::read_xlsx("data/un_hh.xlsx", 
+                             sheet= 4, 
+                             range= "A5:E819", 
+                             col_names = TRUE)
 
 un_data
 ```
@@ -233,7 +246,6 @@ un_data
 Make a new variable in this data frame that contains the three-letter ISO code, by converting from the numeric ISO code. Hint: the countrycode package has a function, `countrycode()`, which can do this.
 
 ``` {r, eval = TRUE}
-library(countrycode)
 
 # un_data$'ISO Code' <- as.factor(un_data$`ISO Code`)
 un_data <- mutate(un_data, 
@@ -272,7 +284,11 @@ Make a visualisation showing average household size for each country. Ensure you
 # maybe a map?
 # plot this on map 
 # first merge datasets to get geometry from world
-un_hh_iso_plot <- merge(y=un_hh_iso, x=world, by.y="iso_code_l", by.x="iso_a3", all.x = TRUE) #lost 6 countries
+un_hh_iso_plot <- merge(y=un_hh_iso, 
+                        x=world, 
+                        by.y="iso_code_l", 
+                        by.x="iso_a3", 
+                        all.x = TRUE) #lost 6 countries
 
 ggplot(data = un_hh_iso_plot) + 
   geom_sf(aes(geometry = geometry, #world map geometry (polygons)
@@ -342,11 +358,14 @@ mod_1df <- mod_1df %>%
 
 mod_1df <- mod_1df %>% mutate(log_gdp = log(`gdp_md_est`))
 
-mod_1df <- drop_na(mod_1df, "SI.POV.GINI") ## down to 125 countries from 166 
-mod_1df <- drop_na(mod_1df, "mean_hh") ## down to 120 countries from 125 
+mod_1df <- drop_na(mod_1df, "SI.POV.GINI") ## 140 countries 
+mod_1df <- drop_na(mod_1df, "mean_hh") ## down to 134 countries from 140
 
 # sam: alternatively, this is doable by passing both column names to the one
 # drop_na call
+
+# megan: i did try that but im sure i got the syntax wrong because i 
+# couldn't get it to work
 
 ```
 
@@ -354,12 +373,15 @@ Fit the model described above.
 
 ``` {r, eval = TRUE}
 
-mod_1df <- mod_1df %>% mutate(p = total_cases_per_million/1e6)
+# mod_1df <- mod_1df %>% mutate(p = total_cases_per_million/1e6)
+mod_1df <- mod_1df %>% mutate (p= total_cases/pop_est)
 
 # sam: better to use a condition to be met rather than hard-coding a row given
 # the position of this row may change
 
-mod_1df <- filter(mod_1df, p <= 1, p >= 0)
+summary(mod_1df$p)
+
+mod_1df <- filter(mod_1df, p <= 1, p >= 0) #now shouldn't need this (see summary)
 
 mod_1 <- glm(data    = mod_1df,
              formula = p ~ `log_gdp` + `mean_hh` + `SI.POV.GINI`,
@@ -381,7 +403,8 @@ Re-fit the earlier model that contains log GDP and Gini index using the new data
 
 mod_1.1 <- glm(data    = mod_1df,
                 formula = p ~ `log_gdp` + `SI.POV.GINI`,
-                family  = "binomial", weights = pop_est)
+                family  = "binomial", 
+                weights = pop_est)
 
 tidy(mod_1.1, conf.int = T) 
 glance(mod_1.1)
@@ -409,14 +432,15 @@ Fit a model that also includes the subregion variable derived through `countryco
 ``` {r, eval = TRUE}
 mod_1.2 <- glm(data    = mod_1df,
                 formula = p ~ `log_gdp` + `SI.POV.GINI` + `mean_hh` + `un_subregion`, 
-                family  = "binomial", weights = pop_est)
+                family  = "binomial", 
+                weights = pop_est)
 
 tidy(mod_1.2, conf.int = T) 
 glance(mod_1.2)
 
 
 # further reduction in AIC with this model
-# gini makes more sense (more unequal = more cases (not negative estimate)), gdp has a more pronounced effect (higher log gdp has fewer cases), hh size still doesn't make a lot of sense (increasing hh size= fewer cases) but this is less pronounced than before 
+# gini makes more sense (more unequal = more cases (not negative estimate)), gdp also makes more sense (higher log gdp has fewer cases), hh size still doesn't make a lot of sense (increasing hh size= fewer cases) but this is less pronounced than before 
 
 # make a plot including each covariate from the 3 models to show how it changes between them; don't include spatial stuff (not un subregions) 
 
@@ -455,6 +479,7 @@ ggplot(all_models_df, aes(x= term)) +
 ```
 
 Sam: how do we know which dot is from which model?
+Megan: I spent forever trying to make a legend, was going to ask you today why it's not working 
 
 Sam: another way to do this is to bind by rows rather than merging columns
 
