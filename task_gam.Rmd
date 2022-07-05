@@ -51,9 +51,13 @@ In the previous GLM task we fit a Binomial regression model where the explanator
 
 gam_gdp_smooth <- gam(data = covid_data,
                       formula = p ~ s(log_gdp),
-                family  = "binomial", weights = pop_est)
+                      family  = "binomial", weights = pop_est)
 
-summary(gam_gdp_smooth) # is the output that for every 10-fold increase in gdp, the total cases per million decreases by 5 (percent?)? 
+summary(gam_gdp_smooth)
+
+# Megan: is the output that for every 10-fold increase in gdp, the total cases per million decreases by 5 (percent?)? 
+
+# Sam: let's discuss
 
 ```
 
@@ -145,8 +149,8 @@ Fit a GAM that contains smooth functions of all of the following: the Gini coeff
 
 ``` {r, eval=TRUE}
 gam_full_smooth <- gam(data    = covid_data,
-                formula = p ~ s(`SI.POV.GINI`) + s(`log_gdp`) + s(`mean_hh`),
-                family  = "binomial", weights = pop_est)
+                       formula = p ~ s(`SI.POV.GINI`) + s(`log_gdp`) + s(`mean_hh`),
+                       family  = "binomial", weights = pop_est)
 
 gam_mean_hh_smooth <- gam(data    = covid_data,
                 formula = p ~ s(`mean_hh`),
