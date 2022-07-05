@@ -354,23 +354,26 @@ Fit the model described above.
 
 ``` {r, eval = TRUE}
 
-mod_1df <- mod_1df %>% mutate(p = total_cases_per_million/pop_est)
+mod_1df <- mod_1df %>% mutate(p = total_cases_per_million/1e6)
 
-summary(mod_1df$p)
-which.max(mod_1df$p) #cyprus (row 27) has over 100% (but this is cases per million/pop- not actually over a 100% cases)
-mod_1df <- mod_1df[-c(27), ] #drop cyprus from analysis for now 
+# sam: better to use a condition to be met rather than hard-coding a row given
+# the position of this row may change
+
+mod_1df <- filter(mod_1df, p <= 1, p >= 0)
 
 mod_1 <- glm(data    = mod_1df,
-                formula = p ~ `log_gdp` + `mean_hh` + `SI.POV.GINI`,
+             formula = p ~ `log_gdp` + `mean_hh` + `SI.POV.GINI`,
                 family  = "binomial", weights = pop_est)
 
 tidy(mod_1, conf.int = T) 
 glance(mod_1) #shows AIC, deviance, etc
 
-## should i redo all models but in total cases (not per million) so that we can put cyprus back in? 
-
 ```
 
+
+Megan: should i redo all models but in total cases (not per million) so that we can put cyprus back in? 
+
+Sam: Cases per million is already a per-capita measure, so don't divide it by the total population. To convert it to $p \in [0,1]$ just divide by a million.
 
 Re-fit the earlier model that contains log GDP and Gini index using the new data set you just generated.
 
