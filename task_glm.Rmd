@@ -358,14 +358,7 @@ mod_1df <- mod_1df %>%
 
 mod_1df <- mod_1df %>% mutate(log_gdp = log(`gdp_md_est`))
 
-mod_1df <- drop_na(mod_1df, "SI.POV.GINI") ## 140 countries 
-mod_1df <- drop_na(mod_1df, "mean_hh") ## down to 134 countries from 140
-
-# sam: alternatively, this is doable by passing both column names to the one
-# drop_na call
-
-# megan: i did try that but im sure i got the syntax wrong because i 
-# couldn't get it to work
+mod_1df <- drop_na(mod_1df, SI.POV.GINI, mean_hh) 
 
 ```
 
