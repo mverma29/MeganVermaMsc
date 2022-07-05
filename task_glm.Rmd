@@ -460,7 +460,7 @@ It may be worth saving the data object at this point as it will be reused in dif
 
 ``` {r, eval=FALSE}
 
-write_csv(mod_1df, "glmcoviddata.csv")
+write_csv(mod_1df, "data/glmcoviddata.csv")
 
 ```
 
