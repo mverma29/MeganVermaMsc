@@ -325,7 +325,7 @@ un_hh_world <- merge(x    = un_hh_iso,
 # carry across missing values into the calculation
 
 un_hh_world <- un_hh_world %>% dplyr::select(iso_code_l, mean_hh, un_subregion, pop_est)
-# still missing those 6 countries (166 total)
+# still missing those 6 territories (166 total)
 
 
 un_hh_world_summ <- un_hh_world %>% 
@@ -346,7 +346,7 @@ mod_1df <- merge(x    = un_hh_iso,
                  y    = owid_gini_latest, 
                  by.x = "iso_code_l",
                  by.y = "iso_code") %>% 
-  dplyr::select("iso_code_l", "mean_hh", "un_subregion", "country",
+  dplyr::select("iso_code_l", "mean_hh", "un_subregion", "country", "total_cases_per_million",
                 "iso2c", "SI.POV.GINI", "year") 
 
 # merge this dataset with world dataset to get GDP, total cases per million (outcome)
@@ -369,9 +369,7 @@ Fit the model described above.
 
 ``` {r, eval = TRUE}
 
-# mod_1df <- mod_1df %>% mutate(p = total_cases_per_million/1e6)
-
-mod_1df <- mod_1df %>% mutate (p= `total_cases`/`pop_est`)
+mod_1df <- mod_1df %>% mutate(p = total_cases_per_million*1e6)
 
 # sam: better to use a condition to be met rather than hard-coding a row given
 # the position of this row may change
