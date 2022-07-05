@@ -429,6 +429,14 @@ mod_1.2 <- glm(data    = mod_1df,
 tidy(mod_1.2, conf.int = T) 
 glance(mod_1.2)
 
+library(purrr)
+list(`gdp mean_hh Gini` = mod_1, # replace NULL with model object name
+     `gdp Gini = mod_1.1,
+     `gdp mean_hh Gini UNsubregion` = mod_1.2)
+     %>%
+  map_df(~epiDisplay::logistic.display(.x), .id = "Model") %>%
+  
+
 
 # further reduction in AIC with this model
 # gini makes more sense (more unequal = more cases (not negative estimate)), gdp also makes more sense (higher log gdp has fewer cases), hh size still doesn't make a lot of sense (increasing hh size= fewer cases) but this is less pronounced than before 
