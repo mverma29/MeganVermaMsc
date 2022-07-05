@@ -364,20 +364,24 @@ mod_1df <- drop_na(mod_1df, "mean_hh") ## down to 134 countries from 140
 # sam: alternatively, this is doable by passing both column names to the one
 # drop_na call
 
+# megan: i did try that but im sure i got the syntax wrong because i 
+# couldn't get it to work
+
 ```
 
 Fit the model described above.
 
 ``` {r, eval = TRUE}
 
-mod_1df <- mod_1df %>% mutate(p = total_cases_per_million/1e6)
+# mod_1df <- mod_1df %>% mutate(p = total_cases_per_million/1e6)
 mod_1df <- mod_1df %>% mutate (p= total_cases/pop_est)
 
 # sam: better to use a condition to be met rather than hard-coding a row given
 # the position of this row may change
+
 summary(mod_1df$p)
 
-mod_1df <- filter(mod_1df, p <= 1, p >= 0)
+mod_1df <- filter(mod_1df, p <= 1, p >= 0) #now shouldn't need this (see summary)
 
 mod_1 <- glm(data    = mod_1df,
              formula = p ~ `log_gdp` + `mean_hh` + `SI.POV.GINI`,
