@@ -191,7 +191,11 @@ tidy(case_glm, conf.int = T)
 
 Is there an association between the log of GDP and a country's case numbers?
 
-<!-- yes, for every 10-fold increase in GDP, there is a ~3-fold increase in cases  -->
+Megan: Yes, for every 10-fold increase in GDP, there is a ~3-fold increase in cases
+
+Sam: For interpreting output of a logistic model we often transform the coefficient, $\beta$, and report $e^{\beta}$, an odds ratio. So rather than a `r coef(case_glm)["log10gdp"]`-fold increase we see a `r exp(coef(case_glm)["log10gdp"])`-fold one.
+
+
 
 ## Extracting Gini index from WDI
 
