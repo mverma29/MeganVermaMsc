@@ -50,7 +50,7 @@ In the previous GLM task we fit a Binomial regression model where the explanator
 ``` {r, eval=TRUE}
 
 gam_gdp_smooth <- gam(data = covid_data,
-                formula = p ~ s(`log_gdp`),
+                      formula = p ~ s(log_gdp),
                 family  = "binomial", weights = pop_est)
 
 summary(gam_gdp_smooth) # is the output that for every 10-fold increase in gdp, the total cases per million decreases by 5 (percent?)? 
@@ -61,7 +61,7 @@ All GLMs are GAMs. Re-fit the GLM model using the `gam()` function; everything i
 
 ``` {r, eval=TRUE}
 gam_gdp <- gam(data    = covid_data,
-                formula = p ~ `log_gdp`,
+                formula = p ~ log_gdp,
                 family  = "binomial", weights = pop_est)
 
 summary(gam_gdp)
