@@ -51,11 +51,15 @@ In the previous GLM task we fit a Binomial regression model where the explanator
 
 gam_gdp_smooth <- gam(data = covid_data,
                       formula = p ~ s(log_gdp),
-                      family  = "binomial", weights = pop_est)
+                      family  = "binomial", weights = `population`)
 
 summary(gam_gdp_smooth)
+exp(-3.133)
 
-# Megan: is the output that for every 10-fold increase in gdp, the total cases per million decreases by 3.4 (percent?)? 
+library(broom)
+tidy(gam_gdp_smooth)
+
+# Megan: is the output that for every 10-fold increase in gdp, the odds of being a case is 0.0435x lower
 
 # Sam: let's discuss
 
@@ -66,9 +70,11 @@ All GLMs are GAMs. Re-fit the GLM model using the `gam()` function; everything i
 ``` {r, eval=TRUE}
 gam_gdp <- gam(data    = covid_data,
                 formula = p ~ log_gdp,
-                family  = "binomial", weights = pop_est)
+                family  = "binomial", weights = `population`)
 
 summary(gam_gdp)
+exp(2.9044)
+# Megan: is the output that for every 10-fold increase in gdp, the odds of being a case is 18.25x higher
 
 ```
 
@@ -132,15 +138,16 @@ Now fit a GAM that relates the number of cases to a smooth function of the Gini 
 ``` {r, eval=TRUE}
 gam_gini_smooth <- gam(data    = covid_data,
                 formula = p ~ s(`SI.POV.GINI`),
-                family  = "binomial", weights = pop_est)
+                family  = "binomial", weights = `population`)
 summary(gam_gini_smooth)
+exp(-2.486) #OR is 0.083
 plot(gam_gini_smooth)
 ```
 
 Using the AIC, which model is preferred out of the Gini coefficient GAM and the log-GDP GAM?
 
 ``` {r, eval=TRUE}
-glance(gam_gini_smooth)
+anova(gam_gini_smooth, gam_gdp_smooth)
 # log-GDP is preferred (smaller AIC)
 ```
 
@@ -150,11 +157,11 @@ Fit a GAM that contains smooth functions of all of the following: the Gini coeff
 ``` {r, eval=TRUE}
 gam_full_smooth <- gam(data    = covid_data,
                        formula = p ~ s(`SI.POV.GINI`) + s(`log_gdp`) + s(`mean_hh`),
-                       family  = "binomial", weights = pop_est)
+                       family  = "binomial", weights = `population`)
 
 gam_mean_hh_smooth <- gam(data    = covid_data,
                 formula = p ~ s(`mean_hh`),
-                family  = "binomial", weights = pop_est)
+                family  = "binomial", weights = `population`)
 summary(gam_full_smooth)
 ```
 
@@ -184,12 +191,9 @@ What happens to the each of the fitted smooths when you compare each of the indi
 Calculate the AIC for all four of the models. Which model is preferred?
 
 ``` {r}
-glance(gam_full_smooth) 
-glance(gam_gdp_smooth)
-glance(gam_gini_smooth)
-glance(gam_mean_hh_smooth)
+anova(gam_full_smooth, gam_gdp_smooth, gam_gini_smooth, gam_mean_hh_smooth)
 
-# full model has a MUCH lower AIC -- preferred 
+# full model has a lower AIC -- preferred 
 ```
 
 Using functional programming in the purrr package we can simplify the calculation a little if you want, reducing the number of times we copy-paste the same code.
