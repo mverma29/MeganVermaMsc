@@ -363,7 +363,7 @@ mod_1df <- mod_1df %>%
                 "iso2c","SI.POV.GINI","year","total_cases_per_million",
                 "log_total_cases", "gdp_md_est","pop_est") 
 
-mod_1df <- mod_1df %>% mutate(log_gdp = log(`gdp_md_est`))
+mod_1df <- mod_1df %>% mutate(log_gdp = log10(gdp_md_est))
 
 mod_1df <- drop_na(mod_1df, SI.POV.GINI, mean_hh) 
 
