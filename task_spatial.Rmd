@@ -50,6 +50,12 @@ One of the simplest ways to approach this is the Conditional Autoregressive (CAR
 
 At this point, you should read over the notes on [Areal modelling](https://isair2021.netlify.app/04_models/models/) from the 2021 offering of the ISAIR course.
 
+## Adding a spatial component to the model
+
+We have a world map as an object of class `sf` which allows us to extract information about adjacency of countries. First, let's look at building a model that uses a structured spatial random effect for the UN subregion effect, as our previous spatial model (in the GLM task) was an unstructured fixed effect (generally not the right way to include and interpret this).
+
+
+
 ## References
 
 
