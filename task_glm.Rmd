@@ -524,3 +524,4 @@ write_csv(mod_1df, "data/glmcoviddata.csv")
 ## References
 
 
+<!-- https://www.taylorfrancis.com/books/mono/10.4324/9780203854501/work-integrated-learning-lesley-cooper-janice-orrell-margaret-bowden -->
