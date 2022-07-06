@@ -348,7 +348,8 @@ mod_1df <- merge(x    = un_hh_iso,
                  y    = owid_gini_latest, 
                  by.x = "iso_code_l",
                  by.y = "iso_code") %>% 
-  dplyr::select("iso_code_l", "mean_hh", "un_subregion", "country", "total_cases_per_million",
+  dplyr::select("iso_code_l", "mean_hh", "un_subregion",
+                "country", "total_cases_per_million",
                 "iso2c", "SI.POV.GINI", "year") 
 
 # merge this dataset with world dataset to get GDP, total cases per million (outcome)
