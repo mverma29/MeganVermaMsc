@@ -434,11 +434,12 @@ tidy(mod_1.2, conf.int = T)
 glance(mod_1.2)
 
 library(purrr)
-list(`gdp mean_hh Gini` = mod_1, # replace NULL with model object name
-     `gdp Gini = mod_1.1,
-     `gdp mean_hh Gini UNsubregion` = mod_1.2)
-     %>%
-  map_df(~epiDisplay::logistic.display(.x), .id = "Model") %>%
+tidy_model_coefs <- list(`gdp mean_hh Gini` = mod_1, # replace NULL with model object name
+     `gdp Gini` = mod_1.1,
+     `gdp mean_hh Gini UNsubregion` = mod_1.2) %>%
+  map_df(tidy, .id = "Model")
+
+# map_df(.x, .f) will only work if the results of .f are a data frame
   
 
 
@@ -488,11 +489,8 @@ Sam: another way to do this is to bind by rows rather than merging columns
 ``` {r}
 
 # as before, but with model identifiers 
-tidy_mod1   <- tidy(mod_1)   %>% mutate(Model = 'Gini + log GDP + HH size')
-tidy_mod1.1 <- tidy(mod_1.1) %>% mutate(Model = 'Gini + log GDP')
-tidy_mod1.2 <- tidy(mod_1.2) %>% mutate(Model = 'Gini + log GDP + HH size + subregion')
 
-tidy_model_coefs <- bind_rows(tidy_mod1, tidy_mod1.1, tidy_mod1.2) %>%
+tidy_model_coefs <- tidy_model_coefs %>%
   filter(term %in% c("log_gdp", "mean_hh", "SI.POV.GINI"))
 
 ggplot(data = tidy_model_coefs,
