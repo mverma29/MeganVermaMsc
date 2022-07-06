@@ -377,7 +377,7 @@ mod_1df <- mod_1df %>% mutate(p = total_cases_per_million/1e6)
 
 summary(mod_1df$p)
 
-mod_1df <- mutate(p = pmax(0, pmin(1, p))) # truncating range to [0,1]
+mod_1df <- mutate(mod_1df, p = pmax(0, pmin(1, p))) # truncating range to [0,1]
 
 # mod_1df <- filter(mod_1df, p <= 1, p >= 0) #now shouldn't need this (see summary)
 
