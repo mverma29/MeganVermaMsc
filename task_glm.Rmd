@@ -353,9 +353,10 @@ mod_1df <- merge(x    = un_hh_iso,
                 "iso2c", "SI.POV.GINI", "year") 
 
 # merge this dataset with world dataset to get GDP, total cases per million (outcome)
-mod_1df <- merge(x=mod_1df, y=world_with_cases, by.x="iso_code_l", by.y = "iso_code") 
-# merges incorrectly-- total cases per million gets duplicated (.x and .y)
-names(mod_1df)
+mod_1df <- merge(x    = mod_1df,
+                 y    = world_with_cases, 
+                 by.x = c("iso_code_l", "total_cases_per_million"), 
+                 by.y = c("iso_code",   "total_cases_per_million")) 
 
 mod_1df <- mod_1df %>% 
   dplyr::select("iso_code_l","mean_hh","un_subregion","country",
