@@ -501,16 +501,16 @@ ggplot(data = tidy_model_coefs,
 # or
 
 ggplot(data = tidy_model_coefs,
-       aes(x = estimate, y = Model)) +
+       aes(x = exp(estimate), y = Model)) +
   geom_point() +
   facet_wrap(~term, scales = 'free_x', ncol = 1,
              labeller = as_labeller(c("log_gdp" = "log GDP",
                                       "mean_hh" = "Mean household size",
                                       "SI.POV.GINI" = "Gini coefficient"))) +
-  geom_vline(xintercept = 0, lty = 2) +
+  geom_vline(xintercept = 1, lty = 2) +
   theme_minimal() +
   theme(axis.text.y = element_text(hjust = 0)) +
-  xlab("Marginal effect")
+  xlab("Odds Ratio")
 ```
 
 ## Tidying up
