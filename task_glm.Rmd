@@ -373,11 +373,13 @@ Fit the model described above.
 
 ``` {r, eval = TRUE}
 
-mod_1df <- mod_1df %>% mutate(p = total_cases_per_million*1e6)
+mod_1df <- mod_1df %>% mutate(p = total_cases_per_million/1e6)
 
 summary(mod_1df$p)
 
-mod_1df <- filter(mod_1df, p <= 1, p >= 0) #now shouldn't need this (see summary)
+mod_1df <- mutate(p = pmax(0, pmin(1, p))) # truncating range to [0,1]
+
+# mod_1df <- filter(mod_1df, p <= 1, p >= 0) #now shouldn't need this (see summary)
 
 mod_1 <- glm(data    = mod_1df,
              formula = p ~ `log_gdp` + `mean_hh` + `SI.POV.GINI`,
