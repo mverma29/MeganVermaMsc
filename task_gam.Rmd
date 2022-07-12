@@ -166,7 +166,7 @@ summary(gam_full_smooth)
 ```
 
 
-For each of the models with only one smooth function, plot the fitted smooth function. Save these graphs.
+For each of the models with only one smooth function, plot the fitted smooth function. Save these graphs as files, e.g. PDF or PNG.
 
 ``` {r}
 plot_gdp <- plot(gam_gdp_smooth) 
@@ -208,6 +208,31 @@ list(`log-GDP`           = gam_gdp_smooth, # replace NULL with model object name
 ```
 
 The above code says 'make a list of models' and then 'apply the `glance()` function to everything in the list', returning the results as a data frame with a column called `Model` that contains the names from the list, and then 'select only these columns'.
+
+## Extension exercise
+
+Gini coefficient and GDP likely have an interaction, as some nations with a high national GDP may also have high economic inequality, indicating an imbalance in who shares in the wealth.
+
+Generate a scatterplot of Gini coefficient and GDP. Choose appropriate scales, labels and annotations where necessary.
+
+``` {r}
+NULL
+```
+
+In the `glm()` function we specify an interaction between linear terms as `y ~ x1*x2`. In mgcv's `gam()` function we can specify the interaction between two smooth terms ..
+
+
+``` {r}
+gam_int_smooth <- gam(data    = covid_data,
+                       formula = p ~ s(`SI.POV.GINI`, `log_gdp`) + s(`mean_hh`),
+                       family  = "binomial", weights = pop_est)
+
+gam_te_smooth <- gam(data    = covid_data,
+                       formula = p ~ te(`SI.POV.GINI`, `log_gdp`) + s(`mean_hh`),
+                       family  = "binomial", weights = pop_est)
+
+```
+
 
 ## References
 
