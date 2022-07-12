@@ -54,6 +54,29 @@ At this point, you should read over the notes on [Areal modelling](https://isair
 
 We have a world map as an object of class `sf` which allows us to extract information about adjacency of countries. First, let's look at building a model that uses a structured spatial random effect for the UN subregion effect, as our previous spatial model (in the GLM task) was an unstructured fixed effect (generally not the right way to include and interpret this).
 
+Using the world map from `rnaturalearth` or another world map object in R, obtain an adjacency matrix for the UN subregions. You may need to use `countrycode::countrycode()` to get the UN subregion value into your map data frame with some minor fixes for places where there's insufficient UN geoscheme info.
+
+``` {r, eval = FALSE}
+world_with_subregions <- world %>%
+  mutate(world, 
+         un_subregion = countrycode(sourcevar   = `iso_a3`, 
+                                    origin      = 'iso3c',
+                                    destination = 'un.regionsub.name')) %>%
+  mutate(un_subregion = case_when(
+    iso_a3    == "ATA"                         ~ "Antarctica",
+    iso_a3    == "TWN"                         ~ "Eastern Asia",
+    name_long == "Ashmore and Cartier Islands" ~ "Australia and New Zealand",
+    name_long == "Northern Cyprus"             ~ "Western Asia",
+    name_long == "Indian Ocean Territories"    ~ "South-eastern Asia",
+    name_long == "Siachen Glacier"             ~ "Southern Asia",
+    name_long == "Kosovo"                      ~ "Southern Europe",
+    name_long == "Somaliland"                  ~ "Sub-Saharan Africa",
+    TRUE                                       ~ un_subregion))
+```
+
+Examine the structure of the matrix that you generate via software. Do the adjacencies make sense? If there are any that should be or should not be neighbours, edit the matrix (remembering that $W_{ij}$ should be equal to $W_{ji}$). Alternatively, you may wish to build $W$ from scratch.
+
+
 
 
 ## References
