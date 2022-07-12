@@ -209,7 +209,7 @@ list(`log-GDP`           = gam_gdp_smooth, # replace NULL with model object name
 
 The above code says 'make a list of models' and then 'apply the `glance()` function to everything in the list', returning the results as a data frame with a column called `Model` that contains the names from the list, and then 'select only these columns'.
 
-## Extension exercise
+## Interaction terms (extension)
 
 Gini coefficient and GDP likely have an interaction, as some nations with a high national GDP may also have high economic inequality, indicating an imbalance in who shares in the wealth.
 
@@ -219,17 +219,23 @@ Generate a scatterplot of Gini coefficient and GDP. Choose appropriate scales, l
 NULL
 ```
 
-In the `glm()` function we specify an interaction between linear terms as `y ~ x1*x2`. In mgcv's `gam()` function we can specify the interaction between two smooth terms ..
+In the `glm()` function we specify an interaction between linear terms as `y ~ x1*x2`. In mgcv's `gam()` function we can specify the interaction between two smooth terms using a **tensor smooth** of the splines. Without going into too much detail, this allows us to make a 2D (or higher) product of all combinations of the spline basis functions for `x1` and `x2` so that we can fit a smooth surface rather than just a smooth line.
 
 
 ``` {r}
-gam_int_smooth <- gam(data    = covid_data,
-                       formula = p ~ s(`SI.POV.GINI`, `log_gdp`) + s(`mean_hh`),
-                       family  = "binomial", weights = pop_est)
-
 gam_te_smooth <- gam(data    = covid_data,
-                       formula = p ~ te(`SI.POV.GINI`, `log_gdp`) + s(`mean_hh`),
-                       family  = "binomial", weights = pop_est)
+                     formula = p ~ te(`SI.POV.GINI`, `log_gdp`) + s(`mean_hh`),
+                     family  = "binomial", weights = pop_est)
+
+```
+
+Alternatively, we can include the main effects of `x1` and `x2` by using the **tensor interaction** term, which is akin to the `x1:x2` interaction in `glm()`.
+
+``` {r}
+gam_ti_smooth <- gam(data    = covid_data,
+                     formula = p ~ s(SI.POV.GINI) + s(log_gdp) +
+                         ti(`SI.POV.GINI`, `log_gdp`) + s(`mean_hh`),
+                     family  = "binomial", weights = pop_est)
 
 ```
 
