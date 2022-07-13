@@ -56,7 +56,16 @@ We have a world map as an object of class `sf` which allows us to extract inform
 
 Using the world map from `rnaturalearth` or another world map object in R, obtain an adjacency matrix for the UN subregions. You may need to use `countrycode::countrycode()` to get the UN subregion value into your map data frame with some minor fixes for places where there's insufficient UN geoscheme info.
 
-``` {r, eval = FALSE}
+``` {r, eval = TRUE}
+library(rnaturalearth)
+library(rnaturalearthdata)
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+```
+
+``` {r, eval = TRUE}
+library(countrycode)
+
 world_with_subregions <- world %>%
   mutate(world, 
          un_subregion = countrycode(sourcevar   = `iso_a3`, 
