@@ -234,7 +234,9 @@ In the `glm()` function we specify an interaction between linear terms as `y ~ x
 ``` {r}
 gam_te_smooth <- gam(data    = covid_data,
                      formula = p ~ te(`SI.POV.GINI`, `log_gdp`) + s(`mean_hh`),
-                     family  = "binomial", weights = pop_est)
+                     family  = "binomial", weights = `population`)
+summary(gam_te_smooth)
+tidy(gam_te_smooth)
 
 ```
 
@@ -244,9 +246,21 @@ Alternatively, we can include the main effects of `x1` and `x2` by using the **t
 gam_ti_smooth <- gam(data    = covid_data,
                      formula = p ~ s(SI.POV.GINI) + s(log_gdp) +
                          ti(`SI.POV.GINI`, `log_gdp`) + s(`mean_hh`),
-                     family  = "binomial", weights = pop_est)
+                     family  = "binomial", `population`)
+summary(gam_ti_smooth)
+tidy(gam_ti_smooth)
 
 ```
+```{r}
+anova(gam_te_smooth, gam_ti_smooth)
+
+# not the same AIC 
+
+plot(gam_te_smooth)
+plot(gam_ti_smooth)
+```
+```
+
 
 
 ## References
