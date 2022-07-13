@@ -216,7 +216,16 @@ Gini coefficient and GDP likely have an interaction, as some nations with a high
 Generate a scatterplot of Gini coefficient and GDP. Choose appropriate scales, labels and annotations where necessary.
 
 ``` {r}
-NULL
+ggplot (data=covid_data,
+        mapping= (aes(x=log_gdp, 
+                      y=SI.POV.GINI))) + 
+    geom_point() + 
+    xlab("Log GDP per capita") + 
+    ylab("Gini coefficient") + 
+    geom_smooth(method = 'lm') +
+    ggtitle("Potential GDP Gini Interaction") + 
+    theme(plot.title = element_text(hjust=0.5)) 
+    
 ```
 
 In the `glm()` function we specify an interaction between linear terms as `y ~ x1*x2`. In mgcv's `gam()` function we can specify the interaction between two smooth terms using a **tensor smooth** of the splines. Without going into too much detail, this allows us to make a 2D (or higher) product of all combinations of the spline basis functions for `x1` and `x2` so that we can fit a smooth surface rather than just a smooth line.
