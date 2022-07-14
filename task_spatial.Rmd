@@ -105,7 +105,10 @@ st_crs(world_with_subregions)
 world_weights <- 0+world_weights 
 summary(world_weights)
 
-# how to visualize this? the matrix is "of a diff length" to world_with_subregions data, so can't plot on top of each other 
+# how to visualize this matrix? the matrix is "of a diff length" to world_with_subregions data, so can't plot on top of each other 
+
+plot(world_with_subregions$geometry)
+# plot(world_weights, add=TRUE)
 
 ```
 
