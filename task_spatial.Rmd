@@ -82,6 +82,32 @@ world_with_subregions <- world %>%
     name_long == "Somaliland"                  ~ "Sub-Saharan Africa",
     TRUE                                       ~ un_subregion))
 ```
+ˆ
+```{r}
+
+if (!require("pacman")) install.packages("pacman")
+pkgs = c("sf", "mgcv",
+         "tidyverse", "magrittr")
+pacman::p_load(pkgs, character.only = T)
+
+#define queen contiguity 
+st_queen <- function(a, b = a,...) st_relate(a, b, pattern = "F***T****", ...)
+
+#define neighbors 
+# create a neighbours object
+library(sf)
+sf_use_s2(FALSE)
+world_weights <- st_queen(world_with_subregions, sparse=FALSE)
+# assumes they are planar-- need to project to mercatori CRS? 
+st_crs(world_with_subregions)
+
+
+world_weights <- 0+world_weights 
+summary(world_weights)
+
+# how to visualize this? the matrix is "of a diff length" to world_with_subregions data, so can't plot on top of each other 
+
+```
 
 Examine the structure of the matrix that you generate via software. Do the adjacencies make sense? If there are any that should be or should not be neighbours, edit the matrix (remembering that $W_{ij}$ should be equal to $W_{ji}$). Alternatively, you may wish to build $W$ from scratch.
 
