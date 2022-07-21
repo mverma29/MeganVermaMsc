@@ -9,4 +9,17 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+#setup 
+
+source("01_load_packages.R")
+
+source("02_load_data.R")
+
+source("03_explore_data.R")
+
+source("04_fit_models.R")
+
+source("05_make_plots.R")
+```
 
