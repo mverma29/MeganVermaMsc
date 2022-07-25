@@ -4,17 +4,21 @@
 
 source("mscprojectscript_01_load_packages")
 
-# load data 
+### load data ----
 
 #RESPICAR dataset (summary)
 respicar <- read_csv("/Users/meganverma/Desktop/git/MeganVermaMsc/data/appendix_summary.csv")
 
-#sociodemographic variables:
+### sociodemographic variables----
 
-# Percent urbanicity
+# Percent urbanicity----
+# from un populations divison, accessed via world bank
+urban_percent <- read_csv("/Users/meganverma/Desktop/git/MeganVermaMsc/data/urban_pop_percent.csv")
 
-# GDP 
+# GDP----
 WDIsearch("gdp per capita")
+# #5 seems right-- GDP per capita, current USD 
+
 gdp_data <- WDI(country = "all",
   indicator = "NY.GDP.PCAP.CD",
   start = 1990,
@@ -24,13 +28,41 @@ gdp_data <- WDI(country = "all",
   latest = NULL,
   language = "en")
 
-# Gini 
 
-# Household size 
+# Gini----
+gini<- WDI(country="all", 
+           indicator= "SI.POV.GINI", 
+           start = 1990,
+           end = 2016, 
+           language = "en")
 
-# Maternal education? 
 
-# UN subregion 
-# NE data? UN Data
 
-# merge datasets on year end (&iso code)
+# Household size----
+# Download the UN Population Division's data on [Household size and composition]
+# (https://www.un.org/development/desa/pd/data/household-size-and-composition)
+
+un_data <- readxl::read_xlsx("/Users/meganverma/Desktop/git/MeganVermaMsc/data/un_hh.xlsx", 
+                             sheet= 4, 
+                             range= "A5:E819", 
+                             col_names = TRUE)
+
+un_data
+
+# will need to find HH data from each study's year end date 
+# (for countries with mult studies, we take most recent study end date)
+
+
+# female education (proxy for maternal)----
+# UNESCO data, from world bank site 
+# secondary education levels!
+
+female_ed <- read_csv("/Users/meganverma/Desktop/git/MeganVermaMsc/data/female_secondary_education.csv")
+
+
+
+# UN subregion---- 
+# already in world_with_cases as "subregion"
+
+
+### merge datasets on year end (& numeric iso code)----
