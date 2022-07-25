@@ -1,10 +1,7 @@
----
-title: "mscprojectscript"
-author: "Megan Verma"
-date: "7/21/2022"
-output: html_document
----
-    
+# Megan Verma 
+# 7/25/2022 
+
+
 #setup: load packages
     
 library(mgcv)
