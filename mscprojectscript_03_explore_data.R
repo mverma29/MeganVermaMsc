@@ -7,6 +7,10 @@ source("/Users/meganverma/Desktop/git/MeganVermaMsc/mscprojectscript_02_load_dat
 # view(respicar) 
 summary(respicar) 
 # 429 datasets
+# Cross-sectional:303
+# Longitudinal   :125
+# Unknown design :  1
+
 t1 <- table(respicar$Country)
 df1 <- as.data.frame(t1)
 # 73 countries, most from US then portugal/israel/brazil (44 & 22 each)
