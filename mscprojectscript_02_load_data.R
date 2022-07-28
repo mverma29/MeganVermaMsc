@@ -16,10 +16,9 @@ urban_percent <- read_csv("data/urban_pop_percent.csv")
 # needs reshaping and ensure that the year has an appropriate class
 urban_percent <- urban_percent %>% 
     pivot_longer(cols = "1960":"2021", 
-                 names_to = "Year")
-urban_percent$Year <- as.integer(urban_percent$Year)
-class(urban_percent$value)
-urban_percent <- rename(urban_percent,"urban_percent"="value")
+                 names_to = "year", values_to = "urban_percent")
+
+urban_percent <- mutate(urban_percent, year = parse_integer(year))
 
 # GDP----
 WDIsearch("gdp per capita")
@@ -56,7 +55,7 @@ hh_data <- readxl::read_xlsx("data/un_hh.xlsx",
                              range= "A5:E819", 
                              col_names = TRUE)
 
-hh_data
+names(hh_data)
 
 # will need to find HH data from each study's year START date-- might be missing 
 
@@ -70,9 +69,10 @@ female_ed <- read_csv("data/female_secondary_education.csv")
 
 female_ed <- female_ed %>% 
     pivot_longer(cols = "1960":"2021", 
-                 names_to = "Year")
-female_ed$Year <- as.integer(female_ed$Year)
-female_ed <- rename(female_ed,"female_ed"="value")
+                 names_to = "year", values_to = "female_ed")
+
+female_ed <- mutate(female_ed, year = parse_number(year))
+
 summary(female_ed)
 
 # UN subregion---- 
@@ -84,6 +84,7 @@ summary(female_ed)
 ## urban percent----
 # match on iso code
 names(urban_percent)
+
 urban_percent <- mutate(urban_percent, 
                       iso_code = countrycode(sourcevar   = `Country Code`, 
                                              origin      = 'wb',
@@ -93,7 +94,7 @@ urban_percent$iso_code
 # this is ok bc no RESPICAR studies on Kosovo 
 
 urban_percent <- drop_na(urban_percent, "iso_code")
-urban_percent$iso_code
+sum(is.na(urban_percent$iso_code)) # 0 NA
 
 respicar <- respicar %>% 
     group_by(`ISO 3166-1`,`Country`) %>%
@@ -102,10 +103,12 @@ respicar <- respicar %>%
 respicar_socio <- merge(x=respicar, 
                         y=urban_percent, 
                         by.x= c("ISO 3166-1", "Year started"),
-                        by.y= c("iso_code", "Year"),
+                        by.y= c("iso_code", "year"),
                         all.x = TRUE) %>% 
     select(!c("Country Name", "Country Code", "Indicator Name", "Indicator Code"))
 names(respicar_socio)
+sum(is.na(respicar_socio$urban_percent))
+# 8/439 missing values for urban percent (1.8%)
 
 ## GDP---- 
 names(gdp_data)
@@ -114,6 +117,8 @@ gdp_data <- mutate(gdp_data,
                                                origin      = 'iso3c',
                                                destination = 'iso3n'))
 gdp_data <- gdp_data %>% drop_na(iso_code)
+sum(is.na(gdp_data$iso_code)) # 0 NA
+
 
 gdp_data <- gdp_data %>% 
     rename("gdp_usd"="NY.GDP.PCAP.CD") %>% 
@@ -125,6 +130,9 @@ respicar_socio <- merge(x=respicar_socio,
                         by.y= c("iso_code", "year"),
                         all.x = TRUE)
 names(respicar_socio)
+sum(is.na(respicar_socio$gdp_usd))
+# 16/439 missing values for gdp (3.6%)
+
 ## Gini---- 
 names(gini)
 gini <- mutate(gini, 
@@ -132,6 +140,7 @@ gini <- mutate(gini,
                                           origin      = 'iso3c',
                                           destination = 'iso3n'))
 gini <- gini %>% drop_na(iso_code)
+sum(is.na(gini$iso_code)) # 0 NA
 
 gini <- gini %>% 
     rename("gini"="SI.POV.GINI") %>% 
@@ -143,29 +152,55 @@ respicar_socio <- merge(x=respicar_socio,
                         by.y= c("iso_code", "year"),
                         all.x = TRUE)
 names(respicar_socio)
-## Household size
+sum(is.na(respicar_socio$gini))
+# 219/439 missing values for gini (49.9%)******* 
+
+## Household size-----
 names(hh_data)
 class(hh_data$`Reference date (dd/mm/yyyy)`)
 
 hh_data <- hh_data %>% 
-    mutate(refyear = as.Date(`Reference date (dd/mm/yyyy)`, 
+    mutate(year = as.Date(`Reference date (dd/mm/yyyy)`, 
                              format= "%d/%m/%y"))
-hh_data <- hh_data %>% 
-    mutate(refyear = format("%Y"))
 
-hh_data <- select(!c("Data source category"))
+hh_data <- mutate(hh_data, year = year(`year`))
 
-gini <- gini %>% drop_na(iso_code)
-
-gini <- gini %>% 
-    rename("gini"="SI.POV.GINI") %>% 
-    select("year", "iso_code", "gini")
+hh_data <- select(hh_data, -c("Data source category",
+                              "Reference date (dd/mm/yyyy)", 
+                              "Country or area"))
+hh_data <- rename(hh_data, "iso_code" = "ISO Code")
 
 respicar_socio <- merge(x=respicar_socio, 
-                        y=gini, 
+                        y=hh_data, 
+                        by.x= c("ISO 3166-1", "Year started"),
+                        by.y= c("iso_code", "year"),
+                        all.x = TRUE)
+# 42 new entries?? unsure of how to check what's added, only know how to check what's dropped 
+names(respicar_socio)
+
+sum(is.na(respicar_socio$`Average household size (number of members)`))
+# 359 are missing-- this not good 
+
+
+
+## Female education----
+names(female_ed)
+female_ed <- mutate(female_ed, 
+               iso_code = countrycode(sourcevar   = `Country Code`, 
+                                      origin      = 'iso3c',
+                                      destination = 'iso3n'))
+female_ed <- female_ed %>% drop_na(iso_code)
+
+female_ed <- female_ed %>% 
+    select("year", "iso_code", "female_ed")
+sum(is.na(female_ed$female_ed))
+# 7460/13330 entries are missing 
+
+respicar_socio <- merge(x=respicar_socio, 
+                        y=female_ed, 
                         by.x= c("ISO 3166-1", "Year started"),
                         by.y= c("iso_code", "year"),
                         all.x = TRUE)
 names(respicar_socio)
-
-
+sum(is.na(respicar_socio$female_ed))
+# 130/439 missing values for female ed (29.6%) ********
