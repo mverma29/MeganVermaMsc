@@ -150,8 +150,8 @@ class(hh_data$`Reference date (dd/mm/yyyy)`)
 hh_data <- hh_data %>% 
     mutate(refyear = as.Date(`Reference date (dd/mm/yyyy)`, 
                              format= "%d/%m/%y"))
-hh_data <- hh_data %>% 
-    mutate(refyear = format("%Y"))
+
+hh_data$refyear<- hh_data %>% year(`refyear`)
 
 hh_data <- select(!c("Data source category"))
 
