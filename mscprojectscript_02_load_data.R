@@ -32,6 +32,7 @@ gini<- WDI(country="all",
            start = 1990,
            end = 2016, 
            language = "en")
+# needs reshaping and ensure that the year has an appropriate class
 
 
 
@@ -55,6 +56,7 @@ un_data
 # secondary education levels!
 
 female_ed <- read_csv("data/female_secondary_education.csv")
+# needs reshaping and ensure that the year has an appropriate class
 
 
 
@@ -62,4 +64,4 @@ female_ed <- read_csv("data/female_secondary_education.csv")
 # already in world_with_cases as "subregion"
 
 
-### merge datasets on year end (& numeric iso code)----
+### merge datasets on each study's `Year started` & numeric iso code----
