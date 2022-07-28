@@ -4,13 +4,13 @@
 ### load data ----
 
 #RESPICAR dataset (summary)
-respicar <- read_csv("/data/appendix_summary.csv")
+respicar <- read_csv("data/appendix_summary.csv")
 
 ### sociodemographic variables----
 
 # Percent urbanicity----
 # from un populations divison, accessed via world bank
-urban_percent <- read_csv("/data/urban_pop_percent.csv")
+urban_percent <- read_csv("data/urban_pop_percent.csv")
 
 # GDP----
 WDIsearch("gdp per capita")
@@ -37,9 +37,9 @@ gini<- WDI(country="all",
 
 # Household size----
 # Download the UN Population Division's data on [Household size and composition]
-# (https://www.un.org/development/desa/pd/data/household-size-and-composition)
+# (https://www.un.org/development/desa/pddata/household-size-and-composition)
 
-un_data <- readxl::read_xlsx("/data/un_hh.xlsx", 
+un_data <- readxl::read_xlsx("data/un_hh.xlsx", 
                              sheet= 4, 
                              range= "A5:E819", 
                              col_names = TRUE)
@@ -54,7 +54,7 @@ un_data
 # UNESCO data, from world bank site 
 # secondary education levels!
 
-female_ed <- read_csv("/data/female_secondary_education.csv")
+female_ed <- read_csv("data/female_secondary_education.csv")
 
 
 

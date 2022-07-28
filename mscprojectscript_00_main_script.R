@@ -7,4 +7,4 @@ source("mscprojectscript_01_load_packages.R")
 source("mscprojectscript_02_load_data.R")
 
 # Exploratory data analysis
-source("mscprojectscript_03_explore_data.R")
+source("mscprojectscript_03_explore_data.R", verbose = TRUE)
