@@ -11,37 +11,36 @@ respicar <- read_csv("data/appendix_summary.csv")
 
 # Percent urbanicity----
 # from un populations divison, accessed via world bank
-urban_percent <- read_csv("data/urban_pop_percent.csv")
-
-# needs reshaping and ensure that the year has an appropriate class
-urban_percent <- urban_percent %>% 
-    pivot_longer(cols = "1960":"2021", 
-                 names_to = "year", values_to = "urban_percent")
-
-urban_percent <- mutate(urban_percent, year = parse_integer(year))
+urban_percent <- read_csv("data/urban_pop_percent.csv")  %>% 
+    pivot_longer(cols      = "1960":"2021", 
+                 names_to  = "year", 
+                 values_to = "urban_percent") %>%
+    mutate(year = parse_integer(year))
 
 # GDP----
 WDIsearch("gdp per capita")
 # #5 seems right-- GDP per capita, current USD 
 
-gdp_data <- WDI(country = "all",
-  indicator = "NY.GDP.PCAP.CD",
-  start = 1990,
-  end = 2016,
-  extra = TRUE,
-  cache = NULL,
-  latest = NULL,
-  language = "en")
+gdp_data <- WDI(
+    country   = "all",
+    indicator = "NY.GDP.PCAP.CD",
+    start     = 1990,
+    end       = 2016,
+    extra     = TRUE,
+    cache     = NULL,
+    latest    = NULL,
+    language  = "en")
 
 class(gdp_data$year) #integer
 
 # Gini----
-gini<- WDI(country="all", 
-           indicator= "SI.POV.GINI", 
-           start = 1990,
-           end = 2016, 
-           extra = TRUE,
-           language = "en")
+gini <- WDI(
+    country   = "all", 
+    indicator = "SI.POV.GINI", 
+    start     = 1990,
+    end       = 2016, 
+    extra     = TRUE,
+    language  = "en")
 
 class(gini$year) #integer
 
@@ -50,10 +49,11 @@ class(gini$year) #integer
 # Download the UN Population Division's data on [Household size and composition]
 # (https://www.un.org/development/desa/pddata/household-size-and-composition)
 
-hh_data <- readxl::read_xlsx("data/un_hh.xlsx", 
-                             sheet= 4, 
-                             range= "A5:E819", 
-                             col_names = TRUE)
+hh_data <- readxl::read_xlsx(
+    path      = "data/un_hh.xlsx", 
+    sheet     = 4, 
+    range     = "A5:E819", 
+    col_names = TRUE)
 
 names(hh_data)
 
@@ -64,14 +64,11 @@ names(hh_data)
 # UNESCO data, from world bank site 
 # secondary education levels!
 
-female_ed <- read_csv("data/female_secondary_education.csv")
-# needs reshaping and ensure that the year has an appropriate class
-
-female_ed <- female_ed %>% 
-    pivot_longer(cols = "1960":"2021", 
-                 names_to = "year", values_to = "female_ed")
-
-female_ed <- mutate(female_ed, year = parse_number(year))
+female_ed <- read_csv("data/female_secondary_education.csv") %>% 
+    pivot_longer(cols      = "1960":"2021", 
+                 names_to  = "year", 
+                 values_to = "female_ed") %>%
+    mutate(year = parse_number(year))
 
 summary(female_ed)
 
