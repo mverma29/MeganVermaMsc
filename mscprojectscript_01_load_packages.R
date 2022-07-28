@@ -23,4 +23,9 @@ library(tidyverse)
 
 
 
-
+fill_socio <- function(x){
+    complete(x, iso_code, year) %>%
+        arrange(iso_code, year) %>%
+        group_by(iso_code) %>%
+        fill(!!!vars(-iso_code, -year), .direction = "downup")     
+}
