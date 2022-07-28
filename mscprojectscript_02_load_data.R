@@ -84,6 +84,7 @@ summary(female_ed)
 ## urban percent----
 # match on iso code
 names(urban_percent)
+
 urban_percent <- mutate(urban_percent, 
                       iso_code = countrycode(sourcevar   = `Country Code`, 
                                              origin      = 'wb',
@@ -151,15 +152,15 @@ hh_data <- hh_data %>%
     mutate(refyear = as.Date(`Reference date (dd/mm/yyyy)`, 
                              format= "%d/%m/%y"))
 
-hh_data$refyear<- hh_data %>% year(`refyear`)
+hh_data <- mutate(hh_data, refyear = year(`refyear`))
 
-hh_data <- select(!c("Data source category"))
+hh_data <- select(hh_data, -c("Data source category"))
 
 gini <- gini %>% drop_na(iso_code)
 
-gini <- gini %>% 
-    rename("gini"="SI.POV.GINI") %>% 
-    select("year", "iso_code", "gini")
+# gini <- gini %>% 
+#     rename("gini"="SI.POV.GINI") %>% 
+#     select("year", "iso_code", "gini")
 
 respicar_socio <- merge(x=respicar_socio, 
                         y=gini, 
