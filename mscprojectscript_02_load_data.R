@@ -1,9 +1,6 @@
 # Megan Verma 
 # 7/25/2022 
 
-
-source("mscprojectscript_01_load_packages.R")
-
 ### load data ----
 
 #RESPICAR dataset (summary)
