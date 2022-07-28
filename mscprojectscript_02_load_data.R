@@ -6,11 +6,20 @@
 #RESPICAR dataset (summary)
 respicar <- read_csv("data/appendix_summary.csv")
 
-### sociodemographic variables----
+
+### sociodemographic variables:
 
 # Percent urbanicity----
 # from un populations divison, accessed via world bank
 urban_percent <- read_csv("data/urban_pop_percent.csv")
+
+# needs reshaping and ensure that the year has an appropriate class
+urban_percent <- urban_percent %>% 
+    pivot_longer(cols = "1960":"2021", 
+                 names_to = "Year")
+urban_percent$Year <- as.integer(urban_percent$Year)
+class(urban_percent$value)
+urban_percent <- rename(urban_percent,"urban_percent"="value")
 
 # GDP----
 WDIsearch("gdp per capita")
@@ -25,15 +34,17 @@ gdp_data <- WDI(country = "all",
   latest = NULL,
   language = "en")
 
+class(gdp_data$year) #integer
 
 # Gini----
 gini<- WDI(country="all", 
            indicator= "SI.POV.GINI", 
            start = 1990,
            end = 2016, 
+           extra = TRUE,
            language = "en")
-# needs reshaping and ensure that the year has an appropriate class
 
+class(gini$year) #integer
 
 
 # Household size----
@@ -47,8 +58,7 @@ un_data <- readxl::read_xlsx("data/un_hh.xlsx",
 
 un_data
 
-# will need to find HH data from each study's year end date 
-# (for countries with mult studies, we take most recent study end date)
+# will need to find HH data from each study's year START date-- might be missing 
 
 
 # female education (proxy for maternal)----
@@ -58,10 +68,42 @@ un_data
 female_ed <- read_csv("data/female_secondary_education.csv")
 # needs reshaping and ensure that the year has an appropriate class
 
-
+female_ed <- female_ed %>% 
+    pivot_longer(cols = "1960":"2021", 
+                 names_to = "Year")
+female_ed$Year <- as.integer(female_ed$Year)
+female_ed <- rename(female_ed,"female_ed"="value")
+summary(female_ed)
 
 # UN subregion---- 
 # already in world_with_cases as "subregion"
 
 
-### merge datasets on each study's `Year started` & numeric iso code----
+### merge datasets on each study's `Year ended` & numeric iso code----
+
+## urban percent----
+# match on iso code
+names(urban_percent)
+urban_percent <- mutate(urban_percent, 
+                      iso_code = countrycode(sourcevar   = `Country Code`, 
+                                             origin      = 'wb',
+                                             destination = 'iso3n')) 
+urban_percent$iso_code
+# unmatched values are all summary values (regional or income level), except Kosovo (XKX)
+# this is ok bc no RESPICAR studies on Kosovo 
+
+urban_percent <- drop_na(urban_percent, "iso_code")
+urban_percent$iso_code
+
+respicar <- respicar %>% 
+    group_by(`ISO 3166-1`,`Country`) %>%
+    arrange(.by_group = TRUE)
+
+respicar_socio <- merge(x=respicar, 
+                        y=urban_percent, 
+                        by.x= c("ISO 3166-1", "Year started"),
+                        by.y= c("iso_code", "Year"),
+                        all.x = TRUE) %>% 
+    select(!c("Country Name", "Country Code", "Indicator Name", "Indicator Code"))
+names(respicar_socio)
+
