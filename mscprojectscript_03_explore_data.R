@@ -1,9 +1,6 @@
 # Megan Verma 
 # 7/25/2022 
 
-source("/Users/meganverma/Desktop/git/MeganVermaMsc/mscprojectscript_01_load_packages.R")
-source("/Users/meganverma/Desktop/git/MeganVermaMsc/mscprojectscript_02_load_data.R") #broken??
-
 # view(respicar) 
 summary(respicar) 
 # 429 datasets
