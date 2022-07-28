@@ -154,7 +154,9 @@ hh_data <- hh_data %>%
 
 hh_data <- mutate(hh_data, refyear = year(`refyear`))
 
-hh_data <- select(hh_data, -c("Data source category"))
+hh_data <- select(hh_data, -c("Data source category",
+                              "Reference date (dd/mm/yyyy)", 
+                              "Country or area"))
 
 gini <- gini %>% drop_na(iso_code)
 
@@ -163,10 +165,12 @@ gini <- gini %>% drop_na(iso_code)
 #     select("year", "iso_code", "gini")
 
 respicar_socio <- merge(x=respicar_socio, 
-                        y=gini, 
+                        y=hh_data, 
                         by.x= c("ISO 3166-1", "Year started"),
-                        by.y= c("iso_code", "year"),
+                        by.y= c("ISO Code", "refyear"),
                         all.x = TRUE)
+# 42 new entries?? unsure of how to check what's added, only know how to check what's dropped 
 names(respicar_socio)
 
-
+sum(is.na(respicar_socio$`Average household size (number of members)`))
+# 359 are missing-- this not good 
