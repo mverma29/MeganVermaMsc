@@ -51,12 +51,12 @@ class(gini$year) #integer
 # Download the UN Population Division's data on [Household size and composition]
 # (https://www.un.org/development/desa/pddata/household-size-and-composition)
 
-un_data <- readxl::read_xlsx("data/un_hh.xlsx", 
+hh_data <- readxl::read_xlsx("data/un_hh.xlsx", 
                              sheet= 4, 
                              range= "A5:E819", 
                              col_names = TRUE)
 
-un_data
+hh_data
 
 # will need to find HH data from each study's year START date-- might be missing 
 
@@ -79,7 +79,7 @@ summary(female_ed)
 # already in world_with_cases as "subregion"
 
 
-### merge datasets on each study's `Year ended` & numeric iso code----
+### merge datasets on each study's `Year started` & numeric iso code:----
 
 ## urban percent----
 # match on iso code
@@ -106,4 +106,66 @@ respicar_socio <- merge(x=respicar,
                         all.x = TRUE) %>% 
     select(!c("Country Name", "Country Code", "Indicator Name", "Indicator Code"))
 names(respicar_socio)
+
+## GDP---- 
+names(gdp_data)
+gdp_data <- mutate(gdp_data, 
+                        iso_code = countrycode(sourcevar   = `iso3c`, 
+                                               origin      = 'iso3c',
+                                               destination = 'iso3n'))
+gdp_data <- gdp_data %>% drop_na(iso_code)
+
+gdp_data <- gdp_data %>% 
+    rename("gdp_usd"="NY.GDP.PCAP.CD") %>% 
+    select("year", "iso_code", "gdp_usd")
+
+respicar_socio <- merge(x=respicar_socio, 
+                        y=gdp_data, 
+                        by.x= c("ISO 3166-1", "Year started"),
+                        by.y= c("iso_code", "year"),
+                        all.x = TRUE)
+names(respicar_socio)
+## Gini---- 
+names(gini)
+gini <- mutate(gini, 
+                   iso_code = countrycode(sourcevar   = `iso3c`, 
+                                          origin      = 'iso3c',
+                                          destination = 'iso3n'))
+gini <- gini %>% drop_na(iso_code)
+
+gini <- gini %>% 
+    rename("gini"="SI.POV.GINI") %>% 
+    select("year", "iso_code", "gini")
+
+respicar_socio <- merge(x=respicar_socio, 
+                        y=gini, 
+                        by.x= c("ISO 3166-1", "Year started"),
+                        by.y= c("iso_code", "year"),
+                        all.x = TRUE)
+names(respicar_socio)
+## Household size
+names(hh_data)
+class(hh_data$`Reference date (dd/mm/yyyy)`)
+
+hh_data <- hh_data %>% 
+    mutate(refyear = as.Date(`Reference date (dd/mm/yyyy)`, 
+                             format= "%d/%m/%y"))
+hh_data <- hh_data %>% 
+    mutate(refyear = format("%Y"))
+
+hh_data <- select(!c("Data source category"))
+
+gini <- gini %>% drop_na(iso_code)
+
+gini <- gini %>% 
+    rename("gini"="SI.POV.GINI") %>% 
+    select("year", "iso_code", "gini")
+
+respicar_socio <- merge(x=respicar_socio, 
+                        y=gini, 
+                        by.x= c("ISO 3166-1", "Year started"),
+                        by.y= c("iso_code", "year"),
+                        all.x = TRUE)
+names(respicar_socio)
+
 
