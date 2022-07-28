@@ -83,36 +83,45 @@ summary(female_ed)
 names(urban_percent)
 
 urban_percent <- mutate(urban_percent, 
-                      iso_code = countrycode(sourcevar   = `Country Code`, 
-                                             origin      = 'wb',
-                                             destination = 'iso3n')) 
+                        iso_code = countrycode(sourcevar   = `Country Code`, 
+                                               origin      = 'wb',
+                                               destination = 'iso3n')) 
 urban_percent$iso_code
+
+sum(is.na(unique(urban_percent$iso_code))) # 1 NA
 # unmatched values are all summary values (regional or income level), except Kosovo (XKX)
 # this is ok bc no RESPICAR studies on Kosovo 
 
 urban_percent <- drop_na(urban_percent, "iso_code")
-sum(is.na(urban_percent$iso_code)) # 0 NA
+
 
 respicar <- respicar %>% 
     group_by(`ISO 3166-1`,`Country`) %>%
     arrange(.by_group = TRUE)
 
-respicar_socio <- merge(x=respicar, 
-                        y=urban_percent, 
-                        by.x= c("ISO 3166-1", "Year started"),
-                        by.y= c("iso_code", "year"),
-                        all.x = TRUE) %>% 
+urban_percent %<>% fill_socio
+
+respicar_socio <- merge(
+    x     = respicar, 
+    y     = urban_percent, 
+    by.x  = c("ISO 3166-1", "Year started"),
+    by.y  = c("iso_code", "year"),
+    all.x = TRUE) %>% 
     select(!c("Country Name", "Country Code", "Indicator Name", "Indicator Code"))
+
 names(respicar_socio)
 sum(is.na(respicar_socio$urban_percent))
 # 8/439 missing values for urban percent (1.8%)
 
+filter(respicar_socio, is.na(urban_percent))
+
 ## GDP---- 
 names(gdp_data)
+
 gdp_data <- mutate(gdp_data, 
-                        iso_code = countrycode(sourcevar   = `iso3c`, 
-                                               origin      = 'iso3c',
-                                               destination = 'iso3n'))
+                   iso_code = countrycode(sourcevar   = `iso3c`, 
+                                          origin      = 'iso3c',
+                                          destination = 'iso3n'))
 gdp_data <- gdp_data %>% drop_na(iso_code)
 sum(is.na(gdp_data$iso_code)) # 0 NA
 
@@ -133,9 +142,9 @@ sum(is.na(respicar_socio$gdp_usd))
 ## Gini---- 
 names(gini)
 gini <- mutate(gini, 
-                   iso_code = countrycode(sourcevar   = `iso3c`, 
-                                          origin      = 'iso3c',
-                                          destination = 'iso3n'))
+               iso_code = countrycode(sourcevar   = `iso3c`, 
+                                      origin      = 'iso3c',
+                                      destination = 'iso3n'))
 gini <- gini %>% drop_na(iso_code)
 sum(is.na(gini$iso_code)) # 0 NA
 
@@ -158,7 +167,7 @@ class(hh_data$`Reference date (dd/mm/yyyy)`)
 
 hh_data <- hh_data %>% 
     mutate(year = as.Date(`Reference date (dd/mm/yyyy)`, 
-                             format= "%d/%m/%y"))
+                          format= "%d/%m/%y"))
 
 hh_data <- mutate(hh_data, year = year(`year`))
 
@@ -183,9 +192,9 @@ sum(is.na(respicar_socio$`Average household size (number of members)`))
 ## Female education----
 names(female_ed)
 female_ed <- mutate(female_ed, 
-               iso_code = countrycode(sourcevar   = `Country Code`, 
-                                      origin      = 'iso3c',
-                                      destination = 'iso3n'))
+                    iso_code = countrycode(sourcevar   = `Country Code`, 
+                                           origin      = 'iso3c',
+                                           destination = 'iso3n'))
 female_ed <- female_ed %>% drop_na(iso_code)
 
 female_ed <- female_ed %>% 
