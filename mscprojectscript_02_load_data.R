@@ -106,6 +106,8 @@ respicar_socio <- merge(x=respicar,
                         all.x = TRUE) %>% 
     select(!c("Country Name", "Country Code", "Indicator Name", "Indicator Code"))
 names(respicar_socio)
+sum(is.na(respicar_socio$urban_percent))
+# 8/439 missing values for urban percent (1.8%)
 
 ## GDP---- 
 names(gdp_data)
@@ -125,6 +127,9 @@ respicar_socio <- merge(x=respicar_socio,
                         by.y= c("iso_code", "year"),
                         all.x = TRUE)
 names(respicar_socio)
+sum(is.na(respicar_socio$gdp_usd))
+# 16/439 missing values for gdp (3.6%)
+
 ## Gini---- 
 names(gini)
 gini <- mutate(gini, 
@@ -143,7 +148,10 @@ respicar_socio <- merge(x=respicar_socio,
                         by.y= c("iso_code", "year"),
                         all.x = TRUE)
 names(respicar_socio)
-## Household size
+sum(is.na(respicar_socio$gini))
+# 219/439 missing values for gini (49.9%)******* 
+
+## Household size-----
 names(hh_data)
 class(hh_data$`Reference date (dd/mm/yyyy)`)
 
@@ -167,3 +175,27 @@ names(respicar_socio)
 
 sum(is.na(respicar_socio$`Average household size (number of members)`))
 # 359 are missing-- this not good 
+
+
+
+## Female education----
+names(female_ed)
+female_ed <- mutate(female_ed, 
+               iso_code = countrycode(sourcevar   = `Country Code`, 
+                                      origin      = 'iso3c',
+                                      destination = 'iso3n'))
+female_ed <- female_ed %>% drop_na(iso_code)
+
+female_ed <- female_ed %>% 
+    select("Year", "iso_code", "female_ed")
+sum(is.na(female_ed$female_ed))
+# 7460/13330 entries are missing 
+
+respicar_socio <- merge(x=respicar_socio, 
+                        y=female_ed, 
+                        by.x= c("ISO 3166-1", "Year started"),
+                        by.y= c("iso_code", "Year"),
+                        all.x = TRUE)
+names(respicar_socio)
+sum(is.na(respicar_socio$female_ed))
+# 130/439 missing values for female ed (29.6%) ********
