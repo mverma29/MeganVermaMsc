@@ -56,9 +56,7 @@ hh_data <- readxl::read_xlsx(
     col_names = TRUE)
 
 names(hh_data)
-
-# will need to find HH data from each study's year START date-- might be missing 
-
+sum(is.na(hh_data$`Average household size (number of members)`)) #0 NAs
 
 # female education (proxy for maternal)----
 # UNESCO data, from world bank site 
@@ -130,6 +128,8 @@ gdp_data <- gdp_data %>%
     rename("gdp_usd"="NY.GDP.PCAP.CD") %>% 
     select("year", "iso_code", "gdp_usd")
 
+gdp_data %<>% fill_socio
+
 respicar_socio <- merge(x=respicar_socio, 
                         y=gdp_data, 
                         by.x= c("ISO 3166-1", "Year started"),
@@ -137,7 +137,7 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gdp_usd))
-# 16/439 missing values for gdp (3.6%)
+# 0/439 missing values for gdp (0%)
 
 ## Gini---- 
 names(gini)
@@ -152,6 +152,8 @@ gini <- gini %>%
     rename("gini"="SI.POV.GINI") %>% 
     select("year", "iso_code", "gini")
 
+gini %<>% fill_socio
+
 respicar_socio <- merge(x=respicar_socio, 
                         y=gini, 
                         by.x= c("ISO 3166-1", "Year started"),
@@ -159,22 +161,42 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gini))
-# 219/439 missing values for gini (49.9%)******* 
+# 24/439 missing values for gini (5.5%)
 
 ## Household size-----
+
+# fix date to be year only 
 names(hh_data)
+
 class(hh_data$`Reference date (dd/mm/yyyy)`)
 
 hh_data <- hh_data %>% 
+    group_by(`Country or area`) %>% 
     mutate(year = as.Date(`Reference date (dd/mm/yyyy)`, 
                           format= "%d/%m/%y"))
+class(hh_data$year)
 
 hh_data <- mutate(hh_data, year = year(`year`))
 
-hh_data <- select(hh_data, -c("Data source category",
-                              "Reference date (dd/mm/yyyy)", 
-                              "Country or area"))
-hh_data <- rename(hh_data, "iso_code" = "ISO Code")
+# average for when there's multiple data sources for the same country-year
+
+hh_data <- mutate(hh_data, 
+                  average_hh = parse_number(`Average household size (number of members)`, 
+                                            na = c("", "NA")))
+# 40 parsing failures? 
+
+hh_data <- hh_data %>% 
+    summarise(mean_hh = mean(average_hh,
+                             na.rm = TRUE), 
+              iso_code = `ISO Code`) #down to 172 rows 
+
+sum(is.na(hh_data$mean_hh)) #11 NAs in mean_hh
+
+sum(is.na(hh_data$iso_code)) #0 NAs in iso_code
+
+hh_data <- select(hh_data, "iso_code", "mean_hh")
+
+hh_data %<>% fill_socio
 
 respicar_socio <- merge(x=respicar_socio, 
                         y=hh_data, 
