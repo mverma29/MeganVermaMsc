@@ -1,4 +1,4 @@
-# Megan Verman MSc Project
+# Megan Verma MSc Project
 
 # Load all packages required for analysis
 source("mscprojectscript_01_load_packages.R")
