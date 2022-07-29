@@ -20,6 +20,7 @@ conflict_prefer('year', 'lubridate')
 library(WDI)
 library(purrr)
 library(lubridate)
+library(magrittr)
 library(tidyverse)
 
 
