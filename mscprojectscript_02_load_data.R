@@ -170,31 +170,31 @@ names(hh_data)
 
 class(hh_data$`Reference date (dd/mm/yyyy)`)
 
-hh_data <- hh_data %>% 
-    group_by(`Country or area`) %>% 
-    mutate(year = as.Date(`Reference date (dd/mm/yyyy)`, 
+hh_data <- hh_data %>%
+    # group_by(`Country or area`) %>%
+    mutate(year = as.Date(`Reference date (dd/mm/yyyy)`,
                           format= "%d/%m/%y"))
 class(hh_data$year)
 
 hh_data <- mutate(hh_data, year = year(`year`))
+class(hh_data$year)
 
 # average for when there's multiple data sources for the same country-year
 
 hh_data <- mutate(hh_data, 
                   average_hh = parse_number(`Average household size (number of members)`, 
-                                            na = c("", "NA")))
+                                            na = c("", "NA", "..")))
 # 40 parsing failures? 
 
 hh_data <- hh_data %>% 
-    summarise(mean_hh = mean(average_hh,
-                             na.rm = TRUE), 
-              iso_code = `ISO Code`) #down to 172 rows 
+    group_by(`Country or area`, year,  iso_code = `ISO Code`) %>%
+    summarise(mean_hh = mean(average_hh, na.rm = TRUE), .groups = "drop") 
 
-sum(is.na(hh_data$mean_hh)) #11 NAs in mean_hh
+sum(is.na(hh_data$mean_hh)) #23 NAs in mean_hh
 
 sum(is.na(hh_data$iso_code)) #0 NAs in iso_code
 
-hh_data <- select(hh_data, "iso_code", "mean_hh")
+hh_data <- select(hh_data, year, iso_code, mean_hh)
 
 hh_data %<>% fill_socio
 
@@ -206,8 +206,8 @@ respicar_socio <- merge(x=respicar_socio,
 # 42 new entries?? unsure of how to check what's added, only know how to check what's dropped 
 names(respicar_socio)
 
-sum(is.na(respicar_socio$`Average household size (number of members)`))
-# 359 are missing-- this not good 
+sum(is.na(respicar_socio$mean_hh))
+# 28 are missing-- this not good 
 
 
 
