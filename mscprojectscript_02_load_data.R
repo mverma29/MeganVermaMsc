@@ -1,7 +1,7 @@
 # Megan Verma 
 # 7/25/2022 
 
-### load data ----
+### load RESPICAR data ----
 
 #RESPICAR dataset (summary)
 respicar <- read_csv("data/appendix_summary.csv")
@@ -75,9 +75,13 @@ summary(female_ed)
 world <- ne_countries(scale = "medium", returnclass = "sf")
 un_subregion <- world %>% select(geometry, subregion, iso_n3)
 
+na_world_iso <- tibble(filter(world, is.na(iso_n3)))
+na_world_iso %>% distinct(sovereignt)
+# 5 countries-ish without iso codes (only 2 "sovereign countries", Northern Cyprus & Kosovo)
+
 ### merge datasets on each study's `Year started` & numeric iso code:----
 
-## urban percent----
+        # urban percent----
 # match on iso code
 names(urban_percent)
 
@@ -113,8 +117,10 @@ sum(is.na(respicar_socio$urban_percent))
 # 8/439 missing values for urban percent (1.8%)
 
 filter(respicar_socio, is.na(urban_percent))
+na_urban_percent <- tibble(filter(respicar_socio, is.na(urban_percent)))
+na_urban_percent %>% distinct(Country)
 
-## GDP---- 
+        # GDP---- 
 names(gdp_data)
 
 gdp_data <- mutate(gdp_data, 
@@ -138,9 +144,10 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gdp_usd))
-# 0/439 missing values for gdp (0%)
-
-## Gini---- 
+# 14/439 missing values for gdp (3.1%)
+na_gdp <- tibble(filter(respicar_socio, is.na(gdp_usd)))
+na_gdp %>% distinct(Country)
+        # Gini---- 
 names(gini)
 gini <- mutate(gini, 
                iso_code = countrycode(sourcevar   = `iso3c`, 
@@ -163,8 +170,10 @@ respicar_socio <- merge(x=respicar_socio,
 names(respicar_socio)
 sum(is.na(respicar_socio$gini))
 # 24/439 missing values for gini (5.5%)
+na_gini <- tibble(filter(respicar_socio, is.na(gini)))
+na_gini %>% distinct(Country)
 
-## Household size-----
+        # Household size-----
 
 # fix date to be year only 
 names(hh_data)
@@ -208,10 +217,10 @@ sum(is.na(respicar_socio$mean_hh))
 # 28/439 are missing (6.3%)
 
 na_mean_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
-# missing hh_data on Philippines, Taiwan, Denmark, Iceland, New Caledonia, Sri Lanka, Sweden, Thailand
+na_mean_hh %>% distinct(Country)
 
 
-## Female education----
+        # Female education----
 names(female_ed)
 female_ed <- mutate(female_ed, 
                     iso_code = countrycode(sourcevar   = `Country Code`, 
@@ -237,7 +246,7 @@ sum(is.na(respicar_socio$female_ed))
 na_female_ed <- tibble(filter(respicar_socio, is.na(female_ed)))
 na_female_ed %>% distinct(Country)
 
-## UN subregion------
+        # UN subregion------
 
 respicar_socio <- merge (x=respicar_socio, y=un_subregion, 
                               by.x = "ISO 3166-1", 
@@ -249,3 +258,4 @@ sum(is.na(respicar_socio$subregion))
 na_subregion <- tibble(filter(respicar_socio, is.na(subregion)))
 na_subregion %>% distinct(Country)
 # obviously some issue-- every country has a subregion 
+# issue is not in the un_subregion df, it's somewhere in the merge?
