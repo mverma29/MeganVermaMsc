@@ -71,8 +71,9 @@ female_ed <- read_csv("data/female_secondary_education.csv") %>%
 summary(female_ed)
 
 # UN subregion---- 
-# already in world_with_cases as "subregion"
 
+world <- ne_countries(scale = "medium", returnclass = "sf")
+un_subregion <- world %>% select(geometry, subregion, iso_n3)
 
 ### merge datasets on each study's `Year started` & numeric iso code:----
 
@@ -184,8 +185,6 @@ class(hh_data$year)
 hh_data <- mutate(hh_data, 
                   average_hh = parse_number(`Average household size (number of members)`, 
                                             na = c("", "NA", "..")))
-# 40 parsing failures? 
-
 hh_data <- hh_data %>% 
     group_by(`Country or area`, year,  iso_code = `ISO Code`) %>%
     summarise(mean_hh = mean(average_hh, na.rm = TRUE), .groups = "drop") 
@@ -203,12 +202,13 @@ respicar_socio <- merge(x=respicar_socio,
                         by.x= c("ISO 3166-1", "Year started"),
                         by.y= c("iso_code", "year"),
                         all.x = TRUE)
-# 42 new entries?? unsure of how to check what's added, only know how to check what's dropped 
 names(respicar_socio)
 
 sum(is.na(respicar_socio$mean_hh))
-# 28 are missing-- this not good 
+# 28/439 are missing (6.3%)
 
+na_mean_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
+# missing hh_data on Philippines, Taiwan, Denmark, Iceland, New Caledonia, Sri Lanka, Sweden, Thailand
 
 
 ## Female education----
@@ -224,6 +224,8 @@ female_ed <- female_ed %>%
 sum(is.na(female_ed$female_ed))
 # 7460/13330 entries are missing 
 
+female_ed %<>% fill_socio
+
 respicar_socio <- merge(x=respicar_socio, 
                         y=female_ed, 
                         by.x= c("ISO 3166-1", "Year started"),
@@ -231,4 +233,19 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$female_ed))
-# 130/439 missing values for female ed (29.6%) ********
+# 9/439 missing values for female ed (2.1%) 
+na_female_ed <- tibble(filter(respicar_socio, is.na(female_ed)))
+na_female_ed %>% distinct(Country)
+
+## UN subregion------
+
+respicar_socio <- merge (x=respicar_socio, y=un_subregion, 
+                              by.x = "ISO 3166-1", 
+                              by.y = "iso_n3", 
+                              all.x=TRUE) 
+names(respicar_socio)
+sum(is.na(respicar_socio$subregion))
+#31/439 missing values for subregion 
+na_subregion <- tibble(filter(respicar_socio, is.na(subregion)))
+na_subregion %>% distinct(Country)
+# obviously some issue-- every country has a subregion 
