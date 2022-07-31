@@ -25,6 +25,11 @@ respicar$`Sampling strategy` <- as.factor(respicar$`Sampling strategy`)
 summary(respicar)
 # 367 entries (studies) if we take out ethnic minority
 
+filter(respicar,`Country` == "Israel")
+# 22 studies in Israel 
+# filter(respicar,`Country` == "Palestinia")
+ 
+
 # make carriage variable
 respicar <- respicar %>% mutate(carriage = Positive/Total)
 
@@ -33,7 +38,8 @@ world <- ne_countries(scale = "medium", returnclass = "sf")
 ggplot(data = world) + geom_sf() + theme_void()
 world_with_carriage <- merge (x=respicar, y=world, 
                               by.x = "ISO 3166-1", 
-                              by.y = "iso_n3")
+                              by.y = "iso_n3", 
+                              all.y=TRUE)
 
 world_with_carriage <- world_with_carriage %>% 
   select("ISO 3166-1", "carriage", "geometry", "pop_est", "gdp_md_est", "subregion") 
@@ -45,7 +51,8 @@ ggplot(data = world_with_carriage) +
   scale_fill_gradient(low="yellow", high="red") + #set color fill 
   theme_bw() #theme of dark text on light background 
 summary(world_with_carriage$carriage)
-# something is wrong-- 3 studies have carriage >100%
+# change to a NA color (pale gray that looks diff frmo yellow), change color scales?
+# filter out antartica from world with carriage 
 
 
 
