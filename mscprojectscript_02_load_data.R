@@ -196,6 +196,50 @@ sum(is.na(hh_data$iso_code)) #0 NAs in iso_code
 
 hh_data <- select(hh_data, year, iso_code, mean_hh)
 
+hh_data_extra <-
+    list(# Swedish census data
+        `752` = read_csv('data/BE0101C¤_20220729-160046.csv', skip = 1) %>%
+            mutate(mean_hh = `00 Sweden Number of persons`/`00 Sweden Number of households`),
+        
+        # Danish census data 
+        `208` = read_csv("data/denmark_pop_thousands.csv", skip = 3,
+                         col_names = c("year", "pop")) %>%
+            full_join(read_csv("data/denmark_households.csv",
+                               skip = 2, col_names = c("year", "hh"))) %>%
+            arrange(year) %>%
+            group_by(year) %>%
+            transmute(mean_hh = pop/hh * 1000),
+        
+        # CEIC data
+        `352` = data.frame(year     = seq(2004, 2016),
+                           mean_hh  = c(2.6, 2.5, 2.5, rep(2.4, 6), NA, 2.7, 2.7, 2.9)),
+        
+        # Statista
+        `158` = data.frame(year     = seq(1990, 2020),
+                           mean_hh  = c(4.19, 4.16, 4.1, 4.1, 4.02, 3.94, 3.92, 3.84, 3.77,
+                                        3.63, 3.62, 3.58, 3.65, 3.53, 3.5, 3.42, 3.41,
+                                        3.38, 3.35, 3.34, 3.25, 3.29, 3.23, 3.21, 3.15,
+                                        3.1, 3.07, 3.07, 3.05, 3.02, 2.92)),
+        
+        # CEIC
+        `144` = data.frame(year     = c(1981, 1986, 1991, 1996, 2001, 2019,
+                                        2016, 2013, 2010, 2007, 2004 ),
+                           mean_hh  = c(4.9,  5.1,  4.9,  4.5,  4.2,  3.7,
+                                        3.8,  3.9,  4.0,  4.1, 4.1)),
+        
+        # Survey and census https://journals.sagepub.com/doi/10.1177/2158244020914556
+        `682` = data.frame(year = c(1992, 2004, 2010, 2000, 2007, 2016),
+                           mean_hh = c(6.6, 6, 6.3, 6.8, 6.0, 5.9))
+    ) %>%
+    map(~select(.x, year, mean_hh)) %>%
+    bind_rows(.id = "iso_code") %>%
+    mutate(iso_code = parse_integer(iso_code)) %>%
+    arrange(iso_code, year)
+
+hh_data %<>% anti_join(distinct(hh_data_extra, iso_code))
+
+hh_data %<>% bind_rows(hh_data_extra)
+
 hh_data %<>% fill_socio
 
 respicar_socio <- merge(x=respicar_socio, 
@@ -207,7 +251,7 @@ respicar_socio <- merge(x=respicar_socio,
 names(respicar_socio)
 
 sum(is.na(respicar_socio$mean_hh))
-# 28 are missing-- this not good 
+# 2 are still missing
 
 
 
