@@ -17,6 +17,56 @@ urban_percent <- read_csv("data/urban_pop_percent.csv")  %>%
                  values_to = "urban_percent") %>%
     mutate(year = parse_integer(year))
 
+# Taiwan and New Caledonia urban population
+# https://www.worldometers.info/world-population/taiwan-population/
+# https://www.worldometers.info/world-population/new-caledonia-population/
+# using UN WPP 2019
+
+urban_percent_extra <-
+    list(`158` = 
+             tibble(year = c(seq(1980, 2015, by = 5),
+                             seq(2016, 2020, by = 1)),
+                    urban_percent = c(48.2,
+                                      57.2,
+                                      65.7,
+                                      68.0,
+                                      69.5,
+                                      72.0,
+                                      74.4,
+                                      76.7,
+                                      77.1,
+                                      77.6,
+                                      78.0,
+                                      78.5,
+                                      78.9),
+                    `Country Code` = "TWN",
+                    `Country Name` = "Taiwan",
+                    `Indicator Name` = "Urban population (% of total population)",
+                    `Indicator Code` = "SP.URB.TOTL.IN.ZS"),
+         `540` = tibble(year = c(seq(1980, 2015, by = 5),
+                                 seq(2016, 2020, by = 1)),
+                        urban_percent = c(57.4,
+                                          58.8, 
+                                          59.4,
+                                          59.5,
+                                          60.7,
+                                          62.9,
+                                          66.4,
+                                          68.9,
+                                          69.4,
+                                          70.0,
+                                          70.6, 
+                                          71.3,
+                                          71.9),
+                        `Country Code` = "NCL",
+                        `Country Name` = "New Caledonia",
+                        `Indicator Name` = "Urban population (% of total population)",
+                        `Indicator Code` = "SP.URB.TOTL.IN.ZS")) %>%
+    bind_rows(.id = "iso_code") %>%
+    mutate(iso_code = parse_integer(iso_code))
+
+urban_percent %<>% bind_rows(urban_percent_extra)
+
 # GDP----
 WDIsearch("gdp per capita")
 # #5 seems right-- GDP per capita, current USD 
@@ -24,7 +74,7 @@ WDIsearch("gdp per capita")
 gdp_data <- WDI(
     country   = "all",
     indicator = "NY.GDP.PCAP.CD",
-    start     = 1990,
+    start     = 1989,
     end       = 2016,
     extra     = TRUE,
     cache     = NULL,
@@ -37,7 +87,7 @@ class(gdp_data$year) #integer
 gini <- WDI(
     country   = "all", 
     indicator = "SI.POV.GINI", 
-    start     = 1990,
+    start     = 1989,
     end       = 2016, 
     extra     = TRUE,
     language  = "en")
@@ -115,11 +165,11 @@ respicar_socio <- merge(
 
 names(respicar_socio)
 sum(is.na(respicar_socio$urban_percent))
-# 8/439 missing values for urban percent (1.8%)
+# 0/439 missing values for urban percent
 
-filter(respicar_socio, is.na(urban_percent))
-na_urban_percent <- tibble(filter(respicar_socio, is.na(urban_percent)))
-na_urban_percent %>% distinct(Country)
+# filter(respicar_socio, is.na(urban_percent))
+# na_urban_percent <- tibble(filter(respicar_socio, is.na(urban_percent)))
+# na_urban_percent %>% distinct(Country)
 
 # GDP---- 
 names(gdp_data)
@@ -145,7 +195,7 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gdp_usd))
-# 14/439 missing values for gdp (3.1%)
+# 12/439 missing values for gdp (3.1%)
 na_gdp <- tibble(filter(respicar_socio, is.na(gdp_usd)))
 na_gdp %>% distinct(Country)
 # Gini---- 
@@ -170,7 +220,7 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gini))
-# 24/439 missing values for gini (5.5%)
+# 22/439 missing values for gini
 na_gini <- tibble(filter(respicar_socio, is.na(gini)))
 na_gini %>% distinct(Country)
 
@@ -281,11 +331,10 @@ respicar_socio <- merge(x=respicar_socio,
 names(respicar_socio)
 
 sum(is.na(respicar_socio$mean_hh))
-# 2 are still missing
 
-na_mean_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
-na_mean_hh %>% distinct(Country)
-
+# 27/439 are missing (6.2%)
+na_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
+na_hh %>% distinct(Country)
 
 # Female education----
 names(female_ed)
@@ -309,7 +358,7 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$female_ed))
-# 9/439 missing values for female ed (2.1%) 
+# 8/439 missing values for female ed (1.8%) 
 na_female_ed <- tibble(filter(respicar_socio, is.na(female_ed)))
 na_female_ed %>% distinct(Country)
 
