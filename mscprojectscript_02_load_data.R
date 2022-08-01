@@ -281,14 +281,15 @@ na_gdp %>% distinct(Country)
 # Gini---- 
 names(gini)
 gini <- mutate(gini, 
-               iso_code = countrycode(sourcevar   = `iso3c`, 
-                                      origin      = 'iso3c',
+               iso_code = countrycode(sourcevar   = `iso2c`, 
+                                      origin      = 'iso2c',
                                       destination = 'iso3n'))
-gini <- gini %>% drop_na(iso_code)
-sum(is.na(gini$iso_code)) # 0 NA
+
+# gini <- gini %>% drop_na(iso_code)
+# sum(is.na(gini$iso_code)) # 0 NA
 
 gini <- gini %>% 
-    rename("gini"="SI.POV.GINI") %>% 
+    rename("gini" = "SI.POV.GINI") %>% 
     select("year", "iso_code", "gini")
 
 gini %<>% fill_socio
@@ -300,9 +301,14 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gini))
-# 22/439 missing values for gini
+# 17/439 missing values for gini
 na_gini <- tibble(filter(respicar_socio, is.na(gini)))
-na_gini %>% distinct(Country)
+na_gini %>% 
+    group_by(Country) %>%
+    nest %>%
+    mutate(R = map(.x = data, ~range(.x$`Year started`) %>% 
+                       setNames(., c("Min", "Max")))) %>%
+    unnest_wider(R)
 
 # Household size-----
 
