@@ -237,7 +237,29 @@ hh_data_extra <-
         
         # Survey and census https://journals.sagepub.com/doi/10.1177/2158244020914556
         `682` = data.frame(year = c(1992, 2004, 2010, 2000, 2007, 2016),
-                           mean_hh = c(6.6, 6, 6.3, 6.8, 6.0, 5.9))
+                           mean_hh = c(6.6, 6, 6.3, 6.8, 6.0, 5.9)),
+        
+        # http://www.stats.gov.cn/tjsj/ndsj/2021/indexeh.htm table 2-7
+        `156` = data.frame(year = c(1982, 1990, 2000, 2010, 2020),
+                           mean_hh = c(4.41, 3.96, 3.44, 3.10, 2.62)),
+        
+        # New Caledonia
+        # 1989 World Development Indicators 2008 ISBN 9780821373873
+        # 1990 Statistical Handbook on the World's Children (2002) ISBN 9781573563901
+        # UN POPULATION DIVISION file
+        # 2014 https://pacificsecurity.net/wp-content/uploads/2021/02/Pacific_Islands_2020_Populations_poster.pdf 
+        # 2021 https://www.prb.org/international/indicator/hh-size-av/table/
+        `540` = data.frame(year   = c(1989, 
+                                      1990, 
+                                      2004, 
+                                      2014,
+                                      2021),
+                           mean_hh = c(4.1,
+                                       4.0, 
+                                       round(weighted.mean(x = c(1, 2.5, 4.5, 6.5),
+                                                     w = c(17.45, 38.67, 28.23, 15.65)),digits = 1),
+                                       3.1,
+                                       3.5))
     ) %>%
     map(~select(.x, year, mean_hh)) %>%
     bind_rows(.id = "iso_code") %>%
