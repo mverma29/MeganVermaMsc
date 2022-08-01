@@ -174,9 +174,15 @@ na_urban_percent %>% distinct(Country)
 names(gdp_data)
 
 gdp_data <- mutate(gdp_data, 
-                   iso_code = countrycode(sourcevar   = `iso3c`, 
-                                          origin      = 'iso3c',
-                                          destination = 'iso3n'))
+                   iso_code = countrycode(sourcevar   = `iso2c`, 
+                                          origin      = 'iso2c',
+                                          destination = 'iso3n'),
+                   iso3c    = ifelse(is.na(iso3c), 
+                                     countrycode(sourcevar   = iso2c,
+                                          origin      = 'iso2c',
+                                          destination = 'iso3c'),
+                                     iso3c))
+
 gdp_data <- gdp_data %>% drop_na(iso_code)
 sum(is.na(gdp_data$iso_code)) # 0 NA
 
