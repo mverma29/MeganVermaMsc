@@ -246,7 +246,7 @@ hh_data_extra <-
         # New Caledonia
         # 1989 World Development Indicators 2008 ISBN 9780821373873
         # 1990 Statistical Handbook on the World's Children (2002) ISBN 9781573563901
-        # UN POPULATION DIVISION file
+        # 2004 UN POPULATION DIVISION file
         # 2014 https://pacificsecurity.net/wp-content/uploads/2021/02/Pacific_Islands_2020_Populations_poster.pdf 
         # 2021 https://www.prb.org/international/indicator/hh-size-av/table/
         `540` = data.frame(year   = c(1989, 
