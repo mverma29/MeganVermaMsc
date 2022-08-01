@@ -74,7 +74,7 @@ WDIsearch("gdp per capita")
 gdp_data <- WDI(
     country   = "all",
     indicator = "NY.GDP.PCAP.CD",
-    start     = 1990,
+    start     = 1989,
     end       = 2016,
     extra     = TRUE,
     cache     = NULL,
@@ -87,7 +87,7 @@ class(gdp_data$year) #integer
 gini <- WDI(
     country   = "all", 
     indicator = "SI.POV.GINI", 
-    start     = 1990,
+    start     = 1989,
     end       = 2016, 
     extra     = TRUE,
     language  = "en")
@@ -123,15 +123,16 @@ summary(female_ed)
 # UN subregion---- 
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
-un_subregion <- world %>% select(geometry, subregion, iso_n3)
 
-na_world_iso <- tibble(filter(world, is.na(iso_n3)))
-na_world_iso %>% distinct(sovereignt)
+sf::sf_use_s2(FALSE)
+
+un_subregion <- world %>% group_by(subregion) %>% summarise(n = n())
+
 # 5 countries-ish without iso codes (only 2 "sovereign countries", Northern Cyprus & Kosovo)
 
 ### merge datasets on each study's `Year started` & numeric iso code:----
 
-        # urban percent----
+# urban percent----
 # match on iso code
 names(urban_percent)
 
@@ -164,13 +165,13 @@ respicar_socio <- merge(
 
 names(respicar_socio)
 sum(is.na(respicar_socio$urban_percent))
-# 8/439 missing values for urban percent (1.8%)
+# 0/439 missing values for urban percent
 
-filter(respicar_socio, is.na(urban_percent))
-na_urban_percent <- tibble(filter(respicar_socio, is.na(urban_percent)))
-na_urban_percent %>% distinct(Country)
+# filter(respicar_socio, is.na(urban_percent))
+# na_urban_percent <- tibble(filter(respicar_socio, is.na(urban_percent)))
+# na_urban_percent %>% distinct(Country)
 
-        # GDP---- 
+# GDP---- 
 names(gdp_data)
 
 gdp_data <- mutate(gdp_data, 
@@ -194,10 +195,10 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gdp_usd))
-# 14/439 missing values for gdp (3.1%)
+# 12/439 missing values for gdp (3.1%)
 na_gdp <- tibble(filter(respicar_socio, is.na(gdp_usd)))
 na_gdp %>% distinct(Country)
-        # Gini---- 
+# Gini---- 
 names(gini)
 gini <- mutate(gini, 
                iso_code = countrycode(sourcevar   = `iso3c`, 
@@ -219,11 +220,11 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gini))
-# 24/439 missing values for gini (5.5%)
+# 22/439 missing values for gini
 na_gini <- tibble(filter(respicar_socio, is.na(gini)))
 na_gini %>% distinct(Country)
 
-        # Household size-----
+# Household size-----
 
 # fix date to be year only 
 names(hh_data)
@@ -254,6 +255,72 @@ sum(is.na(hh_data$iso_code)) #0 NAs in iso_code
 
 hh_data <- select(hh_data, year, iso_code, mean_hh)
 
+hh_data_extra <-
+    list(# Swedish census data
+        `752` = read_csv('data/BE0101C¤_20220729-160046.csv', skip = 1) %>%
+            mutate(mean_hh = `00 Sweden Number of persons`/`00 Sweden Number of households`),
+        
+        # Danish census data 
+        `208` = read_csv("data/denmark_pop_thousands.csv", skip = 3,
+                         col_names = c("year", "pop")) %>%
+            full_join(read_csv("data/denmark_households.csv",
+                               skip = 2, col_names = c("year", "hh"))) %>%
+            arrange(year) %>%
+            group_by(year) %>%
+            transmute(mean_hh = pop/hh * 1000),
+        
+        # CEIC data
+        `352` = data.frame(year     = seq(2004, 2016),
+                           mean_hh  = c(2.6, 2.5, 2.5, rep(2.4, 6), NA, 2.7, 2.7, 2.9)),
+        
+        # Statista
+        `158` = data.frame(year     = seq(1990, 2020),
+                           mean_hh  = c(4.19, 4.16, 4.1, 4.1, 4.02, 3.94, 3.92, 3.84, 3.77,
+                                        3.63, 3.62, 3.58, 3.65, 3.53, 3.5, 3.42, 3.41,
+                                        3.38, 3.35, 3.34, 3.25, 3.29, 3.23, 3.21, 3.15,
+                                        3.1, 3.07, 3.07, 3.05, 3.02, 2.92)),
+        
+        # CEIC
+        `144` = data.frame(year     = c(1981, 1986, 1991, 1996, 2001, 2019,
+                                        2016, 2013, 2010, 2007, 2004 ),
+                           mean_hh  = c(4.9,  5.1,  4.9,  4.5,  4.2,  3.7,
+                                        3.8,  3.9,  4.0,  4.1, 4.1)),
+        
+        # Survey and census https://journals.sagepub.com/doi/10.1177/2158244020914556
+        `682` = data.frame(year = c(1992, 2004, 2010, 2000, 2007, 2016),
+                           mean_hh = c(6.6, 6, 6.3, 6.8, 6.0, 5.9)),
+        
+        # http://www.stats.gov.cn/tjsj/ndsj/2021/indexeh.htm table 2-7
+        `156` = data.frame(year = c(1982, 1990, 2000, 2010, 2020),
+                           mean_hh = c(4.41, 3.96, 3.44, 3.10, 2.62)),
+        
+        # New Caledonia
+        # 1989 World Development Indicators 2008 ISBN 9780821373873
+        # 1990 Statistical Handbook on the World's Children (2002) ISBN 9781573563901
+        # 2004 UN POPULATION DIVISION file
+        # 2014 https://pacificsecurity.net/wp-content/uploads/2021/02/Pacific_Islands_2020_Populations_poster.pdf 
+        # 2021 https://www.prb.org/international/indicator/hh-size-av/table/
+        `540` = data.frame(year   = c(1989, 
+                                      1990, 
+                                      2004, 
+                                      2014,
+                                      2021),
+                           mean_hh = c(4.1,
+                                       4.0, 
+                                       round(weighted.mean(x = c(1, 2.5, 4.5, 6.5),
+                                                           w = c(17.45, 38.67, 28.23, 15.65)),digits = 1),
+                                       3.1,
+                                       3.5))
+    ) %>%
+    map(~select(.x, year, mean_hh)) %>%
+    bind_rows(.id = "iso_code") %>%
+    mutate(iso_code = parse_integer(iso_code)) %>%
+    arrange(iso_code, year)
+
+hh_data %<>% anti_join(distinct(hh_data_extra, iso_code))
+
+hh_data %<>% bind_rows(hh_data_extra)
+
 hh_data %<>% fill_socio
 
 respicar_socio <- merge(x=respicar_socio, 
@@ -264,13 +331,12 @@ respicar_socio <- merge(x=respicar_socio,
 names(respicar_socio)
 
 sum(is.na(respicar_socio$mean_hh))
-# 28/439 are missing (6.3%)
 
-na_mean_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
-na_mean_hh %>% distinct(Country)
+# 27/439 are missing (6.2%)
+na_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
+na_hh %>% distinct(Country)
 
-
-        # Female education----
+# Female education----
 names(female_ed)
 female_ed <- mutate(female_ed, 
                     iso_code = countrycode(sourcevar   = `Country Code`, 
@@ -292,20 +358,18 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$female_ed))
-# 9/439 missing values for female ed (2.1%) 
+# 8/439 missing values for female ed (1.8%) 
 na_female_ed <- tibble(filter(respicar_socio, is.na(female_ed)))
 na_female_ed %>% distinct(Country)
 
-        # UN subregion------
+# UN subregion------
 
-respicar_socio <- merge (x=respicar_socio, y=un_subregion, 
-                              by.x = "ISO 3166-1", 
-                              by.y = "iso_n3", 
-                              all.x=TRUE) 
-names(respicar_socio)
-sum(is.na(respicar_socio$subregion))
-#31/439 missing values for subregion 
-na_subregion <- tibble(filter(respicar_socio, is.na(subregion)))
-na_subregion %>% distinct(Country)
-# obviously some issue-- every country has a subregion 
-# issue is not in the un_subregion df, it's somewhere in the merge?
+respicar_socio <- mutate(respicar_socio,
+                         subregion = countrycode(sourcevar   = `ISO 3166-1`,
+                                                 origin      = 'iso3n', 
+                                                 destination = 'un.regionsub.name'),
+                         subregion = ifelse(test = `ISO 3166-1` == 158, # Taiwan
+                                            yes  = "Eastern Asia",
+                                            no   = subregion))
+
+
