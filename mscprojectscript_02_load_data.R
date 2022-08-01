@@ -82,7 +82,7 @@ un_subregion <- world %>% group_by(subregion) %>% summarise(n = n())
 
 ### merge datasets on each study's `Year started` & numeric iso code:----
 
-        # urban percent----
+# urban percent----
 # match on iso code
 names(urban_percent)
 
@@ -121,7 +121,7 @@ filter(respicar_socio, is.na(urban_percent))
 na_urban_percent <- tibble(filter(respicar_socio, is.na(urban_percent)))
 na_urban_percent %>% distinct(Country)
 
-        # GDP---- 
+# GDP---- 
 names(gdp_data)
 
 gdp_data <- mutate(gdp_data, 
@@ -148,7 +148,7 @@ sum(is.na(respicar_socio$gdp_usd))
 # 14/439 missing values for gdp (3.1%)
 na_gdp <- tibble(filter(respicar_socio, is.na(gdp_usd)))
 na_gdp %>% distinct(Country)
-        # Gini---- 
+# Gini---- 
 names(gini)
 gini <- mutate(gini, 
                iso_code = countrycode(sourcevar   = `iso3c`, 
@@ -174,7 +174,7 @@ sum(is.na(respicar_socio$gini))
 na_gini <- tibble(filter(respicar_socio, is.na(gini)))
 na_gini %>% distinct(Country)
 
-        # Household size-----
+# Household size-----
 
 # fix date to be year only 
 names(hh_data)
@@ -258,7 +258,7 @@ hh_data_extra <-
                            mean_hh = c(4.1,
                                        4.0, 
                                        round(weighted.mean(x = c(1, 2.5, 4.5, 6.5),
-                                                     w = c(17.45, 38.67, 28.23, 15.65)),digits = 1),
+                                                           w = c(17.45, 38.67, 28.23, 15.65)),digits = 1),
                                        3.1,
                                        3.5))
     ) %>%
@@ -287,7 +287,7 @@ na_mean_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
 na_mean_hh %>% distinct(Country)
 
 
-        # Female education----
+# Female education----
 names(female_ed)
 female_ed <- mutate(female_ed, 
                     iso_code = countrycode(sourcevar   = `Country Code`, 
@@ -313,16 +313,14 @@ sum(is.na(respicar_socio$female_ed))
 na_female_ed <- tibble(filter(respicar_socio, is.na(female_ed)))
 na_female_ed %>% distinct(Country)
 
-        # UN subregion------
+# UN subregion------
 
-respicar_socio <- merge (x=respicar_socio, y=un_subregion, 
-                              by.x = "ISO 3166-1", 
-                              by.y = "iso_n3", 
-                              all.x=TRUE) 
-names(respicar_socio)
-sum(is.na(respicar_socio$subregion))
-#31/439 missing values for subregion 
-na_subregion <- tibble(filter(respicar_socio, is.na(subregion)))
-na_subregion %>% distinct(Country)
-# obviously some issue-- every country has a subregion 
-# issue is not in the un_subregion df, it's somewhere in the merge?
+respicar_socio <- mutate(respicar_socio,
+                         subregion = countrycode(sourcevar   = `ISO 3166-1`,
+                                                 origin      = 'iso3n', 
+                                                 destination = 'un.regionsub.name'),
+                         subregion = ifelse(test = `ISO 3166-1` == 158, # Taiwan
+                                            yes  = "Eastern Asia",
+                                            no   = subregion))
+
+
