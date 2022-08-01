@@ -74,7 +74,7 @@ WDIsearch("gdp per capita")
 gdp_data <- WDI(
     country   = "all",
     indicator = "NY.GDP.PCAP.CD",
-    start     = 1990,
+    start     = 1987,
     end       = 2016,
     extra     = TRUE,
     cache     = NULL,
@@ -87,7 +87,7 @@ class(gdp_data$year) #integer
 gini <- WDI(
     country   = "all", 
     indicator = "SI.POV.GINI", 
-    start     = 1990,
+    start     = 1987,
     end       = 2016, 
     extra     = TRUE,
     language  = "en")
