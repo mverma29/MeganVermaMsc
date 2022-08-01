@@ -73,10 +73,11 @@ summary(female_ed)
 # UN subregion---- 
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
-un_subregion <- world %>% select(geometry, subregion, iso_n3)
 
-na_world_iso <- tibble(filter(world, is.na(iso_n3)))
-na_world_iso %>% distinct(sovereignt)
+sf::sf_use_s2(FALSE)
+
+un_subregion <- world %>% group_by(subregion) %>% summarise(n = n())
+
 # 5 countries-ish without iso codes (only 2 "sovereign countries", Northern Cyprus & Kosovo)
 
 ### merge datasets on each study's `Year started` & numeric iso code:----
