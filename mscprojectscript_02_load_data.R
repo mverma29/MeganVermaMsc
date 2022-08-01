@@ -74,7 +74,7 @@ WDIsearch("gdp per capita")
 gdp_data <- WDI(
     country   = "all",
     indicator = "NY.GDP.PCAP.CD",
-    start     = 1990,
+    start     = 1989,
     end       = 2016,
     extra     = TRUE,
     cache     = NULL,
@@ -87,7 +87,7 @@ class(gdp_data$year) #integer
 gini <- WDI(
     country   = "all", 
     indicator = "SI.POV.GINI", 
-    start     = 1990,
+    start     = 1989,
     end       = 2016, 
     extra     = TRUE,
     language  = "en")
@@ -164,11 +164,11 @@ respicar_socio <- merge(
 
 names(respicar_socio)
 sum(is.na(respicar_socio$urban_percent))
-# 8/439 missing values for urban percent (1.8%)
+# 0/439 missing values for urban percent
 
-filter(respicar_socio, is.na(urban_percent))
-na_urban_percent <- tibble(filter(respicar_socio, is.na(urban_percent)))
-na_urban_percent %>% distinct(Country)
+# filter(respicar_socio, is.na(urban_percent))
+# na_urban_percent <- tibble(filter(respicar_socio, is.na(urban_percent)))
+# na_urban_percent %>% distinct(Country)
 
         # GDP---- 
 names(gdp_data)
@@ -194,7 +194,7 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gdp_usd))
-# 14/439 missing values for gdp (3.1%)
+# 12/439 missing values for gdp (3.1%)
 na_gdp <- tibble(filter(respicar_socio, is.na(gdp_usd)))
 na_gdp %>% distinct(Country)
         # Gini---- 
@@ -219,7 +219,7 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gini))
-# 24/439 missing values for gini (5.5%)
+# 22/439 missing values for gini
 na_gini <- tibble(filter(respicar_socio, is.na(gini)))
 na_gini %>% distinct(Country)
 
@@ -264,11 +264,9 @@ respicar_socio <- merge(x=respicar_socio,
 names(respicar_socio)
 
 sum(is.na(respicar_socio$mean_hh))
-# 28/439 are missing (6.3%)
-
-na_mean_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
-na_mean_hh %>% distinct(Country)
-
+# 27/439 are missing (6.2%)
+na_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
+na_hh %>% distinct(Country)
 
         # Female education----
 names(female_ed)
@@ -292,7 +290,7 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$female_ed))
-# 9/439 missing values for female ed (2.1%) 
+# 8/439 missing values for female ed (1.8%) 
 na_female_ed <- tibble(filter(respicar_socio, is.na(female_ed)))
 na_female_ed %>% distinct(Country)
 
@@ -304,8 +302,6 @@ respicar_socio <- merge (x=respicar_socio, y=un_subregion,
                               all.x=TRUE) 
 names(respicar_socio)
 sum(is.na(respicar_socio$subregion))
-#31/439 missing values for subregion 
+#0/439 missing values for subregion 
 na_subregion <- tibble(filter(respicar_socio, is.na(subregion)))
 na_subregion %>% distinct(Country)
-# obviously some issue-- every country has a subregion 
-# issue is not in the un_subregion df, it's somewhere in the merge?
