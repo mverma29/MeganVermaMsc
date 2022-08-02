@@ -391,13 +391,7 @@ sum(is.na(respicar_socio$gini))
 # 4/439 missing values for gini
 na_gini <- tibble(filter(respicar_socio, is.na(gini)))
 
-na_gini %>% 
-    group_by(Country, `ISO 3166-1`) %>%
-    nest %>%
-    mutate(R = map(.x = data, ~range(.x$`Year started`) %>% 
-                       setNames(., c("Min", "Max")))) %>%
-    unnest_wider(R) %>%
-    mutate(n = map_dbl(data, nrow))
+check_socio_na(na_gini)
 
 # Household size-----
 
@@ -509,7 +503,9 @@ sum(is.na(respicar_socio$mean_hh))
 
 # 27/439 are missing (6.2%)
 na_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
-na_hh %>% distinct(Country)
+
+check_socio_na(na_gini)
+
 
 # Female education----
 names(female_ed)
@@ -517,12 +513,13 @@ female_ed <- mutate(female_ed,
                     iso_code = countrycode(sourcevar   = `Country Code`, 
                                            origin      = 'iso3c',
                                            destination = 'iso3n'))
+
 female_ed <- female_ed %>% drop_na(iso_code)
 
 female_ed <- female_ed %>% 
     select("year", "iso_code", "female_ed")
 sum(is.na(female_ed$female_ed))
-# 7460/13330 entries are missing 
+# 620/13330 entries are missing 
 
 female_ed %<>% fill_socio
 
@@ -533,9 +530,10 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$female_ed))
-# 8/439 missing values for female ed (1.8%) 
+# 9/443 missing values for female ed (2.0%) 
 na_female_ed <- tibble(filter(respicar_socio, is.na(female_ed)))
-na_female_ed %>% distinct(Country)
+
+check_socio_na(na_female_ed)
 
 # UN subregion------
 
