@@ -124,6 +124,14 @@ female_ed <- read_csv("data/female_secondary_education.csv") %>%
                  values_to = "female_ed") %>%
     mutate(year = parse_number(year))
 
+female_ed_twn <- readODS::read_ods('data/e104-5.ods', sheet = 1, range = 'A3:D21') %>%
+    mutate(year = gsub(x = `School Year`, pattern = "SY ", replacement = ""),
+           year = parse_integer(sub("[0-9]{4}-", "", year))) %>%
+    mutate(iso_code = 158L) %>%
+    select(iso_code, year = year, female_ed = Female)
+
+female_ed %<>% bind_rows(female_ed_twn)
+
 summary(female_ed)
 
 # UN subregion---- 
