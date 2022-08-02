@@ -124,13 +124,6 @@ female_ed <- read_csv("data/female_secondary_education.csv") %>%
                  values_to = "female_ed") %>%
     mutate(year = parse_number(year))
 
-female_ed_twn <- readODS::read_ods('data/e104-5.ods', sheet = 1, range = 'A3:D21') %>%
-    mutate(year = gsub(x = `School Year`, pattern = "SY ", replacement = ""),
-           year = parse_integer(sub("[0-9]{4}-", "", year))) %>%
-    mutate(iso_code = 158L) %>%
-    select(iso_code, year = year, female_ed = Female)
-
-female_ed %<>% bind_rows(female_ed_twn)
 
 summary(female_ed)
 
@@ -396,7 +389,7 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gini))
-# 4/439 missing values for gini
+# 0/443 missing values for gini
 na_gini <- tibble(filter(respicar_socio, is.na(gini)))
 
 check_socio_na(na_gini)
@@ -435,7 +428,8 @@ hh_data <- select(hh_data, year, iso_code, mean_hh)
 hh_data_extra <-
     list(# Swedish census data
         `752` = read_csv('data/BE0101C¤_20220729-160046.csv', skip = 1) %>%
-            mutate(mean_hh = `00 Sweden Number of persons`/`00 Sweden Number of households`),
+            mutate(mean_hh = `00 Sweden Number of persons`/
+                       `00 Sweden Number of households`),
         
         # Danish census data 
         `208` = read_csv("data/denmark_pop_thousands.csv", skip = 3,
@@ -484,8 +478,10 @@ hh_data_extra <-
                                       2021),
                            mean_hh = c(4.1,
                                        4.0, 
-                                       round(weighted.mean(x = c(1, 2.5, 4.5, 6.5),
-                                                           w = c(17.45, 38.67, 28.23, 15.65)),digits = 1),
+                                       round(weighted.mean(
+                                           x = c(1, 2.5, 4.5, 6.5),
+                                           w = c(17.45, 38.67, 28.23, 15.65)),
+                                           digits = 1),
                                        3.1,
                                        3.5))
     ) %>%
@@ -509,7 +505,8 @@ names(respicar_socio)
 
 sum(is.na(respicar_socio$mean_hh))
 
-# 27/439 are missing (6.2%)
+# 0/443 are missing (6.2%)
+
 na_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
 
 check_socio_na(na_hh)
@@ -525,6 +522,16 @@ female_ed <- female_ed %>% drop_na(iso_code)
 
 female_ed <- female_ed %>% 
     select("year", "iso_code", "female_ed")
+
+female_ed_twn <- readODS::read_ods('data/e104-5.ods', sheet = 1, range = 'A3:D21') %>%
+    mutate(year = gsub(x = `School Year`, pattern = "SY ", replacement = ""),
+           year = parse_integer(sub("[0-9]{4}-", "", year))) %>%
+    mutate(iso_code = 158L) %>%
+    select(iso_code, year = year, female_ed = Female)
+
+female_ed %<>% bind_rows(female_ed_twn)
+
+
 sum(is.na(female_ed$female_ed))
 # 620/13330 entries are missing 
 
