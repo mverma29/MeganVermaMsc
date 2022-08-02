@@ -351,7 +351,7 @@ gini_data_extra <-
         # 1998 https://tradingeconomics.com/singapore/gini-index-wb-data.html
         # 2014 https://en.wikipedia.org/wiki/List_of_countries_by_income_equality CIA
         # 2019 https://www.worldeconomics.com/Inequality/Gini-Coefficient/Singapore.aspx
-        # also check https://www.jstor.org/stable/43184870 2000, 2007, 2008, 2009
+        # 2000, 2007, 2008, 2009 https://www.jstor.org/stable/43184870 
         `702` = data.frame(year = c(1998, 2000, 2001, 2002, 
                                     2003, 2004, 2005, 2006,
                                     2007, 2008, 2009, 2014, 2019),
