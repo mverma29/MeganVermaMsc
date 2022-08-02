@@ -68,8 +68,10 @@ urban_percent_extra <-
 urban_percent %<>% bind_rows(urban_percent_extra)
 
 # GDP----
-WDIsearch("gdp per capita")
-# #5 seems right-- GDP per capita, current USD 
+WDIsearch("gdp per capita") %>%
+    as_tibble %>%
+    filter(grepl(pattern = "^GDP per capita", x = name))
+# GDP per capita, current USD 
 
 gdp_data <- WDI(
     country   = "all",
@@ -82,6 +84,10 @@ gdp_data <- WDI(
     language  = "en")
 
 class(gdp_data$year) #integer
+
+WDIsearch("gini") %>%
+    as_tibble %>%
+    filter(grepl(pattern = "^Gini index", x = name))
 
 # Gini----
 gini <- WDI(
@@ -105,8 +111,8 @@ hh_data <- readxl::read_xlsx(
     range     = "A5:E819", 
     col_names = TRUE)
 
-names(hh_data)
-sum(is.na(hh_data$`Average household size (number of members)`)) #0 NAs
+# names(hh_data)
+# sum(is.na(hh_data$`Average household size (number of members)`)) #0 NAs
 
 # female education (proxy for maternal)----
 # UNESCO data, from world bank site 
@@ -134,8 +140,6 @@ un_subregion <- world %>% group_by(subregion) %>% summarise(n = n())
 
 # urban percent----
 # match on iso code
-names(urban_percent)
-
 urban_percent <- mutate(urban_percent, 
                         iso_code = countrycode(sourcevar   = `Country Code`, 
                                                origin      = 'wb',
@@ -184,13 +188,13 @@ gdp_data <- mutate(gdp_data,
                                                  destination = 'iso3c'),
                                      iso3c))
 
-
-
-gdp_data %>%
-    ungroup %>%
-    filter(is.na(iso_code)) %>%
-    distinct(iso2c, iso3c, country) %>%
-    arrange(iso3c)
+# 
+# 
+# gdp_data %>%
+#     ungroup %>%
+#     filter(is.na(iso_code)) %>%
+#     distinct(iso2c, iso3c, country) %>%
+#     arrange(iso3c)
 
 gdp_data <- gdp_data %>% drop_na(iso_code)
 sum(is.na(gdp_data$iso_code)) # 0 NA
@@ -275,9 +279,10 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gdp_usd))
-# 12/439 missing values for gdp (3.1%)
+# 0/439 missing values for gdp (3.1%)
 na_gdp <- tibble(filter(respicar_socio, is.na(gdp_usd)))
 na_gdp %>% distinct(Country)
+
 # Gini---- 
 names(gini)
 gini <- mutate(gini, 
