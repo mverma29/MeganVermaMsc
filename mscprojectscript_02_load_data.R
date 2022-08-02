@@ -68,13 +68,15 @@ urban_percent_extra <-
 urban_percent %<>% bind_rows(urban_percent_extra)
 
 # GDP----
-WDIsearch("gdp per capita")
-# #5 seems right-- GDP per capita, current USD 
+WDIsearch("gdp per capita") %>%
+    as_tibble %>%
+    filter(grepl(pattern = "^GDP per capita", x = name))
+# GDP per capita, current USD 
 
 gdp_data <- WDI(
     country   = "all",
     indicator = "NY.GDP.PCAP.CD",
-    start     = 1989,
+    start     = 1987,
     end       = 2016,
     extra     = TRUE,
     cache     = NULL,
@@ -83,11 +85,15 @@ gdp_data <- WDI(
 
 class(gdp_data$year) #integer
 
+WDIsearch("gini") %>%
+    as_tibble %>%
+    filter(grepl(pattern = "^Gini index", x = name))
+
 # Gini----
 gini <- WDI(
     country   = "all", 
     indicator = "SI.POV.GINI", 
-    start     = 1989,
+    start     = 1987,
     end       = 2016, 
     extra     = TRUE,
     language  = "en")
@@ -105,8 +111,8 @@ hh_data <- readxl::read_xlsx(
     range     = "A5:E819", 
     col_names = TRUE)
 
-names(hh_data)
-sum(is.na(hh_data$`Average household size (number of members)`)) #0 NAs
+# names(hh_data)
+# sum(is.na(hh_data$`Average household size (number of members)`)) #0 NAs
 
 # female education (proxy for maternal)----
 # UNESCO data, from world bank site 
@@ -117,6 +123,14 @@ female_ed <- read_csv("data/female_secondary_education.csv") %>%
                  names_to  = "year", 
                  values_to = "female_ed") %>%
     mutate(year = parse_number(year))
+
+female_ed_twn <- readODS::read_ods('data/e104-5.ods', sheet = 1, range = 'A3:D21') %>%
+    mutate(year = gsub(x = `School Year`, pattern = "SY ", replacement = ""),
+           year = parse_integer(sub("[0-9]{4}-", "", year))) %>%
+    mutate(iso_code = 158L) %>%
+    select(iso_code, year = year, female_ed = Female)
+
+female_ed %<>% bind_rows(female_ed_twn)
 
 summary(female_ed)
 
@@ -134,8 +148,6 @@ un_subregion <- world %>% group_by(subregion) %>% summarise(n = n())
 
 # urban percent----
 # match on iso code
-names(urban_percent)
-
 urban_percent <- mutate(urban_percent, 
                         iso_code = countrycode(sourcevar   = `Country Code`, 
                                                origin      = 'wb',
@@ -175,9 +187,23 @@ sum(is.na(respicar_socio$urban_percent))
 names(gdp_data)
 
 gdp_data <- mutate(gdp_data, 
-                   iso_code = countrycode(sourcevar   = `iso3c`, 
-                                          origin      = 'iso3c',
-                                          destination = 'iso3n'))
+                   iso_code = countrycode(sourcevar   = `iso2c`, 
+                                          origin      = 'iso2c',
+                                          destination = 'iso3n'),
+                   iso3c    = ifelse(is.na(iso3c), 
+                                     countrycode(sourcevar   = iso2c,
+                                                 origin      = 'iso2c',
+                                                 destination = 'iso3c'),
+                                     iso3c))
+
+# 
+# 
+# gdp_data %>%
+#     ungroup %>%
+#     filter(is.na(iso_code)) %>%
+#     distinct(iso2c, iso3c, country) %>%
+#     arrange(iso3c)
+
 gdp_data <- gdp_data %>% drop_na(iso_code)
 sum(is.na(gdp_data$iso_code)) # 0 NA
 
@@ -185,6 +211,72 @@ sum(is.na(gdp_data$iso_code)) # 0 NA
 gdp_data <- gdp_data %>% 
     rename("gdp_usd"="NY.GDP.PCAP.CD") %>% 
     select("year", "iso_code", "gdp_usd")
+
+# https://www.statista.com/statistics/727589/gross-domestic-product-gdp-in-taiwan/
+# population WPP2019
+data(pop)
+
+pop_extra <- filter(pop, country_code %in% c(158)) %>%
+    rename(iso_code = country_code) %>%
+    select(-name) %>%
+    gather(year, pop, -iso_code) %>%
+    mutate(year = parse_integer(year)) %>%
+    split(.$iso_code) %>%
+    map(~{list(data  = .x,
+               model = approx(x = .x$year, y = .x$pop, xout = full_seq(.x$year, 1)))}) %>%
+    map("model") %>%
+    map_df(as.data.frame, .id = 'iso_code') %>%
+    rename(year = x, pop = y) %>%
+    mutate(iso_code = parse_integer(iso_code))
+
+
+gdp_data_extra <-
+    list(`158` = data.frame(year    = 1987:2021,
+                            gdp_usd = c(105.04,
+                                        126.47,
+                                        152.7,
+                                        116.62,
+                                        187.14,
+                                        222.91,
+                                        236.34,
+                                        256.25,
+                                        279.06,
+                                        292.49,
+                                        303.28,
+                                        279.96,
+                                        303.83,
+                                        330.68,
+                                        299.28,
+                                        307.44,
+                                        317.38,
+                                        346.92,
+                                        374.06,
+                                        386.45,
+                                        406.91,
+                                        415.9,
+                                        390.83,
+                                        444.28,
+                                        483.97,
+                                        495.61,
+                                        512.94,
+                                        535.33,
+                                        534.52,
+                                        543.08,
+                                        590.73,
+                                        609.2,
+                                        611.4,
+                                        669.25,
+                                        789.51)*1e9
+                            
+    )) %>%
+    bind_rows(.id = "iso_code") %>%
+    mutate(iso_code = parse_integer(iso_code))
+
+gdp_per_cap_extra <- left_join(gdp_data_extra, pop_extra) %>%
+    mutate(gdp_usd = gdp_usd/pop/1e3) %>%
+    select(-pop)
+
+gdp_data %<>% bind_rows(gdp_per_cap_extra)
 
 gdp_data %<>% fill_socio
 
@@ -195,21 +287,105 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gdp_usd))
-# 12/439 missing values for gdp (3.1%)
+# 0/439 missing values for gdp (3.1%)
 na_gdp <- tibble(filter(respicar_socio, is.na(gdp_usd)))
 na_gdp %>% distinct(Country)
+
 # Gini---- 
 names(gini)
 gini <- mutate(gini, 
-               iso_code = countrycode(sourcevar   = `iso3c`, 
-                                      origin      = 'iso3c',
+               iso_code = countrycode(sourcevar   = `iso2c`, 
+                                      origin      = 'iso2c',
                                       destination = 'iso3n'))
-gini <- gini %>% drop_na(iso_code)
-sum(is.na(gini$iso_code)) # 0 NA
+
+# gini <- gini %>% drop_na(iso_code)
+# sum(is.na(gini$iso_code)) # 0 NA
 
 gini <- gini %>% 
-    rename("gini"="SI.POV.GINI") %>% 
+    rename("gini" = "SI.POV.GINI") %>% 
     select("year", "iso_code", "gini")
+
+
+
+gini_data_extra <-
+    list(
+        # https://www.statista.com/statistics/922574/taiwan-gini-index/(
+        `158` = data.frame(year    = 1987:2020,
+                           gini = c(29.9,
+                                    30.3,
+                                    30.3,
+                                    31.2,
+                                    30.8,
+                                    31.2,
+                                    31.5,
+                                    31.8,
+                                    31.7,
+                                    31.7,
+                                    32,
+                                    32.4,
+                                    32.5,
+                                    32.6,
+                                    35,
+                                    34.5,
+                                    34.3,
+                                    33.8,
+                                    34,
+                                    33.9,
+                                    34,
+                                    34.1,
+                                    34.5,
+                                    34.2,
+                                    34.2,
+                                    33.8,
+                                    33.6,
+                                    33.6,
+                                    33.8,
+                                    33.6,
+                                    33.7,
+                                    33.8,
+                                    33.9,
+                                    34)
+        ),
+        
+        # https://www.legco.gov.hk/yr04-05/english/sec/library/0405fs07e.pdf
+        # https://www.hkeconomy.gov.hk/en/pdf/gini_comparison.pdf
+        `344` = data.frame(year = c(1981, 1986, 1991, 1996, 2001, 2006),
+                           gini = c(45.1, 45.3, 47.6, 51.8, 52.5, 53.3)),
+        
+        # https://www.spc.int/DigitalLibrary/Doc/SDD/Meetings/2010/3rd_HOPS_2013/CONF_HOPS_2010_IP_3_Measuring_Poverty.doc
+        `540` = data.frame(year = 2008,
+                           gini = 45.0),
+        
+        # 1998 https://tradingeconomics.com/singapore/gini-index-wb-data.html
+        # 2014 https://en.wikipedia.org/wiki/List_of_countries_by_income_equality CIA
+        # 2019 https://www.worldeconomics.com/Inequality/Gini-Coefficient/Singapore.aspx
+        # 2000, 2007, 2008, 2009 https://www.jstor.org/stable/43184870 
+        `702` = data.frame(year = c(1998, 2000, 2001, 2002, 
+                                    2003, 2004, 2005, 2006,
+                                    2007, 2008, 2009, 2014, 2019),
+                           gini = c(42.48, 44.4, 45.6, 45.7,
+                                    46.0,  46.4, 47.0, 47.6,
+                                    48.9, 48.1, 47.8, 46.4, 65.5)),
+        
+        # Saudi Arabia
+        # 2013 https://www.cia.gov/the-world-factbook/field/gini-index-coefficient-distribution-of-family-income/country-comparison
+        # 2016 https://ssrn.com/abstract=3465663
+        `682` = data.frame(year = c(2013, 2016),
+                           gini = c(45.9, 39.97)),
+        
+        # Cuba
+        # 1986-1999 https://www.cepal.org/en/publications/37484-cepal-review-no86
+        # 2002, 2013 http://www.espaciolaical.org/contens/38/101104.pdf
+        # 2017 Ricardo Torres, “Cuba’s Economy: Reforms and Delays, 2014-2018,” in Cuba at the Crossroads, eds., Philip Brenner, John M. Kirk and William M. LeoGrande (Lanham, MD: Rowman and Littlefield, 2020), 56.
+        `192` = data.frame(year = c(1986, 1989, 1995, 1996, 1998, 1999, 2002, 2013, 2017),
+                           gini = c(22.0, 25.0, 55.0, 39.0, 38.0, 40.7, 38.0, 40.0, 45.0))
+        
+        
+    ) %>%
+    bind_rows(.id = "iso_code") %>%
+    mutate(iso_code = parse_integer(iso_code))
+
+gini %<>% bind_rows(gini_data_extra)
 
 gini %<>% fill_socio
 
@@ -220,9 +396,10 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gini))
-# 22/439 missing values for gini
+# 4/439 missing values for gini
 na_gini <- tibble(filter(respicar_socio, is.na(gini)))
-na_gini %>% distinct(Country)
+
+check_socio_na(na_gini)
 
 # Household size-----
 
@@ -334,7 +511,9 @@ sum(is.na(respicar_socio$mean_hh))
 
 # 27/439 are missing (6.2%)
 na_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
-na_hh %>% distinct(Country)
+
+check_socio_na(na_gini)
+
 
 # Female education----
 names(female_ed)
@@ -342,12 +521,13 @@ female_ed <- mutate(female_ed,
                     iso_code = countrycode(sourcevar   = `Country Code`, 
                                            origin      = 'iso3c',
                                            destination = 'iso3n'))
+
 female_ed <- female_ed %>% drop_na(iso_code)
 
 female_ed <- female_ed %>% 
     select("year", "iso_code", "female_ed")
 sum(is.na(female_ed$female_ed))
-# 7460/13330 entries are missing 
+# 620/13330 entries are missing 
 
 female_ed %<>% fill_socio
 
@@ -358,9 +538,10 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$female_ed))
-# 8/439 missing values for female ed (1.8%) 
+# 9/443 missing values for female ed (2.0%) 
 na_female_ed <- tibble(filter(respicar_socio, is.na(female_ed)))
-na_female_ed %>% distinct(Country)
+
+check_socio_na(na_female_ed)
 
 # UN subregion------
 
