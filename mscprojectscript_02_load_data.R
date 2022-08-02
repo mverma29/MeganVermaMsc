@@ -357,7 +357,13 @@ gini_data_extra <-
                                     2007, 2008, 2009, 2014, 2019),
                            gini = c(42.48, 44.4, 45.6, 45.7,
                                     46.0,  46.4, 47.0, 47.6,
-                                    48.9, 48.1, 47.8, 46.4, 65.5))
+                                    48.9, 48.1, 47.8, 46.4, 65.5)),
+        
+        # Saudi Arabia
+        # 2013 https://www.cia.gov/the-world-factbook/field/gini-index-coefficient-distribution-of-family-income/country-comparison
+        # 2016 https://ssrn.com/abstract=3465663
+        `682` = data.frame(year = c(2013, 2016),
+                           gini = c(45.9, 39.97))
         
         
     ) %>%
@@ -375,7 +381,7 @@ respicar_socio <- merge(x=respicar_socio,
                         all.x = TRUE)
 names(respicar_socio)
 sum(is.na(respicar_socio$gini))
-# 17/439 missing values for gini
+# 4/439 missing values for gini
 na_gini <- tibble(filter(respicar_socio, is.na(gini)))
 
 na_gini %>% 
@@ -383,7 +389,8 @@ na_gini %>%
     nest %>%
     mutate(R = map(.x = data, ~range(.x$`Year started`) %>% 
                        setNames(., c("Min", "Max")))) %>%
-    unnest_wider(R)
+    unnest_wider(R) %>%
+    mutate(n = map_dbl(data, nrow))
 
 # Household size-----
 
