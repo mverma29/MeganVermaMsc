@@ -179,9 +179,9 @@ names(respicar_socio)
 sum(is.na(respicar_socio$urban_percent))
 # 0/439 missing values for urban percent
 
-# filter(respicar_socio, is.na(urban_percent))
-# na_urban_percent <- tibble(filter(respicar_socio, is.na(urban_percent)))
-# na_urban_percent %>% distinct(Country)
+na_urban_percent <- tibble(filter(respicar_socio, is.na(urban_percent)))
+check_socio_na(na_urban_percent)
+
 
 # GDP---- 
 names(gdp_data)
@@ -289,7 +289,7 @@ names(respicar_socio)
 sum(is.na(respicar_socio$gdp_usd))
 # 0/439 missing values for gdp (3.1%)
 na_gdp <- tibble(filter(respicar_socio, is.na(gdp_usd)))
-na_gdp %>% distinct(Country)
+check_socio_na(na_gdp)
 
 # Gini---- 
 names(gini)
@@ -512,8 +512,7 @@ sum(is.na(respicar_socio$mean_hh))
 # 27/439 are missing (6.2%)
 na_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
 
-check_socio_na(na_gini)
-
+check_socio_na(na_hh)
 
 # Female education----
 names(female_ed)
@@ -553,4 +552,6 @@ respicar_socio <- mutate(respicar_socio,
                                             yes  = "Eastern Asia",
                                             no   = subregion))
 
+na_subregion <- tibble(filter(respicar_socio, is.na(subregion)))
+check_socio_na(na_subregion)
 
