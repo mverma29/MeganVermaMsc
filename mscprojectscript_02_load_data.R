@@ -363,7 +363,14 @@ gini_data_extra <-
         # 2013 https://www.cia.gov/the-world-factbook/field/gini-index-coefficient-distribution-of-family-income/country-comparison
         # 2016 https://ssrn.com/abstract=3465663
         `682` = data.frame(year = c(2013, 2016),
-                           gini = c(45.9, 39.97))
+                           gini = c(45.9, 39.97)),
+        
+        # Cuba
+        # 1986-1999 https://www.cepal.org/en/publications/37484-cepal-review-no86
+        # 2002, 2013 http://www.espaciolaical.org/contens/38/101104.pdf
+        # 2017 Ricardo Torres, “Cuba’s Economy: Reforms and Delays, 2014-2018,” in Cuba at the Crossroads, eds., Philip Brenner, John M. Kirk and William M. LeoGrande (Lanham, MD: Rowman and Littlefield, 2020), 56.
+        `192` = data.frame(year = c(1986, 1989, 1995, 1996, 1998, 1999, 2002, 2013, 2017),
+                           gini = c(22.0, 25.0, 55.0, 39.0, 38.0, 40.7, 38.0, 40.0, 45.0))
         
         
     ) %>%
