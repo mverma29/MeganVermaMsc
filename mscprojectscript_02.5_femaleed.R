@@ -8,8 +8,6 @@ female_ed <- read_csv("data/female_secondary_education.csv") %>%
                  values_to = "female_ed") %>%
     mutate(year = parse_number(year))
 
-female_ed %<>% bind_rows(female_ed_twn)
-
 summary(female_ed)
 
 # merge Female education data into respicar----
