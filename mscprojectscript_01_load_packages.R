@@ -46,11 +46,30 @@ check_socio_na <- function(x){
 
 
 merge_socio <- function(x, y){
-    merge(
+    argnames <- as.character(as.list(match.call())[-1])
+
+        z <- merge(
         x     = x, 
         y     = y, 
         by.x  = c("ISO 3166-1", "Year started"),
         by.y  = c("iso_code", "year"),
         all.x = TRUE) %>% 
-        select(-any_of(c("Country Name", "Country Code", "Indicator Name", "Indicator Code")))
+        select(-any_of(c("Country Name", "Country Code",
+                         "Indicator Name", "Indicator Code")))
+    
+    n_check <- list(x = x,
+                    z = z) %>%
+        map(ungroup) %>%
+        map_df(~count(.x, id), .id = 'source') %>%
+        spread(source, n) %>%
+        filter(x != z) %>%
+        select(id) 
+    
+    if(nrow(n_check) > 0L){
+        stop(sprintf("Mismatch in rows coming in (%i) and going out (%i). \nCheck covariates in object \'%s\' for id %s.",
+                     nrow(x), nrow(z), argnames[2], paste(n_check$id, collapse = ", ")))
+    } else {
+        z
+    }
+    
 }

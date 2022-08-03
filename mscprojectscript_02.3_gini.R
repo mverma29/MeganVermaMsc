@@ -104,6 +104,8 @@ gini_data_extra <-
     bind_rows(.id = "iso_code") %>%
     mutate(iso_code = parse_integer(iso_code))
 
+gini %<>% anti_join(distinct(gini_data_extra, iso_code))
+
 gini %<>% bind_rows(gini_data_extra)
 
 gini %<>% fill_socio
