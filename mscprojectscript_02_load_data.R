@@ -6,4 +6,20 @@
 #RESPICAR dataset (summary)
 respicar <- read_csv("data/appendix_summary.csv")
 
+# load urbanicity data & add to RESPICAR data 
+source("mscprojectscript_02.1_urbanpercent.R")
 
+# load GDP data & add to RESPICAR data 
+source("mscprojectscript_02.2_gdp.R")
+
+# load Gini data & add to RESPICAR data 
+source("mscprojectscript_02.3_gini.R")
+
+# load Household size data & add to RESPICAR data 
+source("mscprojectscript_02.4_hhsize.R")
+
+# load female education data & add to RESPICAR data 
+source("mscprojectscript_02.5_femaleed.R")
+
+# load UN subregion data & add to RESPICAR data 
+source("mscprojectscript_02.6_unsubregion.R")
