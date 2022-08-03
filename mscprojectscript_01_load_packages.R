@@ -52,5 +52,5 @@ merge_socio <- function(x, y){
         by.x  = c("ISO 3166-1", "Year started"),
         by.y  = c("iso_code", "year"),
         all.x = TRUE) %>% 
-        select(!c("Country Name", "Country Code", "Indicator Name", "Indicator Code"))
+        select(-any_of(c("Country Name", "Country Code", "Indicator Name", "Indicator Code")))
 }
