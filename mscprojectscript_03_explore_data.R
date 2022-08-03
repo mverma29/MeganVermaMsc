@@ -2,36 +2,36 @@
 # 7/25/2022 
 
 # view(respicar) 
-summary(respicar) 
+summary(respicar_socio) 
 
-t1 <- table(respicar$Country)
+t1  <- table(respicar_socio$Country)
 df1 <- as.data.frame(t1)
 # 73 countries, most from US then portugal/israel/brazil (44 & 22 each)
 names(respicar)
 
 # change certain character variables to factor
-respicar$Country <- as.factor(respicar$Country)
-respicar$`ISO 3166-1` <- as.factor(respicar$`ISO 3166-1`)
-respicar$Continent <- as.factor(respicar$Continent)
-respicar$Age <- as.factor(respicar$Age)
-respicar$`Ethnic Minority` <- as.factor(respicar$`Ethnic Minority`)
-respicar$Design <- as.factor(respicar$Design)
-respicar$`Sampling strategy` <- as.factor(respicar$`Sampling strategy`)
+respicar_socio$Country             <- as.factor(respicar_socio$Country)
+respicar_socio$`ISO 3166-1`        <- as.factor(respicar_socio$`ISO 3166-1`)
+respicar_socio$Continent           <- as.factor(respicar_socio$Continent)
+respicar_socio$Age                 <- as.factor(respicar_socio$Age)
+respicar_socio$`Ethnic Minority`   <- as.factor(respicar_socio$`Ethnic Minority`)
+respicar_socio$Design              <- as.factor(respicar_socio$Design)
+respicar_socio$`Sampling strategy` <- as.factor(respicar_socio$`Sampling strategy`)
 
-summary(respicar)
+summary(respicar_socio)
 # 367 entries (studies) if we take out ethnic minority
 # 429 datasets
 # Cross-sectional:303
 # Longitudinal   :125
 # Unknown design :  1
 
-respicar_israel <- filter(respicar,`Country` == "Israel")
+respicar_israel    <- filter(respicar_socio,`Country` == "Israel")
 # 22 studies in Israel, 1993-2009
-respicar_palestine <- filter(respicar,`Country` == "Palestinian Territories")
+respicar_palestine <- filter(respicar_socio,`Country` == "Palestinian Territories")
 # 5 studies in Palestine, 2009 only
 
 # make carriage variable
-respicar <- respicar %>% mutate(carriage = Positive/Total)
+respicar_socio <- mutate(respicar_socio, carriage = Positive/Total)
 
 # plot carriage by country 
 world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -40,7 +40,7 @@ world <- world %>% subset(sovereignt!="Antarctica")
 
 #ggplot(data = world) + geom_sf() + theme_void()
 
-world_with_carriage <- merge (x=respicar, y=world, 
+world_with_carriage <- merge (x=respicar_socio, y=world, 
                               by.x = "ISO 3166-1", 
                               by.y = "iso_n3", 
                               all.y=TRUE)
