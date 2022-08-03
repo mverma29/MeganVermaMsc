@@ -72,8 +72,9 @@ urban_percent <- drop_na(urban_percent, "iso_code")
 
 
 respicar <- respicar %>% 
-  group_by(`ISO 3166-1`,`Country`) %>%
-  arrange(.by_group = TRUE)
+    group_by(`ISO 3166-1`,`Country`) %>%
+    arrange(.by_group = TRUE) %>%
+    ungroup
 
 urban_percent %<>% fill_socio
 
