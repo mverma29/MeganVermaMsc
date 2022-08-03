@@ -43,3 +43,14 @@ check_socio_na <- function(x){
         unnest_wider(R) %>%
         mutate(n = map_dbl(data, nrow))
 }
+
+
+merge_socio <- function(x, y){
+    merge(
+        x     = x, 
+        y     = y, 
+        by.x  = c("ISO 3166-1", "Year started"),
+        by.y  = c("iso_code", "year"),
+        all.x = TRUE) %>% 
+        select(!c("Country Name", "Country Code", "Indicator Name", "Indicator Code"))
+}

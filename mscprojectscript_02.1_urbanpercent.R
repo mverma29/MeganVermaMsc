@@ -77,13 +77,8 @@ respicar <- respicar %>%
 
 urban_percent %<>% fill_socio
 
-respicar_socio <- merge(
-  x     = respicar, 
-  y     = urban_percent, 
-  by.x  = c("ISO 3166-1", "Year started"),
-  by.y  = c("iso_code", "year"),
-  all.x = TRUE) %>% 
-  select(!c("Country Name", "Country Code", "Indicator Name", "Indicator Code"))
+respicar_socio <- merge_socio(x = respicar, 
+                              y = urban_percent)
 
 names(respicar_socio)
 
