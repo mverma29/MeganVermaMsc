@@ -62,9 +62,10 @@ ggplot(data = world_with_carriage) +
   geom_sf(aes(geometry= geometry, #world map geometry (polygons)
               fill=carriage_country)) + #color map w/ cont. values of total cases
   scale_fill_gradient(low="yellow", high="red", na.value="azure2", 
-                      name = 'Weighted carriage rate') + #set color fill 
+                      name = 'Weighted carriage rate', 
+                      limits = c(0,1)) + #set color fill 
   theme_bw()  #theme of dark text on light background 
-    
+
 # add map title 
 
 summary(world_with_carriage$carriage)
