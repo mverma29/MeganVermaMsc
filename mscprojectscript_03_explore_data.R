@@ -70,5 +70,6 @@ ggplot(data = world_with_carriage) +
 
 summary(world_with_carriage$carriage)
 
+# how old is the covariate value for each study?
 
-
+staleness_socio <- get_staleness_socio(respicar_socio)
