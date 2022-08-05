@@ -6,6 +6,9 @@
 #RESPICAR dataset (summary)
 respicar <- read_csv("data/appendix_summary.csv")
 
+# Omit New Caledonia
+respicar %<>% filter(`ISO 3166-1` != 540L)
+
 # load urbanicity data & add to RESPICAR data 
 source("mscprojectscript_02.1_urbanpercent.R")
 
