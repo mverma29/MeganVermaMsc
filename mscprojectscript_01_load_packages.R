@@ -28,10 +28,26 @@ library(readODS)
 
 
 fill_socio <- function(x){
-    complete(x, iso_code, year) %>%
+    
+    
+    z <- complete(x, iso_code, year) %>%
         arrange(iso_code, year) %>%
+        select(-any_of(c('Country Name', 'Country Code', 
+                         'Indicator Name', 'Indicator Code'))) 
+    
+    zcols <- colnames(z)[-matches(c("iso_code", "year"),
+                                  vars = colnames(z))] %>% setNames(.,.)
+    
+    z <-  
+        mutate_at(z,
+                  .vars = zcols,
+                  .funs = list(filled_year = ~ifelse(is.na(.),
+                                                     NA,
+                                                     year)), ) %>%
         group_by(iso_code) %>%
         fill(!!!vars(-iso_code, -year), .direction = "downup")     
+    
+    z
 }
 
 
