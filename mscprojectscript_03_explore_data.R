@@ -1,6 +1,7 @@
 # Megan Verma 
 # 7/25/2022 
 
+# summaries/tidying------
 # view(respicar) 
 summary(respicar_socio) 
 
@@ -33,15 +34,25 @@ respicar_israel    <- filter(respicar_socio,`Country` == "Israel")
 respicar_palestine <- filter(respicar_socio,`Country` == "Palestinian Territories")
 # 5 studies in Palestine, 2009 only
 
+# basic map-----
 # make carriage variable
 respicar_socio <- respicar_socio %>% 
     mutate(carriage = Positive/Total)
 
 # make weighted mean of carriage by country
 
-respicar_socio <- respicar_socio %>% 
-    group_by(`ISO 3166-1`) %>% 
-    summarise(carriage_country = weighted.mean(x = carriage, w = Total, na.rm = T),`ISO 3166-1`)
+respicar_carriage <- respicar_socio %>% 
+    dplyr::group_by(`ISO 3166-1`) %>% 
+    dplyr::summarise(carriage_country = weighted.mean
+              (x = carriage, w = Total, na.rm = T), n= n(),
+              `ISO 3166-1`)
+   
+# strange structure (not condensing into groups correctly but shouldn't matter)
+
+# because assumed fixed effect, we take a weighted average of the carriage 
+# by the population in the study (total individuals)
+
+# can't do the same for covariates-- they change over time 
 
 # plot carriage by country 
 world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -50,25 +61,189 @@ world <- world %>% subset(sovereignt!="Antarctica")
 
 #ggplot(data = world) + geom_sf() + theme_void()
 
-world_with_carriage <- merge (x=respicar_socio, y=world, 
+world_with_carriage <- merge (x=respicar_carriage, y=world, 
                               by.x = "ISO 3166-1", 
                               by.y = "iso_n3", 
                               all.y=TRUE)
 
-world_with_carriage <- world_with_carriage %>% 
-  select("ISO 3166-1", "carriage_country", "geometry", "pop_est", "gdp_md_est", "subregion") 
+# the respicar_carriage dataset gets merged in but since it's not condensed, makes a mess
   
-ggplot(data = world_with_carriage) +  
+country_map <- ggplot(data = world_with_carriage) +  
   geom_sf(aes(geometry= geometry, #world map geometry (polygons)
               fill=carriage_country)) + #color map w/ cont. values of total cases
   scale_fill_gradient(low="yellow", high="red", na.value="azure2", 
                       name = 'Weighted carriage rate', 
                       limits = c(0,1)) + #set color fill 
-  theme_bw()  #theme of dark text on light background 
-
-# add map title 
+  theme_bw() + #theme of dark text on light background 
+    ggtitle("Worldwide Streptococcus pneumoniae Carriage")
 
 summary(world_with_carriage$carriage)
 
+# re-map into UN subregions carriage-----
+
+# make weighted mean of carriage by UN subregion 
+
+respicar_subregion <- respicar_socio %>% 
+    dplyr::group_by(`subregion`) %>% 
+    dplyr::summarise(carriage_subregion = weighted.mean
+                     (x = carriage, w = Total, na.rm = T), n= n(),
+                     `ISO 3166-1`)
+
+# aggregate world geometry into subregions
+subworld <- world %>% 
+    group_by(subregion) %>%
+    # Mock the data field
+    summarise(data=n())
+
+# merge map data with subregion 
+world_with_subregion_carriage <- merge (x=respicar_subregion, y=subworld, 
+                              by= "subregion", 
+                              all.y=TRUE)
+
+# re-map onto subregions 
+subregion_map <- ggplot(data = world_with_subregion_carriage) +  
+    geom_sf(aes(geometry= geometry, #world map geometry (polygons)
+                fill=carriage_subregion)) + #color map w/ cont. values of total cases
+    scale_fill_gradient(low="yellow", high="red", na.value="azure2", 
+                        name = 'Weighted carriage rate', 
+                        limits = c(0,1)) + #set color fill 
+    theme_bw() + #theme of dark text on light background 
+    ggtitle("Worldwide Streptococcus pneumoniae Carriage, by UN Subregion")
+
+# for the subregions with missing countries, looks like they're plotted as NA's
+
+ggsave(filename = subregion_map, 
+       plot = last_plot(), 
+       device = "pdf")
+
+# exploratory analysis covariates: scatter plots -------
 
 
+
+
+
+# carriage and urban percent
+ggplot(respicar_socio, aes(y = carriage,x = urban_percent)) + 
+    geom_point(size=2) + 
+    ylab("log Carriage") + 
+    xlab("Percent Urban Population") +
+    #scale_x_log10() + 
+    scale_y_log10() + # when carriage is on the log scale & urban_percent is linear, 
+    # there may be some relationship--less carriage in higher urbanized populations?? 
+    geom_smooth(method = 'lm')
+    
+
+# carriage and GDP
+ggplot(respicar_socio, aes(y = carriage,x = gdp_usd)) + 
+    geom_point(size=2) + 
+    ylab("log Carriage") + 
+    xlab("log GDP per capita") +
+    scale_x_log10() + 
+    scale_y_log10() + # some relationship on log-log scale: when GDP is higher, carriage is lower
+    geom_smooth(method = 'lm')
+
+# carriage and Gini??? does it make sense to check? 
+ggplot(respicar_socio, aes(y = carriage,x = gini)) +
+    geom_point(size=2) +
+    ylab("Carriage") +
+    xlab("Gini Coefficient of Inequality") +
+    #scale_x_log10() +
+    #scale_y_log10() + # when gini is higher (more unequal), carriage is higher
+    geom_smooth(method = 'lm')
+
+# carriage and HH size 
+ggplot(respicar_socio, aes(y = carriage,x = mean_hh)) + 
+    geom_point(size=2) + 
+    ylab("Carriage") + 
+    xlab("Average Household Size") +
+    #scale_x_log10() +
+    #scale_y_log10() + # when average hh size increases, carriage increases
+    geom_smooth(method = 'lm')
+
+# carriage and female education
+ggplot(respicar_socio, aes(y = carriage,x = female_ed)) + 
+    geom_point(size=2) + 
+    ylab("Carriage") + 
+    xlab("Female Secondary Education Rate") +
+    #scale_x_log10() + 
+    #scale_y_log10() + # when female ed increases, carriage decreases
+    geom_smooth(method = 'lm')
+
+# carriage and UN subregion (not useful?)
+# ggplot(respicar_subregion, aes(y = carriage_subregion,x = subregion)) + 
+#     geom_point(size=2) + 
+#     ylab("Carriage") + 
+#     xlab("UN Subregion") +
+#     #scale_x_log10() + 
+#     #scale_y_log10() + # when carriage is...
+#     geom_smooth(method = 'lm') + 
+#     geom_text( aes(label = subregion), hjust = 1, vjust = -1)
+
+
+
+
+# basic model fitting (one covariate at a time)-----
+
+
+# Fit a logistic GLM of the total carriage as a function of each covariate. 
+# As each study has a different total individuals serotyped, we'll need to ensure that we use the 
+# total serotyped as though it was a number of "trials", $n$, and the number of cases as a number 
+# of "successes", $y$, in our GLM. This is done by specifying the left hand side of the regression 
+# formula as `cbind(y, n-y)` with appropriate variable names in place of `n` and `y`.
+
+# add RE for subregions in
+
+# urban_percent 
+urban_percent_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
+                formula = p ~ urban_percent,
+                family  = "binomial", weights = Total)
+
+tidy(urban_percent_glm, conf.int = T, exponentiate = TRUE)
+
+
+# GDP
+gdp_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
+                         formula = p ~ gdp_usd,
+                         family  = "binomial", weights = Total)
+
+tidy(gdp_glm, conf.int = T, exponentiate = TRUE)
+
+
+# Gini
+gini_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
+                         formula = p ~ gini,
+                         family  = "binomial", weights = Total)
+
+tidy(gini_glm, conf.int = T, exponentiate = TRUE)
+
+
+# HH size
+hh_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
+                formula = p ~ mean_hh,
+                family  = "binomial", weights = Total)
+
+tidy(hh_glm, conf.int = T, exponentiate = TRUE) # an actual association!
+
+
+# female ed 
+female_ed_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
+              formula = p ~ female_ed,
+              family  = "binomial", weights = Total)
+
+tidy(female_ed_glm, conf.int = T, exponentiate = TRUE)
+
+
+# full model (without interaction), with RE for subregion correlation----
+
+# add in RE 
+full_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
+              formula = p ~ urban_percent + gdp + gini + mean_hh + female_ed,
+              family  = "binomial", weights = Total) 
+
+# full model (with interaction), with RE for subregion correlation----
+
+# add in RE 
+# check formatting for interaction term (*??)
+full_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
+                formula = p ~ urban_percent + gdp*gini + mean_hh + female_ed,
+                family  = "binomial", weights = Total) 
