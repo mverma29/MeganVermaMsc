@@ -42,11 +42,10 @@ respicar_socio <- respicar_socio %>%
 # make weighted mean of carriage by country
 
 respicar_carriage <- respicar_socio %>% 
-    dplyr::group_by(`ISO 3166-1`) %>% 
-    dplyr::summarise(carriage_country = weighted.mean
-              (x = carriage, w = Total, na.rm = T), n= n(),
-              `ISO 3166-1`)
-   
+  dplyr::group_by(`ISO 3166-1`) %>% 
+  dplyr::summarise(carriage_country = weighted.mean
+                   (x = carriage, w = Total, na.rm = T), n= n())
+
 # strange structure (not condensing into groups correctly but shouldn't matter)
 
 # because assumed fixed effect, we take a weighted average of the carriage 
@@ -85,10 +84,10 @@ summary(world_with_carriage$carriage)
 
 
 respicar_subregion <- respicar_socio %>% 
-    dplyr::group_by(`subregion`) %>% 
-    dplyr::summarise(carriage_subregion = weighted.mean
-                     (x = carriage, w = Total, na.rm = T), n= n(),
-                     `ISO 3166-1`)
+  dplyr::group_by(`subregion`) %>% 
+  dplyr::summarise(carriage_subregion = weighted.mean(x = carriage, 
+                                                      w = Total, na.rm = T),
+                   n= n())
 
 # aggregate world geometry into subregions
 subworld <- world %>% 
