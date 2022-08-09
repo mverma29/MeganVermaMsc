@@ -54,9 +54,8 @@ respicar_carriage <- respicar_socio %>%
 # can't do the same for covariates-- they change over time 
 
 # plot carriage by country 
-world <- ne_countries(scale = "medium", returnclass = "sf")
-filter(world, `sovereignt`=="Antarctica")
-world <- world %>% subset(sovereignt!="Antarctica")
+world <- ne_countries(scale = "small", returnclass = "sf")
+world <- world %>% filter(sovereignt!="Antarctica")
 
 #ggplot(data = world) + geom_sf() + theme_void()
 
@@ -102,19 +101,20 @@ world_with_subregion_carriage <- merge (x=respicar_subregion, y=subworld,
 
 # re-map onto subregions 
 subregion_map <- ggplot(data = world_with_subregion_carriage) +  
-    geom_sf(aes(geometry= geometry, #world map geometry (polygons)
-                fill=carriage_subregion)) + #color map w/ cont. values of total cases
-    scale_fill_gradient(low="yellow", high="red", na.value="azure2", 
-                        name = 'Weighted carriage rate', 
-                        limits = c(0,1)) + #set color fill 
-    theme_bw() + #theme of dark text on light background 
-    ggtitle("Worldwide Streptococcus pneumoniae Carriage, by UN Subregion")
+  geom_sf(aes(geometry= geometry, #world map geometry (polygons)
+              fill=carriage_subregion)) + #color map w/ cont. values of total cases
+  scale_fill_gradient(low="yellow", high="red", na.value="azure2", 
+                      name = 'Carriage rate (weighted average)', 
+                      limits = c(0,1)) + #set color fill 
+  theme_bw() + #theme of dark text on light background 
+  theme(legend.position = 'bottom') +
+  ggtitle("Worldwide Streptococcus pneumoniae Carriage, by UN Subregion")
 
 # for the subregions with missing countries, looks like they're plotted as NA's
 
-ggsave(filename = subregion_map, 
-       plot = last_plot(), 
-       device = "pdf")
+ggsave(filename = "outputs/subregion_map.pdf", 
+       plot = subregion_map, 
+       device = cairo_pdf, width = 7, height = 3, units = 'in')
 
 # how old is the covariate value for each study?-----
 
