@@ -78,7 +78,9 @@ country_map <- ggplot(data = world_with_carriage) +
   ggtitle("Worldwide Streptococcus pneumoniae Carriage")
 
 
-ggsave("outputs/country_map.png")
+ggsave(filename = "outputs/country_map.png", 
+       plot = country_map, 
+       device = png, width = 7, height = 3, units = 'in', res = 600)
 
 summary(world_with_carriage$carriage)
 
