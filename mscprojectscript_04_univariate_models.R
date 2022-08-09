@@ -7,7 +7,7 @@
 # of "successes", $y$, in our GLM. This is done by specifying the left hand side of the regression 
 # formula as `cbind(y, n-y)` with appropriate variable names in place of `n` and `y`.
 
-# add RE for subregions in
+# add RE for subregions in using glmer function (lme4 package)
 
 # intercept-only model, to assess clustering in the data
 intercept_glm <- glmer(
@@ -33,12 +33,7 @@ urban_percent_glm <- glmer(
 
 print(urban_percent_glm, corr = FALSE)
 
-jtools:: summ(urban_percent_glm, exp=TRUE, confint=TRUE)
-
-# tidy(urban_percent_glm, 
-#      conf.int = T, 
-#      exponentiate = TRUE)
-
+summ(urban_percent_glm, exp=TRUE, confint=TRUE) #OR of 1
 
 # GDP
 gdp_glm <- glmer(
@@ -50,30 +45,48 @@ gdp_glm <- glmer(
 
 print(gdp_glm, corr = FALSE)
 
-summ(gdp_glm, exp=TRUE)
+summ(gdp_glm, exp=TRUE, confint=TRUE)  #OR of 1
 
 
 
 # Gini
-gini_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
-                formula = p ~ gini,
-                family  = "binomial", weights = Total)
+gini_glm <- glmer(
+    data = respicar_socio %>% 
+        mutate(p = Positive/Total),
+    formula = p ~ gini + (1|subregion),
+    family  = "binomial", 
+    weights = Total)
 
-tidy(gini_glm, conf.int = T, exponentiate = TRUE)
+print(gini_glm, corr = FALSE)
+
+summ(gini_glm, exp=TRUE, confint=TRUE)  #OR of 0.99
+
 
 
 # HH size
-hh_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
-              formula = p ~ mean_hh,
-              family  = "binomial", weights = Total)
+hh_glm <- glmer(
+    data = respicar_socio %>% 
+        mutate(p = Positive/Total),
+    formula = p ~ mean_hh + (1|subregion),
+    family  = "binomial", 
+    weights = Total)
 
-tidy(hh_glm, conf.int = T, exponentiate = TRUE) # an actual association!
+print(hh_glm, corr = FALSE)
+
+summ(hh_glm, exp=TRUE, confint=TRUE)  #OR of 1.36 (actual association!!)
+
 
 
 # female ed 
-female_ed_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
-                     formula = p ~ female_ed,
-                     family  = "binomial", weights = Total)
+female_ed_glm <- glmer(
+    data = respicar_socio %>% 
+        mutate(p = Positive/Total),
+    formula = p ~ female_ed + (1|subregion),
+    family  = "binomial", 
+    weights = Total)
 
-tidy(female_ed_glm, conf.int = T, exponentiate = TRUE)
+print(female_ed_glm, corr = FALSE)
+
+summ(female_ed_glm, exp=TRUE, confint=TRUE)  #OR of 0.99
+
 
