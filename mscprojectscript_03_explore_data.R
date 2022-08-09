@@ -66,7 +66,7 @@ country_map <- ggplot(data = world_with_carriage) +
   geom_sf(aes(geometry= geometry, #world map geometry (polygons)
               fill=carriage_country)) + #color map w/ cont. values of total cases
   scale_fill_gradient(low="yellow", high="red", na.value="azure2", 
-                      name = 'Weighted carriage rate', 
+                      name = 'Carriage rate (weighted average)', 
                       limits = c(0,1)) + #set color fill 
   theme_bw() + #theme of dark text on light background 
     theme(legend.position = 'bottom') + 
@@ -85,23 +85,40 @@ summary(world_with_carriage$carriage) #108 countries without carriage (not in da
 
 # find most recent population of each country 
 data(pop)
-respicar_socio <- merge (x=respicar_socio, y=pop, 
+respicar_subregion <- merge (x=respicar_carriage, y=pop, 
                                         by.x= "ISO 3166-1",
                                         by.y= "country_code",
                                         all.x=TRUE)
 
-na_pop <- respicar_socio %>% filter(is.na(2020)) # no missing values
+na_pop <- respicar_subregion %>% filter(is.na(2020)) # no missing values
 
-respicar_subregion <- respicar_socio %>% 
-  dplyr::group_by(`subregion`) %>% 
-  dplyr::summarise(carriage_subregion = weighted.mean(x = carriage, 
-                                                      w = 2020, na.rm = T),
-                   n= n())
+respicar_subregion <- respicar_subregion %>% 
+    mutate(region= countrycode(sourcevar =`ISO 3166-1`,
+                               origin = "iso3n",
+                               destination = "un.regionsub.name"), 
+           region = ifelse(test = `ISO 3166-1` == 158,
+                yes  = "Eastern Asia", 
+                no   = region))
 
-world$region <- countrycode(world$iso_a3,
+na_subregion <- respicar_subregion %>% filter(is.na(region))
+
+respicar_subregion <- respicar_subregion %>% 
+    dplyr::group_by(`region`) %>% 
+    dplyr::summarise(carriage_subregion = 
+                         weighted.mean(x = carriage_country, 
+                                       w = `2020`, na.rm = T),
+                     n= n())
+
+
+world <- mutate(world, 
+                region= countrycode(sourcevar =`iso_a3`,
                             origin = "iso3c",
-                            destination = "un.regionsub.name")
-# fix Taiwan 
+                            destination = "un.regionsub.name"),
+                region = ifelse(test = `iso_n3` == "158",
+                                yes  = "Eastern Asia", 
+                                no   = region))
+
+na_region <- world %>% filter(is.na(region)) #countries not in study
 
 # aggregate world geometry into subregions
 subworld <- world %>% 
@@ -111,10 +128,8 @@ subworld <- world %>%
 
 # merge map data with subregion 
 world_with_subregion_carriage <- merge (x=respicar_subregion, y=subworld, 
-                                        by.x= "subregion",
-                                        by.y= "region",
+                                        by= "region",
                                         all.y=TRUE)
-# 4 NA's are Taiwan-- need to fix 
 
 # re-map onto subregions 
 subregion_map <- ggplot(data = world_with_subregion_carriage) +  
