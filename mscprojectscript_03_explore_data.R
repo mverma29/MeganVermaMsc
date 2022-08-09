@@ -1,6 +1,8 @@
 # Megan Verma 
 # 7/25/2022 
 
+if(!dir.exists('outputs')){dir.create('outputs')}
+
 # summaries/tidying------
 # view(respicar) 
 summary(respicar_socio) 
