@@ -75,6 +75,9 @@ country_map <- ggplot(data = world_with_carriage) +
   theme_bw() + #theme of dark text on light background 
   ggtitle("Worldwide Streptococcus pneumoniae Carriage")
 
+
+ggsave("country_map.png")
+
 summary(world_with_carriage$carriage)
 
 # re-map into UN subregions carriage-----
@@ -110,16 +113,19 @@ subregion_map <- ggplot(data = world_with_subregion_carriage) +
   theme(legend.position = 'bottom') +
   ggtitle("Worldwide Streptococcus pneumoniae Carriage, by UN Subregion")
 
-# for the subregions with missing countries, looks like they're plotted as NA's
+# for the subregions with missing countries, looks like there's a cutoff, 
+# then they're plotted as NA's
 
 ggsave(filename = "outputs/subregion_map.pdf", 
        plot = subregion_map, 
        device = cairo_pdf, width = 7, height = 3, units = 'in')
 
+ggsave("subregion_map.png")
+
 # how old is the covariate value for each study?-----
 
 staleness_socio <- get_staleness_socio(respicar_socio)
-# shouldn't there be 439*5=2195 values here?
+# shouldn't there be 438*5=2190 values here?
 
 summary(staleness_socio) # max: -23 (23 years in the future)
 
@@ -151,49 +157,63 @@ staleness_female_ed <- staleness_socio %>%
 
 # carriage and urban percent
 ggplot(respicar_socio, aes(y = carriage,x = urban_percent)) + 
-  geom_point(size=2) + 
-  ylab("log Carriage") + 
-  xlab("Percent Urban Population") +
-  #scale_x_log10() + 
-  scale_y_log10() + # when carriage is on the log scale & urban_percent is linear, 
-  # there may be some relationship--less carriage in higher urbanized populations?? 
-  geom_smooth(method = 'lm')
+    geom_point(size=2) + 
+    ylab("log Carriage") + 
+    xlab("Percent Urban Population") +
+    #scale_x_log10() + 
+    scale_y_log10() + # when carriage is on the log scale & urban_percent is linear, 
+    # there may be some relationship--less carriage in higher urbanized populations?? 
+    geom_smooth(method = 'lm')
+    
+ggsave("scatter_urban_percent_carriage.png")
 
 
 # carriage and GDP
 ggplot(respicar_socio, aes(y = carriage,x = gdp_usd)) + 
-  geom_point(size=2) + 
-  ylab("log Carriage") + 
-  xlab("log GDP per capita") +
-  scale_x_log10() + 
-  geom_smooth(method = 'lm')
+    geom_point(size=2) + 
+    ylab("log Carriage") + 
+    xlab("log GDP per capita") +
+    scale_x_log10() + 
+    scale_y_log10() + # carriage decreases as gdp inc
+    geom_smooth(method = 'lm')
+
+ggsave("scatter_gdp_carriage.png")
 
 # carriage and Gini??? does it make sense to check? 
 ggplot(respicar_socio, aes(y = carriage,x = gini)) +
-  geom_point(size=2) +
-  ylab("Carriage") +
-  xlab("Gini Coefficient of Inequality") +
-  #scale_x_log10() +
-  #scale_y_log10() + # when gini is higher (more unequal), carriage is higher
-  geom_smooth(method = 'lm')
+    geom_point(size=2) +
+    ylab("log Carriage") +
+    xlab("Gini Coefficient of Inequality") +
+    # scale_x_log10() +
+    scale_y_log10() + # when gini is higher (more unequal), carriage is higher
+    geom_smooth(method = 'lm')
+
+ggsave("scatter_gini_carriage.png")
+
 
 # carriage and HH size 
 ggplot(respicar_socio, aes(y = carriage,x = mean_hh)) + 
-  geom_point(size=2) + 
-  ylab("Carriage") + 
-  xlab("Average Household Size") +
-  #scale_x_log10() +
-  #scale_y_log10() + # when average hh size increases, carriage increases
-  geom_smooth(method = 'lm')
+    geom_point(size=2) + 
+    ylab("log Carriage") + 
+    xlab("Average Household Size") +
+    #scale_x_log10() +
+    scale_y_log10() + # when average hh size increases, carriage increases
+    geom_smooth(method = 'lm')
+
+ggsave("scatter_hh_carriage.png")
+
 
 # carriage and female education
 ggplot(respicar_socio, aes(y = carriage,x = female_ed)) + 
-  geom_point(size=2) + 
-  ylab("Carriage") + 
-  xlab("Female Secondary Education Rate") +
-  #scale_x_log10() + 
-  #scale_y_log10() + # when female ed increases, carriage decreases
-  geom_smooth(method = 'lm')
+    geom_point(size=2) + 
+    ylab("log Carriage") + 
+    xlab("Female Secondary Education Rate") +
+    #scale_x_log10() + 
+    scale_y_log10() + # when female ed increases, carriage decreases
+    geom_smooth(method = 'lm')
+
+ggsave("scatter_female_ed_carriage.png")
+
 
 # carriage and UN subregion (not useful?)
 # ggplot(respicar_subregion, aes(y = carriage_subregion,x = subregion)) + 
