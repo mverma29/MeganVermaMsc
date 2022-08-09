@@ -231,9 +231,6 @@ intercept_glm <- glmer(
 print(intercept_glm, corr = FALSE)
 
 
-# install package to measure ICC
-# install.packages("sjstats")
-library("sjstats")
 
 performance::icc(urban_percent_glm) # 8% of the variation in carriage 
 # can be accounted for by clustering of the data by subregion 
@@ -250,9 +247,7 @@ print(urban_percent_glm, corr = FALSE)
 
 # need package to visualize glmer output (tidy doesn't work)
 #install.packages("jtools")
-library("jtools")
-conflict_prefer("summ", "jtools")
-jtools:: summ(urban_percent_glm, exp=TRUE)
+jtools::summ(urban_percent_glm, exp=TRUE)
 
 # tidy(urban_percent_glm, 
 #      conf.int = T, 
