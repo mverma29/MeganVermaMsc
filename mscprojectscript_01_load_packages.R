@@ -28,10 +28,26 @@ library(lme4)
 
 
 fill_socio <- function(x){
-    complete(x, iso_code, year) %>%
+    
+    
+    z <- complete(x, iso_code, year) %>%
         arrange(iso_code, year) %>%
+        select(-any_of(c('Country Name', 'Country Code', 
+                         'Indicator Name', 'Indicator Code'))) 
+    
+    zcols <- colnames(z)[-matches(c("iso_code", "year"),
+                                  vars = colnames(z))] %>% setNames(.,.)
+    
+    z <-  
+        mutate_at(z,
+                  .vars = zcols,
+                  .funs = list(filled_year = ~ifelse(is.na(.),
+                                                     NA,
+                                                     year)), ) %>%
         group_by(iso_code) %>%
         fill(!!!vars(-iso_code, -year), .direction = "downup")     
+    
+    z
 }
 
 
@@ -47,8 +63,8 @@ check_socio_na <- function(x){
 
 merge_socio <- function(x, y){
     argnames <- as.character(as.list(match.call())[-1])
-
-        z <- merge(
+    
+    z <- merge(
         x     = x, 
         y     = y, 
         by.x  = c("ISO 3166-1", "Year started"),
@@ -72,4 +88,23 @@ merge_socio <- function(x, y){
         z
     }
     
+}
+
+get_staleness_socio <- function(x){
+    # find which variables got 'filled_year' values from fill_socio()
+    nms <- names(x) %>%
+        grep('filled_year', ., value = T) %>%
+        c("id", "Year started") 
+    
+    # find the distinct metadata from each study
+    # then reshape as a long data frame
+    # if a 2005 study uses 2004 covariate data, staleness is 1
+    z   <- select(.data = x, any_of(nms)) %>%
+        rename(year_study = `Year started`) %>%
+        distinct %>%
+        gather(variable, year_covar, -id, -year_study) %>%
+        mutate(variable = sub('_filled_year', '', variable)) %>%
+        mutate(staleness = year_study - year_covar)
+    
+    z
 }

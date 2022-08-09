@@ -80,8 +80,10 @@ country_map <- ggplot(data = world_with_carriage) +
 summary(world_with_carriage$carriage)
 
 # re-map into UN subregions carriage-----
+# how old is the covariate value for each study?
 
 # make weighted mean of carriage by UN subregion 
+staleness_socio <- get_staleness_socio(respicar_socio)
 
 respicar_subregion <- respicar_socio %>% 
     dplyr::group_by(`subregion`) %>% 
@@ -139,7 +141,6 @@ ggplot(respicar_socio, aes(y = carriage,x = gdp_usd)) +
     ylab("log Carriage") + 
     xlab("log GDP per capita") +
     scale_x_log10() + 
-    scale_y_log10() + # some relationship on log-log scale: when GDP is higher, carriage is lower
     geom_smooth(method = 'lm')
 
 # carriage and Gini??? does it make sense to check? 
