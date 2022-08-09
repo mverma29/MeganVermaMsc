@@ -48,25 +48,19 @@ respicar_carriage <- respicar_socio %>%
   dplyr::summarise(carriage_country = weighted.mean
                    (x = carriage, w = Total, na.rm = T), n= n())
 
-# strange structure (not condensing into groups correctly but shouldn't matter)
-
 # because assumed fixed effect, we take a weighted average of the carriage 
 # by the population in the study (total individuals)
-
 # can't do the same for covariates-- they change over time 
 
 # plot carriage by country 
 world <- ne_countries(scale = "small", returnclass = "sf")
 world <- world %>% filter(sovereignt!="Antarctica")
 
-#ggplot(data = world) + geom_sf() + theme_void()
-
 world_with_carriage <- merge (x=respicar_carriage, y=world, 
                               by.x = "ISO 3166-1", 
                               by.y = "iso_n3", 
                               all.y=TRUE)
 
-# the respicar_carriage dataset gets merged in but since it's not condensed, makes a mess
 
 country_map <- ggplot(data = world_with_carriage) +  
   geom_sf(aes(geometry= geometry, #world map geometry (polygons)
@@ -83,17 +77,25 @@ ggsave(filename = "outputs/country_map.png",
        plot = country_map, 
        device = png, width = 7, height = 3, units = 'in', res = 600)
 
-summary(world_with_carriage$carriage)
+summary(world_with_carriage$carriage) #108 countries without carriage (not in dataset)
 
 # re-map into UN subregions carriage-----
 
 # make weighted mean of carriage by UN subregion 
 
+# find most recent population of each country 
+data(pop)
+respicar_socio <- merge (x=respicar_socio, y=pop, 
+                                        by.x= "ISO 3166-1",
+                                        by.y= "country_code",
+                                        all.x=TRUE)
+
+na_pop <- respicar_socio %>% filter(is.na(2020)) # no missing values
 
 respicar_subregion <- respicar_socio %>% 
   dplyr::group_by(`subregion`) %>% 
   dplyr::summarise(carriage_subregion = weighted.mean(x = carriage, 
-                                                      w = Total, na.rm = T),
+                                                      w = 2020, na.rm = T),
                    n= n())
 
 world$region <- countrycode(world$iso_a3,
