@@ -76,7 +76,7 @@ country_map <- ggplot(data = world_with_carriage) +
   ggtitle("Worldwide Streptococcus pneumoniae Carriage")
 
 
-ggsave("country_map.png")
+ggsave("outputs/country_map.png")
 
 summary(world_with_carriage$carriage)
 
@@ -120,7 +120,7 @@ ggsave(filename = "outputs/subregion_map.pdf",
        plot = subregion_map, 
        device = cairo_pdf, width = 7, height = 3, units = 'in')
 
-ggsave("subregion_map.png")
+ggsave("outputs/subregion_map.png")
 
 # how old is the covariate value for each study?-----
 
@@ -165,7 +165,7 @@ ggplot(respicar_socio, aes(y = carriage,x = urban_percent)) +
     # there may be some relationship--less carriage in higher urbanized populations?? 
     geom_smooth(method = 'lm')
     
-ggsave("scatter_urban_percent_carriage.png")
+ggsave("outputs/scatter_urban_percent_carriage.png")
 
 
 # carriage and GDP
@@ -177,7 +177,7 @@ ggplot(respicar_socio, aes(y = carriage,x = gdp_usd)) +
     scale_y_log10() + # carriage decreases as gdp inc
     geom_smooth(method = 'lm')
 
-ggsave("scatter_gdp_carriage.png")
+ggsave("outputs/scatter_gdp_carriage.png")
 
 # carriage and Gini??? does it make sense to check? 
 ggplot(respicar_socio, aes(y = carriage,x = gini)) +
@@ -188,7 +188,7 @@ ggplot(respicar_socio, aes(y = carriage,x = gini)) +
     scale_y_log10() + # when gini is higher (more unequal), carriage is higher
     geom_smooth(method = 'lm')
 
-ggsave("scatter_gini_carriage.png")
+ggsave("outputs/scatter_gini_carriage.png")
 
 
 # carriage and HH size 
@@ -200,7 +200,7 @@ ggplot(respicar_socio, aes(y = carriage,x = mean_hh)) +
     scale_y_log10() + # when average hh size increases, carriage increases
     geom_smooth(method = 'lm')
 
-ggsave("scatter_hh_carriage.png")
+ggsave("outputs/scatter_hh_carriage.png")
 
 
 # carriage and female education
@@ -212,7 +212,7 @@ ggplot(respicar_socio, aes(y = carriage,x = female_ed)) +
     scale_y_log10() + # when female ed increases, carriage decreases
     geom_smooth(method = 'lm')
 
-ggsave("scatter_female_ed_carriage.png")
+ggsave("outputs/scatter_female_ed_carriage.png")
 
 
 # carriage and UN subregion (not useful?)
