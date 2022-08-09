@@ -118,9 +118,9 @@ subregion_map <- ggplot(data = world_with_subregion_carriage) +
 # for the subregions with missing countries, looks like there's a cutoff, 
 # then they're plotted as NA's
 
-ggsave(filename = "outputs/subregion_map.pdf", 
+ggsave(filename = "outputs/subregion_map.png", 
        plot = subregion_map, 
-       device = cairo_pdf, width = 7, height = 3, units = 'in')
+       device = png, width = 7, height = 3, units = 'in', res = 600)
 
 ggsave("outputs/subregion_map.png")
 
