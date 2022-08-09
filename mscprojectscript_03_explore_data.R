@@ -193,20 +193,57 @@ ggplot(respicar_socio, aes(y = carriage,x = female_ed)) +
 
 # add RE for subregions in
 
-# urban_percent 
-urban_percent_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
-                formula = p ~ urban_percent,
-                family  = "binomial", weights = Total)
+# intercept-only model, to assess clustering in the data
+intercept_glm <- glmer(
+    data = respicar_socio %>% 
+        mutate(p = Positive/Total),
+    formula = p ~ 1 + (1|subregion),
+    family  = "binomial", 
+    weights = Total)
 
-tidy(urban_percent_glm, conf.int = T, exponentiate = TRUE)
+print(intercept_glm, corr = FALSE)
+
+
+# install package to measure ICC
+# install.packages("sjstats")
+library("sjstats")
+
+performance::icc(urban_percent_glm) # 8% of the variation in carriage 
+# can be accounted for by clustering of the data by subregion 
+
+# urban_percent 
+urban_percent_glm <- glmer(
+    data = respicar_socio %>% 
+        mutate(p = Positive/Total),
+    formula = p ~ urban_percent + (1|subregion),
+    family  = "binomial", 
+    weights = Total)
+
+print(urban_percent_glm, corr = FALSE)
+
+# need package to visualize glmer output (tidy doesn't work)
+#install.packages("jtools")
+library("jtools")
+conflict_prefer("summ", "jtools")
+jtools:: summ(urban_percent_glm, exp=TRUE)
+
+# tidy(urban_percent_glm, 
+#      conf.int = T, 
+#      exponentiate = TRUE)
 
 
 # GDP
-gdp_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
-                         formula = p ~ gdp_usd,
-                         family  = "binomial", weights = Total)
+gdp_glm <- glmer(
+    data = respicar_socio %>% 
+        mutate(p = Positive/Total),
+    formula = p ~ gdp_usd + (1|subregion),
+    family  = "binomial", 
+    weights = Total)
 
-tidy(gdp_glm, conf.int = T, exponentiate = TRUE)
+print(gdp_glm, corr = FALSE)
+
+summ(gdp_glm, exp=TRUE)
+
 
 
 # Gini
