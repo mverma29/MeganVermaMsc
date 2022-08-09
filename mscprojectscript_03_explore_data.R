@@ -164,6 +164,7 @@ ggplot(respicar_socio, aes(y = carriage,x = urban_percent)) +
     # there may be some relationship--less carriage in higher urbanized populations?? 
     geom_smooth(method = 'lm')
     
+ggsave("scatter_urban_percent_carriage.png")
 
 # carriage and GDP
 ggplot(respicar_socio, aes(y = carriage,x = gdp_usd)) + 
@@ -171,34 +172,46 @@ ggplot(respicar_socio, aes(y = carriage,x = gdp_usd)) +
     ylab("log Carriage") + 
     xlab("log GDP per capita") +
     scale_x_log10() + 
+    scale_y_log10() + # carriage decreases as gdp inc
     geom_smooth(method = 'lm')
+
+ggsave("scatter_gdp_carriage.png")
 
 # carriage and Gini??? does it make sense to check? 
 ggplot(respicar_socio, aes(y = carriage,x = gini)) +
     geom_point(size=2) +
-    ylab("Carriage") +
+    ylab("log Carriage") +
     xlab("Gini Coefficient of Inequality") +
-    #scale_x_log10() +
-    #scale_y_log10() + # when gini is higher (more unequal), carriage is higher
+    # scale_x_log10() +
+    scale_y_log10() + # when gini is higher (more unequal), carriage is higher
     geom_smooth(method = 'lm')
+
+ggsave("scatter_gini_carriage.png")
+
 
 # carriage and HH size 
 ggplot(respicar_socio, aes(y = carriage,x = mean_hh)) + 
     geom_point(size=2) + 
-    ylab("Carriage") + 
+    ylab("log Carriage") + 
     xlab("Average Household Size") +
     #scale_x_log10() +
-    #scale_y_log10() + # when average hh size increases, carriage increases
+    scale_y_log10() + # when average hh size increases, carriage increases
     geom_smooth(method = 'lm')
+
+ggsave("scatter_hh_carriage.png")
+
 
 # carriage and female education
 ggplot(respicar_socio, aes(y = carriage,x = female_ed)) + 
     geom_point(size=2) + 
-    ylab("Carriage") + 
+    ylab("log Carriage") + 
     xlab("Female Secondary Education Rate") +
     #scale_x_log10() + 
-    #scale_y_log10() + # when female ed increases, carriage decreases
+    scale_y_log10() + # when female ed increases, carriage decreases
     geom_smooth(method = 'lm')
+
+ggsave("scatter_female_ed_carriage.png")
+
 
 # carriage and UN subregion (not useful?)
 # ggplot(respicar_subregion, aes(y = carriage_subregion,x = subregion)) + 
