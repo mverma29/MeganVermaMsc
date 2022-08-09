@@ -230,19 +230,19 @@ intercept_glm <- glmer(
 print(intercept_glm, corr = FALSE)
 
 
-
-performance::icc(urban_percent_glm) # 8% of the variation in carriage 
-# can be accounted for by clustering of the data by subregion 
-
 # urban_percent 
 urban_percent_glm <- glmer(
-    data = respicar_socio %>% 
+  data = respicar_socio %>% 
         mutate(p = Positive/Total),
     formula = p ~ urban_percent + (1|subregion),
     family  = "binomial", 
     weights = Total)
 
 print(urban_percent_glm, corr = FALSE)
+
+performance::icc(urban_percent_glm) # 8% of the variation in carriage 
+# can be accounted for by clustering of the data by subregion 
+
 
 # need package to visualize glmer output (tidy doesn't work)
 #install.packages("jtools")
@@ -295,13 +295,13 @@ tidy(female_ed_glm, conf.int = T, exponentiate = TRUE)
 
 # add in RE 
 full_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
-              formula = p ~ urban_percent + gdp + gini + mean_hh + female_ed,
-              family  = "binomial", weights = Total) 
+                formula = p ~ urban_percent + gdp_usd + gini + mean_hh + female_ed,
+                family  = "binomial", weights = Total) 
 
 # full model (with interaction), with RE for subregion correlation----
 
 # add in RE 
 # check formatting for interaction term (*??)
 full_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
-                formula = p ~ urban_percent + gdp*gini + mean_hh + female_ed,
+                formula = p ~ urban_percent + gdp_usd*gini + mean_hh + female_ed,
                 family  = "binomial", weights = Total) 
