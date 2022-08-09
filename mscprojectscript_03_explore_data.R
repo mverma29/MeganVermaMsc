@@ -252,7 +252,7 @@ print(intercept_glm, corr = FALSE)
 # install.packages("sjstats")
 library("sjstats")
 
-performance::icc(urban_percent_glm) # 8% of the variation in carriage 
+performance::icc(intercept_glm) # 8.3% of the variation in carriage 
 # can be accounted for by clustering of the data by subregion 
 
 # urban_percent 
@@ -269,7 +269,7 @@ print(urban_percent_glm, corr = FALSE)
 #install.packages("jtools")
 library("jtools")
 conflict_prefer("summ", "jtools")
-jtools:: summ(urban_percent_glm, exp=TRUE)
+jtools:: summ(urban_percent_glm, exp=TRUE, confint=TRUE)
 
 # tidy(urban_percent_glm, 
 #      conf.int = T, 
