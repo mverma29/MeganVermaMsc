@@ -75,7 +75,8 @@ country_map <- ggplot(data = world_with_carriage) +
                       name = 'Weighted carriage rate', 
                       limits = c(0,1)) + #set color fill 
   theme_bw() + #theme of dark text on light background 
-  ggtitle("Worldwide Streptococcus pneumoniae Carriage")
+    theme(legend.position = 'bottom') + 
+  ggtitle("Worldwide Streptococcus pneumoniae Carriage, by Country")
 
 
 ggsave(filename = "outputs/country_map.png", 
@@ -95,16 +96,23 @@ respicar_subregion <- respicar_socio %>%
                                                       w = Total, na.rm = T),
                    n= n())
 
+world$region <- countrycode(world$iso_a3,
+                            origin = "iso3c",
+                            destination = "un.regionsub.name")
+# fix Taiwan 
+
 # aggregate world geometry into subregions
 subworld <- world %>% 
-  group_by(subregion) %>%
+  group_by(region) %>%
   # Mock the data field
   summarise(data=n())
 
 # merge map data with subregion 
 world_with_subregion_carriage <- merge (x=respicar_subregion, y=subworld, 
-                                        by= "subregion", # these don't match perfectly
+                                        by.x= "subregion",
+                                        by.y= "region",
                                         all.y=TRUE)
+# 4 NA's are Taiwan-- need to fix 
 
 # re-map onto subregions 
 subregion_map <- ggplot(data = world_with_subregion_carriage) +  
@@ -123,8 +131,6 @@ subregion_map <- ggplot(data = world_with_subregion_carriage) +
 ggsave(filename = "outputs/subregion_map.png", 
        plot = subregion_map, 
        device = png, width = 7, height = 3, units = 'in', res = 600)
-
-ggsave("outputs/subregion_map.png")
 
 # how old is the covariate value for each study?-----
 
