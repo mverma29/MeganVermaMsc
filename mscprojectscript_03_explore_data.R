@@ -37,7 +37,7 @@ respicar_palestine <- filter(respicar_socio,`Country` == "Palestinian Territorie
 # basic map-----
 # make carriage variable
 respicar_socio <- respicar_socio %>% 
-    mutate(carriage = Positive/Total)
+  mutate(carriage = Positive/Total)
 
 # make weighted mean of carriage by country
 
@@ -65,7 +65,7 @@ world_with_carriage <- merge (x=respicar_carriage, y=world,
                               all.y=TRUE)
 
 # the respicar_carriage dataset gets merged in but since it's not condensed, makes a mess
-  
+
 country_map <- ggplot(data = world_with_carriage) +  
   geom_sf(aes(geometry= geometry, #world map geometry (polygons)
               fill=carriage_country)) + #color map w/ cont. values of total cases
@@ -73,7 +73,7 @@ country_map <- ggplot(data = world_with_carriage) +
                       name = 'Weighted carriage rate', 
                       limits = c(0,1)) + #set color fill 
   theme_bw() + #theme of dark text on light background 
-    ggtitle("Worldwide Streptococcus pneumoniae Carriage")
+  ggtitle("Worldwide Streptococcus pneumoniae Carriage")
 
 summary(world_with_carriage$carriage)
 
@@ -90,14 +90,14 @@ respicar_subregion <- respicar_socio %>%
 
 # aggregate world geometry into subregions
 subworld <- world %>% 
-    group_by(subregion) %>%
-    # Mock the data field
-    summarise(data=n())
+  group_by(subregion) %>%
+  # Mock the data field
+  summarise(data=n())
 
 # merge map data with subregion 
 world_with_subregion_carriage <- merge (x=respicar_subregion, y=subworld, 
-                              by= "subregion", 
-                              all.y=TRUE)
+                                        by= "subregion", # these don't match perfectly
+                                        all.y=TRUE)
 
 # re-map onto subregions 
 subregion_map <- ggplot(data = world_with_subregion_carriage) +  
@@ -124,24 +124,24 @@ staleness_socio <- get_staleness_socio(respicar_socio)
 summary(staleness_socio) # max: -23 (23 years in the future)
 
 staleness_urban <- staleness_socio %>% 
-    filter(variable == "urban_percent") %>% 
-    filter(staleness >= 5 | staleness<= (-5)) #0 
+  filter(variable == "urban_percent") %>% 
+  filter(staleness >= 5 | staleness<= (-5)) #0 
 
 staleness_gdp <- staleness_socio %>% 
-    filter(variable == "gdp_usd") %>% 
-    filter(staleness >= 5 | staleness<= (-5)) # 1 
+  filter(variable == "gdp_usd") %>% 
+  filter(staleness >= 5 | staleness<= (-5)) # 1 
 
 staleness_gini <- staleness_socio %>% 
-    filter(variable == "gini") %>% 
-    filter(staleness >= 5 | staleness<= (-5)) # 28
+  filter(variable == "gini") %>% 
+  filter(staleness >= 5 | staleness<= (-5)) # 28
 
 staleness_hh <- staleness_socio %>% 
-    filter(variable == "mean_hh") %>% 
-    filter(staleness >= 5 | staleness<= (-5)) # 97
+  filter(variable == "mean_hh") %>% 
+  filter(staleness >= 5 | staleness<= (-5)) # 97
 
 staleness_female_ed <- staleness_socio %>% 
-    filter(variable == "female_ed") %>% 
-    filter(staleness >= 5 | staleness<= (-5)) # 22
+  filter(variable == "female_ed") %>% 
+  filter(staleness >= 5 | staleness<= (-5)) # 22
 
 # exploratory analysis covariates: scatter plots -------
 
@@ -151,49 +151,49 @@ staleness_female_ed <- staleness_socio %>%
 
 # carriage and urban percent
 ggplot(respicar_socio, aes(y = carriage,x = urban_percent)) + 
-    geom_point(size=2) + 
-    ylab("log Carriage") + 
-    xlab("Percent Urban Population") +
-    #scale_x_log10() + 
-    scale_y_log10() + # when carriage is on the log scale & urban_percent is linear, 
-    # there may be some relationship--less carriage in higher urbanized populations?? 
-    geom_smooth(method = 'lm')
-    
+  geom_point(size=2) + 
+  ylab("log Carriage") + 
+  xlab("Percent Urban Population") +
+  #scale_x_log10() + 
+  scale_y_log10() + # when carriage is on the log scale & urban_percent is linear, 
+  # there may be some relationship--less carriage in higher urbanized populations?? 
+  geom_smooth(method = 'lm')
+
 
 # carriage and GDP
 ggplot(respicar_socio, aes(y = carriage,x = gdp_usd)) + 
-    geom_point(size=2) + 
-    ylab("log Carriage") + 
-    xlab("log GDP per capita") +
-    scale_x_log10() + 
-    geom_smooth(method = 'lm')
+  geom_point(size=2) + 
+  ylab("log Carriage") + 
+  xlab("log GDP per capita") +
+  scale_x_log10() + 
+  geom_smooth(method = 'lm')
 
 # carriage and Gini??? does it make sense to check? 
 ggplot(respicar_socio, aes(y = carriage,x = gini)) +
-    geom_point(size=2) +
-    ylab("Carriage") +
-    xlab("Gini Coefficient of Inequality") +
-    #scale_x_log10() +
-    #scale_y_log10() + # when gini is higher (more unequal), carriage is higher
-    geom_smooth(method = 'lm')
+  geom_point(size=2) +
+  ylab("Carriage") +
+  xlab("Gini Coefficient of Inequality") +
+  #scale_x_log10() +
+  #scale_y_log10() + # when gini is higher (more unequal), carriage is higher
+  geom_smooth(method = 'lm')
 
 # carriage and HH size 
 ggplot(respicar_socio, aes(y = carriage,x = mean_hh)) + 
-    geom_point(size=2) + 
-    ylab("Carriage") + 
-    xlab("Average Household Size") +
-    #scale_x_log10() +
-    #scale_y_log10() + # when average hh size increases, carriage increases
-    geom_smooth(method = 'lm')
+  geom_point(size=2) + 
+  ylab("Carriage") + 
+  xlab("Average Household Size") +
+  #scale_x_log10() +
+  #scale_y_log10() + # when average hh size increases, carriage increases
+  geom_smooth(method = 'lm')
 
 # carriage and female education
 ggplot(respicar_socio, aes(y = carriage,x = female_ed)) + 
-    geom_point(size=2) + 
-    ylab("Carriage") + 
-    xlab("Female Secondary Education Rate") +
-    #scale_x_log10() + 
-    #scale_y_log10() + # when female ed increases, carriage decreases
-    geom_smooth(method = 'lm')
+  geom_point(size=2) + 
+  ylab("Carriage") + 
+  xlab("Female Secondary Education Rate") +
+  #scale_x_log10() + 
+  #scale_y_log10() + # when female ed increases, carriage decreases
+  geom_smooth(method = 'lm')
 
 # carriage and UN subregion (not useful?)
 # ggplot(respicar_subregion, aes(y = carriage_subregion,x = subregion)) + 
@@ -221,11 +221,11 @@ ggplot(respicar_socio, aes(y = carriage,x = female_ed)) +
 
 # intercept-only model, to assess clustering in the data
 intercept_glm <- glmer(
-    data = respicar_socio %>% 
-        mutate(p = Positive/Total),
-    formula = p ~ 1 + (1|subregion),
-    family  = "binomial", 
-    weights = Total)
+  data = respicar_socio %>% 
+    mutate(p = Positive/Total),
+  formula = p ~ 1 + (1|subregion),
+  family  = "binomial", 
+  weights = Total)
 
 print(intercept_glm, corr = FALSE)
 
@@ -233,10 +233,10 @@ print(intercept_glm, corr = FALSE)
 # urban_percent 
 urban_percent_glm <- glmer(
   data = respicar_socio %>% 
-        mutate(p = Positive/Total),
-    formula = p ~ urban_percent + (1|subregion),
-    family  = "binomial", 
-    weights = Total)
+    mutate(p = Positive/Total),
+  formula = p ~ urban_percent + (1|subregion),
+  family  = "binomial", 
+  weights = Total)
 
 print(urban_percent_glm, corr = FALSE)
 
@@ -255,11 +255,11 @@ jtools::summ(urban_percent_glm, exp=TRUE)
 
 # GDP
 gdp_glm <- glmer(
-    data = respicar_socio %>% 
-        mutate(p = Positive/Total),
-    formula = p ~ gdp_usd + (1|subregion),
-    family  = "binomial", 
-    weights = Total)
+  data = respicar_socio %>% 
+    mutate(p = Positive/Total),
+  formula = p ~ gdp_usd + (1|subregion),
+  family  = "binomial", 
+  weights = Total)
 
 print(gdp_glm, corr = FALSE)
 
@@ -269,24 +269,24 @@ summ(gdp_glm, exp=TRUE)
 
 # Gini
 gini_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
-                         formula = p ~ gini,
-                         family  = "binomial", weights = Total)
+                formula = p ~ gini,
+                family  = "binomial", weights = Total)
 
 tidy(gini_glm, conf.int = T, exponentiate = TRUE)
 
 
 # HH size
 hh_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
-                formula = p ~ mean_hh,
-                family  = "binomial", weights = Total)
+              formula = p ~ mean_hh,
+              family  = "binomial", weights = Total)
 
 tidy(hh_glm, conf.int = T, exponentiate = TRUE) # an actual association!
 
 
 # female ed 
 female_ed_glm <- glm(data    = respicar_socio %>% mutate(p = Positive/Total),
-              formula = p ~ female_ed,
-              family  = "binomial", weights = Total)
+                     formula = p ~ female_ed,
+                     family  = "binomial", weights = Total)
 
 tidy(female_ed_glm, conf.int = T, exponentiate = TRUE)
 
