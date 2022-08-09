@@ -80,10 +80,9 @@ country_map <- ggplot(data = world_with_carriage) +
 summary(world_with_carriage$carriage)
 
 # re-map into UN subregions carriage-----
-# how old is the covariate value for each study?
 
 # make weighted mean of carriage by UN subregion 
-staleness_socio <- get_staleness_socio(respicar_socio)
+
 
 respicar_subregion <- respicar_socio %>% 
     dplyr::group_by(`subregion`) %>% 
@@ -117,6 +116,33 @@ subregion_map <- ggplot(data = world_with_subregion_carriage) +
 ggsave(filename = subregion_map, 
        plot = last_plot(), 
        device = "pdf")
+
+# how old is the covariate value for each study?-----
+
+staleness_socio <- get_staleness_socio(respicar_socio)
+# shouldn't there be 439*5=2195 values here?
+
+summary(staleness_socio) # max: -23 (23 years in the future)
+
+staleness_urban <- staleness_socio %>% 
+    filter(variable == "urban_percent") %>% 
+    filter(staleness >= 5 | staleness<= (-5)) #0 
+
+staleness_gdp <- staleness_socio %>% 
+    filter(variable == "gdp_usd") %>% 
+    filter(staleness >= 5 | staleness<= (-5)) # 1 
+
+staleness_gini <- staleness_socio %>% 
+    filter(variable == "gini") %>% 
+    filter(staleness >= 5 | staleness<= (-5)) # 28
+
+staleness_hh <- staleness_socio %>% 
+    filter(variable == "mean_hh") %>% 
+    filter(staleness >= 5 | staleness<= (-5)) # 97
+
+staleness_female_ed <- staleness_socio %>% 
+    filter(variable == "female_ed") %>% 
+    filter(staleness >= 5 | staleness<= (-5)) # 22
 
 # exploratory analysis covariates: scatter plots -------
 
