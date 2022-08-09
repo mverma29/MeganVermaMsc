@@ -77,6 +77,9 @@ country_map <- ggplot(data = world_with_carriage) +
   theme_bw() + #theme of dark text on light background 
     ggtitle("Worldwide Streptococcus pneumoniae Carriage")
 
+
+ggsave("country_map.png")
+
 summary(world_with_carriage$carriage)
 
 # re-map into UN subregions carriage-----
@@ -111,16 +114,17 @@ subregion_map <- ggplot(data = world_with_subregion_carriage) +
     theme_bw() + #theme of dark text on light background 
     ggtitle("Worldwide Streptococcus pneumoniae Carriage, by UN Subregion")
 
-# for the subregions with missing countries, looks like they're plotted as NA's
+# for the subregions with missing countries, looks like there's a cutoff, 
+# then they're plotted as NA's
 
-ggsave(filename = subregion_map, 
-       plot = last_plot(), 
-       device = "pdf")
+# add in subregion borders? 
+
+ggsave("subregion_map.png")
 
 # how old is the covariate value for each study?-----
 
 staleness_socio <- get_staleness_socio(respicar_socio)
-# shouldn't there be 439*5=2195 values here?
+# shouldn't there be 438*5=2190 values here?
 
 summary(staleness_socio) # max: -23 (23 years in the future)
 
