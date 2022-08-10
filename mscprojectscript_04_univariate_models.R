@@ -90,3 +90,13 @@ print(female_ed_glm, corr = FALSE)
 summ(female_ed_glm, exp=TRUE, confint=TRUE)  #OR of 0.99
 
 
+
+# try again using glmm package for adaptive quadrature----- 
+devtools::install_github("drizopoulos/GLMMadaptive")
+
+urban_percent_glm_adaptive <- GLMMadaptive::mixed_model(fixed = carriage ~ urban_percent, 
+                                          random = ~ 1 | subregion, 
+                                          data = respicar_socio,
+                  family = binomial())
+
+summary(urban_percent_glm_adaptive)
