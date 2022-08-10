@@ -39,7 +39,7 @@ summ(urban_percent_glm, exp=TRUE, confint=TRUE) #OR of 1
 gdp_glm <- glmer(
   data = respicar_socio %>% 
     mutate(p = Positive/Total),
-  formula = p ~ gdp_usd + (1|subregion),
+  formula = p ~ log_gdp + (1|subregion),
   family  = "binomial", 
   weights = Total)
 

@@ -26,3 +26,14 @@ source("mscprojectscript_02.5_femaleed.R")
 
 # load UN subregion data & add to RESPICAR data 
 source("mscprojectscript_02.6_unsubregion.R")
+
+# mutate GDP to log GDP 
+respicar_socio %<>% mutate(log_gdp = log(gdp_usd))
+
+# mutate all covariate percentages to proportions in RESPICAR dataset
+respicar_socio %<>% mutate(
+    urban_percent = urban_percent / 100,
+    gini = gini / 100,
+    female_ed = female_ed / 100
+)
+

@@ -3,7 +3,7 @@
 full_glm <- glmer(
     data = respicar_socio %>% 
         mutate(p = Positive/Total),
-    formula = p ~ urban_percent + gdp_usd + gini + mean_hh + female_ed + (1|subregion),
+    formula = p ~ urban_percent + log_gdp + gini + mean_hh + female_ed + (1|subregion),
     family  = "binomial", 
     weights = Total)
 
@@ -15,7 +15,7 @@ summ(full_glm, exp=TRUE, confint=TRUE)  #only urban_percent (barely) and mean_hh
 full_glm_interaction <- glmer(
     data = respicar_socio %>% 
         mutate(p = Positive/Total),
-    formula = p ~ urban_percent + gdp_usd*gini + mean_hh + female_ed + (1|subregion),
+    formula = p ~ urban_percent + log_gdp*gini + mean_hh + female_ed + (1|subregion),
     family  = "binomial", 
     weights = Total)
 

@@ -196,11 +196,11 @@ ggsave("outputs/scatter_urban_percent_carriage.png")
 
 
 # carriage and GDP
-ggplot(respicar_socio, aes(y = carriage,x = gdp_usd)) + 
+ggplot(respicar_socio, aes(y = carriage,x = log_gdp)) + 
     geom_point(size=2) + 
     ylab("log Carriage") + 
     xlab("log GDP per capita") +
-    scale_x_log10() + 
+    # scale_x_log10() + 
     scale_y_log10() + # carriage decreases as gdp inc
     geom_smooth(method = 'lm')
 
@@ -262,4 +262,15 @@ ggplot (respicar_socio, aes(carriage)) +
 
 boxplot(carriage ~ subregion, data=respicar_socio)
 # potentially some correlation there
+
+
+# how to facetwrap plot ex
+library(ggplot2)
+data(mtcars)
+ggplot(data = mtcars,
+       aes(x = wt, y = mpg)) +
+    geom_point() +
+    facet_wrap( ~ cyl, nrow = 1) +
+    theme_bw() +
+    geom_point(data = select(mtcars, -cyl), alpha = 0.2, pch = 16)
 
