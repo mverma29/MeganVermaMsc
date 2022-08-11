@@ -24,11 +24,13 @@
 # urban_percent 
 urban_percent_glm <- gamm4(
   data    = respicar_socio,
-  formula = cbind(Positive,Total) ~ urban_percent, 
+  formula = cbind(Positive, Total - Positive) ~ urban_percent, 
   random  = ~(1|subregion),
   family  = "binomial")
 
 tidy(urban_percent_glm$mer, exp=TRUE, conf.int=TRUE)
+
+summary(urban_percent_glm$gam)
 
 # GDP
 gdp_glm <- glmer(
