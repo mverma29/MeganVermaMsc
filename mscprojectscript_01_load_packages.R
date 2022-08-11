@@ -129,3 +129,10 @@ get_staleness_socio <- function(x){
     
     z
 }
+
+
+covariate_staleness_socio <- function(x) { 
+    staleness_socio %>% 
+        filter(variable == x)
+        filter(staleness >= 5 | staleness <= (-5))
+}
