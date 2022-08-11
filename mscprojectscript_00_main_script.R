@@ -11,3 +11,6 @@ source("mscprojectscript_03_explore_data.R", verbose = TRUE)
 
 # Univariate mixed effect models 
 source("mscprojectscript_04_univariate_models.R", verbose = TRUE)
+
+# Multivariate mixed effect models 
+source("mscprojectscript_05_multivariate_models.R")
