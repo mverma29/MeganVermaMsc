@@ -7,31 +7,28 @@
 # of "successes", $y$, in our GLM. This is done by specifying the left hand side of the regression 
 # formula as `cbind(y, n-y)` with appropriate variable names in place of `n` and `y`.
 
-# add RE for subregions in using glmer function (lme4 package)
 
-# intercept-only model, to assess clustering in the data
-intercept_glm <- glmer(
-  data = respicar_socio,
-  formula = carriage ~ 1 + (1|subregion),
-  family  = "binomial", 
-  weights = Total)
-
-print(intercept_glm, corr = FALSE)
-
-
-performance::icc(intercept_glm) # 8.3% of the variation in carriage 
-# can be accounted for by clustering of the data by subregion 
+# # intercept-only model, to assess clustering in the data
+# intercept_glm <- buildgamm4(
+#   data = respicar_socio,
+#   formula = carriage ~ 1 + (1|subregion),
+#   family  = "binomial", 
+#   weights = Total)
+# 
+# print(intercept_glm, corr = FALSE)
+# 
+# 
+# performance::icc(intercept_glm) # 8.3% of the variation in carriage 
+# # can be accounted for by clustering of the data by subregion 
 
 # urban_percent 
-urban_percent_glm <- glmer(
-  data = respicar_socio,
-  formula = carriage ~ urban_percent + (1|subregion),
-  family  = "binomial", 
-  weights = Total)
+urban_percent_glm <- gamm4(
+  data    = respicar_socio,
+  formula = cbind(Positive,Total) ~ urban_percent, 
+  random  = ~(1|subregion),
+  family  = "binomial")
 
-print(urban_percent_glm, corr = FALSE)
-
-summ(urban_percent_glm, exp=TRUE, confint=TRUE) #OR of 1
+tidy(urban_percent_glm$mer, exp=TRUE, conf.int=TRUE)
 
 # GDP
 gdp_glm <- glmer(
