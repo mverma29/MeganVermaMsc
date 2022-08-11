@@ -48,11 +48,11 @@ summ(gdp_glm, exp=TRUE, confint=TRUE)  #OR of 1
 
 # Gini
 gini_glm <- glmer(
-    data = respicar_socio %>% 
-        mutate(p = Positive/Total),
-    formula = p ~ gini + (1|subregion),
-    family  = "binomial", 
-    weights = Total)
+  data = respicar_socio %>% 
+    mutate(p = Positive/Total),
+  formula = p ~ gini + (1|subregion),
+  family  = "binomial", 
+  weights = Total)
 
 print(gini_glm, corr = FALSE)
 
@@ -62,11 +62,11 @@ summ(gini_glm, exp=TRUE, confint=TRUE)  #OR of 0.99
 
 # HH size
 hh_glm <- glmer(
-    data = respicar_socio %>% 
-        mutate(p = Positive/Total),
-    formula = p ~ mean_hh + (1|subregion),
-    family  = "binomial", 
-    weights = Total)
+  data = respicar_socio %>% 
+    mutate(p = Positive/Total),
+  formula = p ~ mean_hh + (1|subregion),
+  family  = "binomial", 
+  weights = Total)
 
 print(hh_glm, corr = FALSE)
 
@@ -76,19 +76,20 @@ summ(hh_glm, exp=TRUE, confint=TRUE)  #OR of 1.36 (actual association!!)
 
 # female ed 
 female_ed_glm <- glmer(
-    data = respicar_socio %>% 
-        mutate(p = Positive/Total),
-    formula = p ~ female_ed + (1|subregion),
-    family  = "binomial", 
-    weights = Total)
+  data = respicar_socio %>% 
+    mutate(p = Positive/Total),
+  formula = p ~ female_ed + (1|subregion),
+  family  = "binomial", 
+  weights = Total)
 
 print(female_ed_glm, corr = FALSE)
 
 summ(female_ed_glm, exp=TRUE, confint=TRUE)  #OR of 0.99
 
-urban_percent_glm_adaptive <- GLMMadaptive::mixed_model(fixed = carriage ~ urban_percent, 
-                                          random = ~ 1 | subregion, 
-                                          data = respicar_socio,
-                  family = binomial())
+urban_percent_glm_adaptive <- GLMMadaptive::mixed_model(
+  fixed  = cbind(Positive, Total - Positive) ~ urban_percent, 
+  random = ~ 1 | subregion, 
+  data   = respicar_socio, 
+  family = binomial())
 
 summary(urban_percent_glm_adaptive)
