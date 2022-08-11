@@ -11,9 +11,8 @@
 
 # intercept-only model, to assess clustering in the data
 intercept_glm <- glmer(
-  data = respicar_socio %>% 
-    mutate(p = Positive/Total),
-  formula = p ~ 1 + (1|subregion),
+  data = respicar_socio,
+  formula = carriage ~ 1 + (1|subregion),
   family  = "binomial", 
   weights = Total)
 
@@ -25,9 +24,8 @@ performance::icc(intercept_glm) # 8.3% of the variation in carriage
 
 # urban_percent 
 urban_percent_glm <- glmer(
-  data = respicar_socio %>% 
-    mutate(p = Positive/Total),
-  formula = p ~ urban_percent + (1|subregion),
+  data = respicar_socio,
+  formula = carriage ~ urban_percent + (1|subregion),
   family  = "binomial", 
   weights = Total)
 
@@ -37,9 +35,8 @@ summ(urban_percent_glm, exp=TRUE, confint=TRUE) #OR of 1
 
 # GDP
 gdp_glm <- glmer(
-  data = respicar_socio %>% 
-    mutate(p = Positive/Total),
-  formula = p ~ log_gdp + (1|subregion),
+  data = respicar_socio,
+  formula = carriage ~ log_gdp + (1|subregion),
   family  = "binomial", 
   weights = Total)
 
