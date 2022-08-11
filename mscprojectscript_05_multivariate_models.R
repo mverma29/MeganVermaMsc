@@ -51,8 +51,6 @@ summ(
 
 # AIC comparison/model-building with stepcAIC function 
 
-install.packages("cAIC4")
-library(cAIC4)
 
 
 chosen_model <- stepcAIC (
