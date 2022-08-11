@@ -21,6 +21,7 @@ library(readODS)
 library(lme4)
 library(sjstats)
 library(jtools)
+library(cAIC4)
 library(conflicted)
 conflict_prefer('select', 'dplyr')
 conflict_prefer('filter', 'dplyr')
@@ -29,6 +30,10 @@ conflict_prefer('multinom', 'mgcv')
 conflict_prefer('year', 'lubridate')
 conflict_prefer("summ", "jtools")
 
+if (!require(GLMMadaptive)){
+    devtools::install_github("drizopoulos/GLMMadaptive")
+    library(GLMMadaptive)
+}
 
 
 fill_socio <- function(x){
@@ -105,7 +110,7 @@ get_staleness_socio <- function(x){
     # if a 2005 study uses 2004 covariate data, staleness is 1
     z   <- select(.data = x, any_of(nms)) %>%
         rename(year_study = `Year started`) %>%
-        distinct %>%
+        # distinct %>%
         gather(variable, year_covar, -id, -year_study) %>%
         mutate(variable = sub('_filled_year', '', variable)) %>%
         mutate(staleness = year_study - year_covar)
