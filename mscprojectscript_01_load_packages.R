@@ -1,27 +1,38 @@
 # Megan Verma 
 # 7/25/2022 
 
-
 #setup: load packages
 
-library(mgcv)
+# spatial
 library(sf)
-library(broom)
 library(rnaturalearth)
 library(rnaturalearthdata)
 library(countrycode)
-library(epiDisplay)
+
+# data sources
+library(wpp2019)
 library(WDI)
+library(readODS)
+
+# epi diagnostics
+library(sjstats)
+library(jtools)
+library(epiDisplay)
+
+# modelling
+library(mgcv)
+library(gamm4)
+library(buildmer)
+
+# tidyverse and related
+library(tidyverse)
 library(purrr)
 library(lubridate)
 library(magrittr)
-library(tidyverse)
-library(wpp2019)
-library(readODS)
-library(lme4)
-library(sjstats)
-library(jtools)
-library(cAIC4)
+library(broom)
+library(broom.mixed)
+
+# resolving namespace conflicts
 library(conflicted)
 conflict_prefer('select', 'dplyr')
 conflict_prefer('filter', 'dplyr')
@@ -30,14 +41,9 @@ conflict_prefer('multinom', 'mgcv')
 conflict_prefer('year', 'lubridate')
 conflict_prefer("summ", "jtools")
 
-if (!require(GLMMadaptive)){
-    devtools::install_github("drizopoulos/GLMMadaptive")
-    library(GLMMadaptive)
-}
-
 
 fill_socio <- function(x){
-    
+    # sam clifford
     
     z <- complete(x, iso_code, year) %>%
         arrange(iso_code, year) %>%
@@ -61,6 +67,8 @@ fill_socio <- function(x){
 
 
 check_socio_na <- function(x){
+    # sam clifford
+    
     group_by(x, Country, `ISO 3166-1`) %>%
         nest %>%
         mutate(R = map(.x = data, ~range(.x$`Year started`) %>% 
@@ -71,6 +79,8 @@ check_socio_na <- function(x){
 
 
 merge_socio <- function(x, y){
+    # sam clifford
+    
     argnames <- as.character(as.list(match.call())[-1])
     
     z <- merge(
@@ -100,7 +110,9 @@ merge_socio <- function(x, y){
 }
 
 get_staleness_socio <- function(x){
+    # sam clifford
     # find which variables got 'filled_year' values from fill_socio()
+    
     nms <- names(x) %>%
         grep('filled_year', ., value = T) %>%
         c("id", "Year started") 
