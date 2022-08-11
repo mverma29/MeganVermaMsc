@@ -1,9 +1,10 @@
 # full model (without interaction), WITHOUT RE for subregion correlation----
 
 # gamm4 version (no stepwise regression)
-full_glm_no_re <- gamm4(
+full_glm_no_re <- glm(
     data    = respicar_socio,
-    formula = cbind(Positive, Total) ~ urban_percent + log_gdp + gini + mean_hh + female_ed,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent + log_gdp + gini + mean_hh + female_ed,
     family  = "binomial")
 
 summ(
