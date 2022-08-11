@@ -226,15 +226,15 @@ staleness_gdp       <- staleness_socio %>%
 
 staleness_gini      <- staleness_socio %>%
   filter(variable == "gini") %>%
-  filter(staleness >= 5 | staleness <= (-5)) # 28
+  filter(staleness >= 5 | staleness <= (-5)) # 56
 
 staleness_hh        <- staleness_socio %>%
   filter(variable == "mean_hh") %>%
-  filter(staleness >= 5 | staleness <= (-5)) # 97
+  filter(staleness >= 5 | staleness <= (-5)) # 190
 
 staleness_female_ed <- staleness_socio %>%
   filter(variable == "female_ed") %>%
-  filter(staleness >= 5 | staleness <= (-5)) # 22
+  filter(staleness >= 5 | staleness <= (-5)) # 49
 
 # exploratory analysis covariates: scatter plots -------
 
@@ -248,7 +248,7 @@ ggplot(respicar_socio, aes(y = carriage, x = urban_percent)) +
   ylab("Carriage") +
   xlab("Proportion Urban Population") +
   #scale_x_log10() +
-  #scale_y_log10() + # when carriage is on the log scale & urban_percent is linear,
+  #scale_y_log10() + 
   # there may be some relationship--less carriage in higher urbanized populations??
   geom_smooth(method       = 'lm')
 
@@ -266,7 +266,7 @@ ggplot(respicar_socio, aes(y = carriage, x = log_gdp)) +
 
 ggsave("outputs/scatter_gdp_carriage.png")
 
-# carriage and Gini??? does it make sense to check?
+# carriage and Gini
 ggplot(respicar_socio, aes(y = carriage, x = gini)) +
   geom_point(size = 2) +
   ylab("Carriage") +
@@ -324,15 +324,126 @@ boxplot(carriage ~ subregion, data = respicar_socio)
 # potentially some correlation there
 
 
-# how to facetwrap plot ex
-library(ggplot2)
-data(mtcars)
-ggplot(data = mtcars,
-       aes(x = wt, y = mpg)) +
-  geom_point() +
-  facet_wrap(~ cyl, nrow = 1) +
-  theme_bw() +
-  geom_point(data = select(mtcars,-cyl),
-             alpha = 0.2,
-             pch = 16)
+# facetwrap plot of each covariate by UN subregion -------
+
+facet_urban_percent <- ggplot(data = respicar_socio,
+       aes(x = urban_percent, y = carriage)) +
+    geom_point() +
+    facet_wrap(~ subregion, nrow = 3) +
+    theme_bw() +
+    geom_point(data = select(respicar_socio,-subregion),
+               alpha = 0.2,
+               pch = 16) + 
+    ggtitle("Urban Population Percent and Carriage, by UN Subregion") + 
+    theme(plot.title = element_text(hjust = 0.5)) + 
+    theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue")) + 
+    xlab("Urban Population Percent") + 
+    ylab("Carriage Rate")
+
+ggsave(
+    filename = "outputs/facet_urban_percent_carriage.png",
+    plot     = facet_urban_percent,
+    device   = png,
+    width    = 11,
+    height   = 5,
+    units    = 'in',
+    res      = 600
+)
+
+facet_gdp <- ggplot(data = respicar_socio,
+       aes(x = log_gdp, y = carriage)) +
+    geom_point() +
+    facet_wrap(~ subregion, nrow = 3) +
+    theme_bw() +
+    geom_point(data = select(respicar_socio,-subregion),
+               alpha = 0.2,
+               pch = 16) + 
+    ggtitle("Log GDP and Carriage, by UN Subregion") + 
+    theme(plot.title = element_text(hjust = 0.5)) + 
+    theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue")) + 
+    xlab("Log GDP") + 
+    ylab("Carriage Rate")
+
+ggsave(
+    filename = "outputs/facet_gdp_carriage.png",
+    plot     = facet_gdp,
+    device   = png,
+    width    = 11,
+    height   = 5,
+    units    = 'in',
+    res      = 600
+)
+
+facet_gini <- ggplot(data = respicar_socio,
+       aes(x = gini, y = carriage)) +
+    geom_point() +
+    facet_wrap(~ subregion, nrow = 3) +
+    theme_bw() +
+    geom_point(data = select(respicar_socio,-subregion),
+               alpha = 0.2,
+               pch = 16) + 
+    ggtitle("Gini Coefficient of Inequality and Carriage, by UN Subregion") + 
+    theme(plot.title = element_text(hjust = 0.5)) + 
+    theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue")) + 
+    xlab("Gini Coefficient of Inequality") + 
+    ylab("Carriage Rate")
+
+ggsave(
+    filename = "outputs/facet_gini_carriage.png",
+    plot     = facet_gini,
+    device   = png,
+    width    = 11,
+    height   = 5,
+    units    = 'in',
+    res      = 600
+)
+
+facet_hh <- ggplot(data = respicar_socio,
+       aes(x = mean_hh, y = carriage)) +
+    geom_point() +
+    facet_wrap(~ subregion, nrow = 3) +
+    theme_bw() +
+    geom_point(data = select(respicar_socio,-subregion),
+               alpha = 0.2,
+               pch = 16) + 
+    ggtitle("Average Household Size and Carriage, by UN Subregion") + 
+    theme(plot.title = element_text(hjust = 0.5)) + 
+    theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue")) + 
+    xlab("Average Household Size") + 
+    ylab("Carriage Rate")
+
+ggsave(
+    filename = "outputs/facet_hh_carriage.png",
+    plot     = facet_hh,
+    device   = png,
+    width    = 11,
+    height   = 5,
+    units    = 'in',
+    res      = 600
+)
+
+facet_ed <- ggplot(data = respicar_socio,
+       aes(x = female_ed, y = carriage)) +
+    geom_point() +
+    facet_wrap(~ subregion, nrow = 3) +
+    theme_bw() +
+    geom_point(data = select(respicar_socio,-subregion),
+               alpha = 0.2,
+               pch = 16) + 
+    ggtitle("Female Secondary Education Enrollment Percent and Carriage, by UN Subregion") + 
+    theme(plot.title = element_text(hjust = 0.5)) + 
+    theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue")) + 
+    xlab("Female Secondary Education Enrollment Percent") + 
+    ylab("Carriage Rate")
+
+ggsave(
+    filename = "outputs/facet_ed_carriage.png",
+    plot     = facet_ed,
+    device   = png,
+    width    = 11,
+    height   = 5,
+    units    = 'in',
+    res      = 600
+)
+
 
