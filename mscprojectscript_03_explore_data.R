@@ -25,6 +25,7 @@ respicar_socio$Age                 <- as.factor(respicar_socio$Age)
 respicar_socio$`Ethnic Minority`   <- as.factor(respicar_socio$`Ethnic Minority`)
 respicar_socio$Design              <- as.factor(respicar_socio$Design)
 respicar_socio$`Sampling strategy` <- as.factor(respicar_socio$`Sampling strategy`)
+# respicar_socio$`subregion`         <- as.factor(respicar_socio$`subregion`)
 
 summary(respicar_socio)
 ethnic_minority <- filter(respicar_socio, `Ethnic Minority`=="Yes")
@@ -332,7 +333,7 @@ facet_urban_percent <- ggplot(data = respicar_socio,
     facet_wrap(~ subregion, nrow = 3) +
     theme_bw() +
     geom_point(data = select(respicar_socio,-subregion),
-               alpha = 0.2,
+               alpha = 0.1,
                pch = 16) + 
     ggtitle("Urban Population Percent and Carriage, by UN Subregion") + 
     theme(plot.title = element_text(hjust = 0.5)) + 
@@ -356,7 +357,7 @@ facet_gdp <- ggplot(data = respicar_socio,
     facet_wrap(~ subregion, nrow = 3) +
     theme_bw() +
     geom_point(data = select(respicar_socio,-subregion),
-               alpha = 0.2,
+               alpha = 0.1,
                pch = 16) + 
     ggtitle("Log GDP and Carriage, by UN Subregion") + 
     theme(plot.title = element_text(hjust = 0.5)) + 
@@ -380,7 +381,7 @@ facet_gini <- ggplot(data = respicar_socio,
     facet_wrap(~ subregion, nrow = 3) +
     theme_bw() +
     geom_point(data = select(respicar_socio,-subregion),
-               alpha = 0.2,
+               alpha = 0.1,
                pch = 16) + 
     ggtitle("Gini Coefficient of Inequality and Carriage, by UN Subregion") + 
     theme(plot.title = element_text(hjust = 0.5)) + 
@@ -404,7 +405,7 @@ facet_hh <- ggplot(data = respicar_socio,
     facet_wrap(~ subregion, nrow = 3) +
     theme_bw() +
     geom_point(data = select(respicar_socio,-subregion),
-               alpha = 0.2,
+               alpha = 0.1,
                pch = 16) + 
     ggtitle("Average Household Size and Carriage, by UN Subregion") + 
     theme(plot.title = element_text(hjust = 0.5)) + 
@@ -428,7 +429,7 @@ facet_ed <- ggplot(data = respicar_socio,
     facet_wrap(~ subregion, nrow = 3) +
     theme_bw() +
     geom_point(data = select(respicar_socio,-subregion),
-               alpha = 0.2,
+               alpha = 0.1,
                pch = 16) + 
     ggtitle("Female Secondary Education Enrollment Percent and Carriage, by UN Subregion") + 
     theme(plot.title = element_text(hjust = 0.5)) + 
