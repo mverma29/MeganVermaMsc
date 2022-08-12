@@ -133,6 +133,6 @@ get_staleness_socio <- function(x){
 
 covariate_staleness_socio <- function(x) { 
     staleness_socio %>% 
-        filter(variable == "x") %>% 
+        filter(variable == x) %>% 
         filter(staleness >= 5 | staleness <= (-5))
 }
