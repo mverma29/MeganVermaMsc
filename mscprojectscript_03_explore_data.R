@@ -216,26 +216,14 @@ staleness_socio <- get_staleness_socio(respicar_socio)
 
 summary(staleness_socio) # max: -23 (23 years in the future)
 
-# make this a function
-staleness_urban     <- staleness_socio %>%
-  filter(variable == "urban_percent") %>%
-  filter(staleness >= 5 | staleness <= (-5)) #0
+# look at the total datasets with vars of 5+ years of staleness, for each var: 
 
-staleness_gdp       <- staleness_socio %>%
-  filter(variable == "gdp_usd") %>%
-  filter(staleness >= 5 | staleness <= (-5)) # 1
+staleness_urban <- covariate_staleness_socio("urban_percent")
+staleness_gdp <- covariate_staleness_socio("gdp_usd")
+staleness_gini <- covariate_staleness_socio("gini")
+staleness_hh <- covariate_staleness_socio("mean_hh")
+staleness_female_ed <- covariate_staleness_socio("female_ed")
 
-staleness_gini      <- staleness_socio %>%
-  filter(variable == "gini") %>%
-  filter(staleness >= 5 | staleness <= (-5)) # 56
-
-staleness_hh        <- staleness_socio %>%
-  filter(variable == "mean_hh") %>%
-  filter(staleness >= 5 | staleness <= (-5)) # 190
-
-staleness_female_ed <- staleness_socio %>%
-  filter(variable == "female_ed") %>%
-  filter(staleness >= 5 | staleness <= (-5)) # 49
 
 # exploratory analysis covariates: scatter plots -------
 
