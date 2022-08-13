@@ -179,23 +179,37 @@ world_with_subregion_carriage <-
          all.y = TRUE)
 
 
-# re-map onto subregions
-subregion_map <- ggplot(data = world_with_subregion_carriage) +
-  geom_sf(aes(geometry     = geometry, #world map geometry (polygons)
-              fill         = carriage_subregion)) + #color map w/ cont. values of total cases
-  scale_fill_gradient(
-    low                  = "yellow",
-    high                 = "red",
-    na.value             = "azure2",
-    name                 = 'Carriage rate (weighted average)',
-    limits               = c(0, 1)
-  ) + #set color fill
-  theme_bw() + #theme of dark text on light background
-  theme(legend.position    = 'bottom') +
-  ggtitle("Worldwide Streptococcus pneumoniae Carriage, by UN Subregion")
 
-# for the subregions with missing countries, looks like there's a cutoff, 
-# then they're plotted as NA's
+# re-map onto subregions
+
+
+# combine geometries of subregions to make better borders
+subregions <- world_with_subregion_carriage %>% 
+    group_by(region) %>% 
+    summarise(region, geometry) %>% 
+    st_as_sf()
+
+subregions <- st_union(subregions, by_feature=TRUE)
+
+subregion_map <- ggplot(data = world_with_subregion_carriage) +
+    geom_sf(aes(geometry       = geometry, #world map geometry (polygons)
+                fill           = carriage_subregion),
+            lwd                = 0) + #color map w/ cont. values of total cases
+    scale_fill_gradient(
+        low                      = "yellow",
+        high                     = "red",
+        na.value                 = "azure2",
+        name                     = 'Carriage rate (weighted average)',
+        limits                   = c(0, 1)
+    ) + #set color fill
+    theme_bw() + #theme of dark text on light background
+    theme(legend.position      = 'bottom') +
+    ggtitle("Worldwide Streptococcus pneumoniae Carriage, by UN Subregion")+ 
+    geom_sf(
+    data                       = subregions,
+    mapping                    = aes(geometry = `geometry`),
+    fill                       = NA
+)
 
 
 ggsave(
@@ -207,6 +221,7 @@ ggsave(
   units    = 'in',
   res      = 600
 )
+
 
 # how old is the covariate value for each study?-----
 
