@@ -10,7 +10,7 @@ summary(respicar_socio)
 summary(respicar_socio$female_ed) # max is >1 
 
 excess_ed <- respicar_socio %>% 
-  filter(`female_ed` > 1) # 155 datasets with ed > 100% 
+  filter(`female_ed` > 100) # 155 datasets with ed > 100% 
 
 t1              <- table(respicar_socio$Country)
 study_countries <- as.data.frame(t1)
