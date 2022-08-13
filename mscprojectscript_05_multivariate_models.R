@@ -79,10 +79,28 @@ lmtest::lrtest(full_glm_re$mer, full_glm_re_interaction$mer) # <2e-16 (reject nu
 
 # AIC comparison/model-building with buildgamm4 function-------
 
-chosen_model <- buildmer (
+chosen_model_re <- buildgamm4 (
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent + log_gdp * gini + mean_hh + female_ed + (1 | subregion),
+    family  = "binomial"
+)
+
+summary(chosen_model_re@model) 
+
+# AIC: 35408 
+
+
+chosen_model_no_re<- buildgamm4 (
     data    = respicar_socio,
     formula = cbind(Positive, Total - Positive) ~
         urban_percent + log_gdp * gini + mean_hh + female_ed,
-    random  = ~ (1 | subregion),
     family  = "binomial"
 )
+
+
+summary(chosen_model_no_re@model) 
+
+# AIC: 37873
+
+# full model with RE has the smallest AIC, & therefore fits the best 
