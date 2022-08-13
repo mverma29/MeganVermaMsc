@@ -1,5 +1,5 @@
 
-# basic model fitting (univariate)-----
+# basic model fitting (univariate): 
 
 # Fit a logistic GLM of the total carriage as a function of each covariate. 
 # As each study has a different total individuals serotyped, we'll need to ensure that we use the 
@@ -7,88 +7,117 @@
 # of "successes", $y$, in our GLM. This is done by specifying the left hand side of the regression 
 # formula as `cbind(y, n-y)` with appropriate variable names in place of `n` and `y`.
 
+# use glm for simple model 
+# gamm4 allows for RE to be added to model 
+# conduct an LRT to test null hypothesis of no within subregion clustering 
 
-# # intercept-only model, to assess clustering in the data
-# intercept_glm <- buildgamm4(
-#   data = respicar_socio,
-#   formula = carriage ~ 1 + (1|subregion),
-#   family  = "binomial", 
-#   weights = Total)
-# 
-# print(intercept_glm, corr = FALSE)
-# 
-# 
-# performance::icc(intercept_glm) # 8.3% of the variation in carriage 
-# # can be accounted for by clustering of the data by subregion 
+# urban percent ----------
+# urban_percent model, no RE
+urban_percent_glm <- glm(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~ urban_percent, 
+    family  = "binomial")
 
-# urban_percent 
-urban_percent_glm <- gamm4(
+tidy(urban_percent_glm, exp=TRUE, conf.int=TRUE) # OR: 0.987
+summary(urban_percent_glm) # p-val (Wald approx): <2e-16
+
+urban_percent_glm_re <- gamm4(
   data    = respicar_socio,
   formula = cbind(Positive, Total - Positive) ~ urban_percent, 
   random  = ~(1|subregion),
   family  = "binomial")
 
-tidy(urban_percent_glm$mer, exp=TRUE, conf.int=TRUE)
+tidy(urban_percent_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 0.995
+summary(urban_percent_glm_re$mer) # p-val (Wald approx): <2e-16
 
-summary(urban_percent_glm$gam)
-
-# GDP
-gdp_glm <- glmer(
-  data = respicar_socio,
-  formula = carriage ~ log_gdp + (1|subregion),
-  family  = "binomial", 
-  weights = Total)
-
-print(gdp_glm, corr = FALSE)
-
-summ(gdp_glm, exp=TRUE, confint=TRUE)  #OR of 1
+lmtest::lrtest(urban_percent_glm, urban_percent_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
 
 
+# GDP -----------
 
-# Gini
-gini_glm <- glmer(
-  data = respicar_socio %>% 
-    mutate(p = Positive/Total),
-  formula = p ~ gini + (1|subregion),
-  family  = "binomial", 
-  weights = Total)
+# gdp model, no RE
+gdp_glm <- glm(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~ log_gdp, 
+    family  = "binomial")
 
-print(gini_glm, corr = FALSE)
+tidy(gdp_glm, exp=TRUE, conf.int=TRUE) # OR: 0.578
+summary(urban_percent_glm) # p-val (Wald approx): <2e-16
 
-summ(gini_glm, exp=TRUE, confint=TRUE)  #OR of 0.99
+# gdp model w/ RE
+gdp_glm_re <- gamm4(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~ log_gdp, 
+    random  = ~(1|subregion),
+    family  = "binomial")
 
+tidy(gdp_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR:0.558
 
-
-# HH size
-hh_glm <- glmer(
-  data = respicar_socio %>% 
-    mutate(p = Positive/Total),
-  formula = p ~ mean_hh + (1|subregion),
-  family  = "binomial", 
-  weights = Total)
-
-print(hh_glm, corr = FALSE)
-
-summ(hh_glm, exp=TRUE, confint=TRUE)  #OR of 1.36 (actual association!!)
+lmtest::lrtest(gdp_glm, gdp_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
 
 
+# Gini-------
 
-# female ed 
-female_ed_glm <- glmer(
-  data = respicar_socio %>% 
-    mutate(p = Positive/Total),
-  formula = p ~ female_ed + (1|subregion),
-  family  = "binomial", 
-  weights = Total)
+# gini model, no RE
+gini_glm <- glm(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~ gini, 
+    family  = "binomial")
 
-print(female_ed_glm, corr = FALSE)
+tidy(gini_glm, exp=TRUE, conf.int=TRUE) # OR: 1.02
+summary(gini_glm) # p-val (Wald approx): <2e-16
 
-summ(female_ed_glm, exp=TRUE, confint=TRUE)  #OR of 0.99
+# gini model w/ RE
+gini_glm_re <- gamm4(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~ gini, 
+    random  = ~(1|subregion),
+    family  = "binomial")
 
-urban_percent_glm_adaptive <- GLMMadaptive::mixed_model(
-  fixed  = cbind(Positive, Total - Positive) ~ urban_percent, 
-  random = ~ 1 | subregion, 
-  data   = respicar_socio, 
-  family = binomial())
+tidy(gini_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 0.989
+lmtest::lrtest(gini_glm, gini_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
 
-summary(urban_percent_glm_adaptive)
+
+
+# HH size------
+
+# HH model, no RE
+hh_glm <- glm(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~ mean_hh, 
+    family  = "binomial")
+
+tidy(hh_glm, exp=TRUE, conf.int=TRUE) # OR: 1.32
+summary(hh_glm) # p-val (Wald approx): <2e-16
+
+# HH model w/ RE
+hh_glm_re <- gamm4(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~ mean_hh, 
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+tidy(hh_glm_re$mer, exp=TRUE, conf.int=TRUE) #OR: 1.36
+lmtest::lrtest(hh_glm, hh_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
+
+
+# female ed------
+
+female_ed_glm <- glm(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~ female_ed, 
+    family  = "binomial")
+
+tidy(female_ed_glm, exp=TRUE, conf.int=TRUE) # OR: 0.991
+summary(female_ed_glm) # p-val (Wald approx): <2e-16
+
+# female ed model w/ RE
+female_ed_glm_re <- gamm4(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~ female_ed, 
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+tidy(female_ed_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 0.992
+lmtest::lrtest(female_ed_glm, female_ed_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
+
