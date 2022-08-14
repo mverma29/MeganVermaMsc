@@ -36,11 +36,12 @@ lmtest::lrtest(urban_percent_glm, urban_percent_glm_re$mer) # <2e-16 (reject nul
 # make table of model outputs
 urban_percent_re <- tbl_regression(urban_percent_glm_re$mer, 
                                 exponentiate = TRUE, 
+                                intercept= FALSE,
                                 tidy_fun = broom.mixed::tidy)
 
 urban_percent_re %>%
     as_flex_table() %>%
-    flextable::save_as_docx(path = "/Users/meganverma/Desktop/git/MeganVermaMsc/outputs/urban_percent_re.docx")
+    flextable::save_as_docx(path = "outputs/urban_percent_re.docx")
 
 
 # GDP -----------
@@ -68,11 +69,12 @@ lmtest::lrtest(gdp_glm, gdp_glm_re$mer) # <2e-16 (reject null hyp of no clusteri
 # make table of model outputs
 gdp_re_model <- tbl_regression(gdp_glm_re$mer, 
                                    exponentiate = TRUE, 
+                                   intercept= FALSE, 
                                    tidy_fun = broom.mixed::tidy)
 
 gdp_re_model %>%
     as_flex_table() %>%
-    flextable::save_as_docx(path = "/Users/meganverma/Desktop/git/MeganVermaMsc/outputs/gdp_re_model.docx")
+    flextable::save_as_docx(path = "outputs/gdp_re_model.docx")
 
 
 # Gini-------
@@ -99,11 +101,12 @@ lmtest::lrtest(gini_glm, gini_glm_re$mer) # <2e-16 (reject null hyp of no cluste
 # make table of model outputs
 gini_re_model <- tbl_regression(gini_glm_re$mer, 
                                exponentiate = TRUE, 
+                               intercept= FALSE, 
                                tidy_fun = broom.mixed::tidy)
 
 gini_re_model %>%
     as_flex_table() %>%
-    flextable::save_as_docx(path = "/Users/meganverma/Desktop/git/MeganVermaMsc/outputs/gini_re_model.docx")
+    flextable::save_as_docx(path = "outputs/gini_re_model.docx")
 
 
 # HH size------
@@ -131,11 +134,12 @@ lmtest::lrtest(hh_glm, hh_glm_re$mer) # <2e-16 (reject null hyp of no clustering
 # make table of model outputs
 hh_re_model <- tbl_regression(hh_glm_re$mer, 
                                exponentiate = TRUE, 
+                               intercept= FALSE, 
                                tidy_fun = broom.mixed::tidy)
 
 hh_re_model %>%
     as_flex_table() %>%
-    flextable::save_as_docx(path = "/Users/meganverma/Desktop/git/MeganVermaMsc/outputs/hh_re_model.docx")
+    flextable::save_as_docx(path = "outputs/hh_re_model.docx")
 
 
 # female ed------
@@ -161,10 +165,11 @@ lmtest::lrtest(female_ed_glm, female_ed_glm_re$mer) # <2e-16 (reject null hyp of
 
 # make table of model outputs
 ed_re_model <- tbl_regression(female_ed_glm_re$mer, 
-                               exponentiate = TRUE, 
+                               exponentiate = TRUE,
+                               intercept= FALSE, 
                                tidy_fun = broom.mixed::tidy)
 
 ed_re_model %>%
     as_flex_table() %>%
-    flextable::save_as_docx(path = "/Users/meganverma/Desktop/git/MeganVermaMsc/outputs/ed_re_model.docx")
+    flextable::save_as_docx(path = "outputs/ed_re_model.docx")
 
