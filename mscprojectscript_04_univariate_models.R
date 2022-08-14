@@ -29,8 +29,18 @@ urban_percent_glm_re <- gamm4(
 
 tidy(urban_percent_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 0.995
 summary(urban_percent_glm_re$mer) # p-val (Wald approx): <2e-16
+    
 
 lmtest::lrtest(urban_percent_glm, urban_percent_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
+
+# make table of model outputs
+urban_percent_re <- tbl_regression(urban_percent_glm_re$mer, 
+                                exponentiate = TRUE, 
+                                tidy_fun = broom.mixed::tidy)
+
+urban_percent_re %>%
+    as_flex_table() %>%
+    flextable::save_as_docx(path = "/Users/meganverma/Desktop/git/MeganVermaMsc/outputs/urban_percent_re.docx")
 
 
 # GDP -----------
@@ -55,6 +65,15 @@ tidy(gdp_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR:0.558
 
 lmtest::lrtest(gdp_glm, gdp_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
 
+# make table of model outputs
+gdp_re_model <- tbl_regression(gdp_glm_re$mer, 
+                                   exponentiate = TRUE, 
+                                   tidy_fun = broom.mixed::tidy)
+
+gdp_re_model %>%
+    as_flex_table() %>%
+    flextable::save_as_docx(path = "/Users/meganverma/Desktop/git/MeganVermaMsc/outputs/gdp_re_model.docx")
+
 
 # Gini-------
 
@@ -77,6 +96,14 @@ gini_glm_re <- gamm4(
 tidy(gini_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 0.989
 lmtest::lrtest(gini_glm, gini_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
 
+# make table of model outputs
+gini_re_model <- tbl_regression(gini_glm_re$mer, 
+                               exponentiate = TRUE, 
+                               tidy_fun = broom.mixed::tidy)
+
+gini_re_model %>%
+    as_flex_table() %>%
+    flextable::save_as_docx(path = "/Users/meganverma/Desktop/git/MeganVermaMsc/outputs/gini_re_model.docx")
 
 
 # HH size------
@@ -101,6 +128,16 @@ tidy(hh_glm_re$mer, exp=TRUE, conf.int=TRUE) #OR: 1.36
 lmtest::lrtest(hh_glm, hh_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
 
 
+# make table of model outputs
+hh_re_model <- tbl_regression(hh_glm_re$mer, 
+                               exponentiate = TRUE, 
+                               tidy_fun = broom.mixed::tidy)
+
+hh_re_model %>%
+    as_flex_table() %>%
+    flextable::save_as_docx(path = "/Users/meganverma/Desktop/git/MeganVermaMsc/outputs/hh_re_model.docx")
+
+
 # female ed------
 
 female_ed_glm <- glm(
@@ -120,4 +157,14 @@ female_ed_glm_re <- gamm4(
 
 tidy(female_ed_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 0.992
 lmtest::lrtest(female_ed_glm, female_ed_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
+
+
+# make table of model outputs
+ed_re_model <- tbl_regression(female_ed_glm_re$mer, 
+                               exponentiate = TRUE, 
+                               tidy_fun = broom.mixed::tidy)
+
+ed_re_model %>%
+    as_flex_table() %>%
+    flextable::save_as_docx(path = "/Users/meganverma/Desktop/git/MeganVermaMsc/outputs/ed_re_model.docx")
 
