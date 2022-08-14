@@ -89,5 +89,6 @@ na_urban_percent <- tibble(filter(respicar_socio, is.na(urban_percent)))
 
 check_socio_na(na_urban_percent)
 
-
+respicar_socio %<>% mutate(urban_percent= urban_percent/10)
+summary(respicar_socio$urban_percent)
 
