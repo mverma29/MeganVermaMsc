@@ -7,11 +7,11 @@ full_glm_no_re <- glm(
     family  = "binomial")
 
 tidy(
-    full_glm_no_re,
-    exp     = TRUE,
-    confint = TRUE,
-    pvals   = TRUE,
-    digits  = 3
+    x        = full_glm_no_re,
+    exp      = TRUE,
+    conf.int = TRUE,
+    pvals    = TRUE,
+    digits   = 3
 ) 
 
 # full model (without interaction, WITH RE for subregion correlation)----
@@ -24,11 +24,11 @@ full_glm_re <- gamm4(
     family  = "binomial")
 
 tidy(
-    full_glm_re$mer,
-    exp     = TRUE,
+    x        = full_glm_re$mer,
+    exp      = TRUE,
     conf.int = TRUE,
-    pvals   = TRUE,
-    digits  = 3
+    pvals    = TRUE,
+    digits   = 3
 ) 
 
 # lrtest of null hypothesis of no correlation by subregion
