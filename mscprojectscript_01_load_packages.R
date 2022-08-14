@@ -33,6 +33,9 @@ library(magrittr)
 library(broom)
 library(broom.mixed)
 
+# formatting data
+library(gtsummary)
+
 # resolving namespace conflicts
 library(conflicted)
 conflict_prefer('select', 'dplyr')
