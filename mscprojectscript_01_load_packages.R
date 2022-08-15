@@ -35,6 +35,7 @@ library(broom.mixed)
 
 # formatting data
 library(gtsummary)
+library(flextable)
 
 # resolving namespace conflicts
 library(conflicted)

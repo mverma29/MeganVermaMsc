@@ -94,12 +94,12 @@ summary(chosen_model_re@model)
 # make output table 
 chosen_mod_re <- tbl_regression(chosen_model_re@model, 
                                 exponentiate = TRUE, 
-                                tidy_fun = broom.mixed::tidy)
- #   add_glance_source_note()
+                                tidy_fun = broom.mixed::tidy) %>% 
+    add_glance_source_note(include = c("AIC"))
 
 chosen_mod_re %>%
     as_flex_table() %>%
-    flextable::save_as_docx(path = "/Users/meganverma/Desktop/git/MeganVermaMsc/outputs/chosen_mod_re.docx")
+    save_as_docx(path = "outputs/chosen_mod_re.docx")
 
 
 # AIC: 35408 
@@ -123,7 +123,7 @@ chosen_mod_no_re <- tbl_regression(chosen_model_no_re@model,
                                 tidy_fun = broom.mixed::tidy)
 
 as_flex_table(chosen_mod_no_re) %>%
-    flextable::save_as_docx(path = "/Users/meganverma/Desktop/git/MeganVermaMsc/outputs/chosen_mod_no_re.docx")
+    flextable::save_as_docx(path = "outputs/chosen_mod_no_re.docx")
 
 
 # AIC: 37873
