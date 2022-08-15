@@ -10,3 +10,5 @@ data/appendix_summary.csv
 *.html
 
 outputs/*.png
+
+outputs/*.docx
