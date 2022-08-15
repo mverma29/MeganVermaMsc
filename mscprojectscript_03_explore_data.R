@@ -325,9 +325,19 @@ ggsave("outputs/scatter_female_ed_carriage.png")
 
 # explore carriage itself------
 # carriage histogram
-ggplot (respicar_socio, aes(x = carriage)) +
+carriage_hist <- ggplot (respicar_socio, aes(x = carriage)) +
   geom_histogram(binwidth = 0.02, center = 0.02/2)
 # fairly normal distribution ?
+
+ggsave(
+    filename = "outputs/carriage_hist.png",
+    plot     = carriage_hist, 
+    device   = png,
+    width    = 10,
+    height   = 7,
+    units    = 'in',
+    res      = 600
+)
 
 boxplot_subregion <- ggplot(respicar_socio, aes (subregion, carriage)) + 
     geom_boxplot() +
