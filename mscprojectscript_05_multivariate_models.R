@@ -14,6 +14,9 @@ tidy(
     digits   = 3
 ) 
 
+# full p-val of model? 
+summary(full_glm_no_re)$coefficients[1,4] #<0.001
+
 # full model (without interaction, WITH RE for subregion correlation)----
 
 full_glm_re <- gamm4(
@@ -91,8 +94,8 @@ summary(chosen_model_re@model)
 # make output table 
 chosen_mod_re <- tbl_regression(chosen_model_re@model, 
                                 exponentiate = TRUE, 
-                                tidy_fun = broom.mixed::tidy) %>% 
-    add_glance_source_note()
+                                tidy_fun = broom.mixed::tidy)
+ #   add_glance_source_note()
 
 chosen_mod_re %>%
     as_flex_table() %>%
