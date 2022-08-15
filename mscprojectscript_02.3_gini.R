@@ -119,5 +119,5 @@ na_gini <- tibble(filter(respicar_socio, is.na(gini)))
 
 check_socio_na(na_gini)
 
-respicar_socio %<>% mutate(gini = gini/10)
-summary(respicar_socio$gini)
+respicar_socio %<>% mutate(gini_tenth = gini/10)
+summary(respicar_socio$gini_tenth)

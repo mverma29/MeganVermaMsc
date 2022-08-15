@@ -255,7 +255,7 @@ staleness_female_ed <- covariate_staleness_socio("female_ed")
 ggplot(respicar_socio, aes(y = carriage, x = urban_percent)) +
   geom_point(size          = 2) +
   ylab("Carriage") +
-  xlab("Urban Population (Deciles)") +
+  xlab("Urban Population (Percent)") +
   #scale_x_log10() +
   #scale_y_log10() + 
   # there may be some relationship--less carriage in higher urbanized populations??
@@ -268,7 +268,7 @@ ggsave("outputs/scatter_urban_percent_carriage.png")
 ggplot(respicar_socio, aes(y = carriage, x = log_gdp)) +
   geom_point(size = 2) +
   ylab("Carriage") +
-  xlab("log GDP (USD) per capita") +
+  xlab("Log GDP (USD) per capita") +
   # scale_x_log10() +
   # scale_y_log10() + # carriage decreases as gdp inc
   geom_smooth(method = 'lm')
@@ -279,7 +279,7 @@ ggsave("outputs/scatter_gdp_carriage.png")
 ggplot(respicar_socio, aes(y = carriage, x = gini)) +
   geom_point(size = 2) +
   ylab("Carriage") +
-  xlab("Gini Coefficient of Inequality (Deciles)") +
+  xlab("Gini Coefficient of Inequality (Percent)") +
   # scale_x_log10() +
   #scale_y_log10() + # when gini is higher (more unequal), carriage is higher
   geom_smooth(method = 'lm')
@@ -303,7 +303,7 @@ ggsave("outputs/scatter_hh_carriage.png")
 ggplot(respicar_socio, aes(y = carriage,x = female_ed)) + 
   geom_point(size=2) + 
   ylab("Carriage") + 
-  xlab("Female Secondary Education Rate (Deciles)") +
+  xlab("Female Secondary Education Rate (Percent)") +
   #scale_x_log10() + 
   #scale_y_log10() + # when female ed increases, carriage decreases
   geom_smooth(method = 'lm')
@@ -361,7 +361,7 @@ facet_urban_percent <- ggplot(data = respicar_socio,
     ggtitle("Urban Population and Carriage, by UN Subregion") + 
     theme(plot.title = element_text(hjust = 0.5)) + 
     theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue")) + 
-    xlab("Urban Population (Deciles)") + 
+    xlab("Urban Population (Percent)") + 
     ylab("Carriage Rate")
 
 ggsave(
@@ -409,7 +409,7 @@ facet_gini <- ggplot(data = respicar_socio,
     ggtitle("Gini Coefficient of Inequality and Carriage, by UN Subregion") + 
     theme(plot.title = element_text(hjust = 0.5)) + 
     theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue")) + 
-    xlab("Gini Coefficient of Inequality (Deciles)") + 
+    xlab("Gini Coefficient of Inequality (Percent)") + 
     ylab("Carriage Rate")
 
 ggsave(
@@ -457,7 +457,7 @@ facet_ed <- ggplot(data = respicar_socio,
     ggtitle("Female Secondary Education Enrollment and Carriage, by UN Subregion") + 
     theme(plot.title = element_text(hjust = 0.5)) + 
     theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue")) + 
-    xlab("Female Secondary Education Enrollment (Deciles)") + 
+    xlab("Female Secondary Education Enrollment (Percent)") + 
     ylab("Carriage Rate")
 
 ggsave(

@@ -15,7 +15,7 @@
 # urban_percent model, no RE
 urban_percent_glm <- glm(
     data    = respicar_socio,
-    formula = cbind(Positive, Total - Positive) ~ urban_percent, 
+    formula = cbind(Positive, Total - Positive) ~ urban_percent_tenth, 
     family  = "binomial")
 
 tidy(urban_percent_glm, exp=TRUE, conf.int=TRUE) # OR: 0.987
@@ -23,7 +23,7 @@ summary(urban_percent_glm) # p-val (Wald approx): <2e-16
 
 urban_percent_glm_re <- gamm4(
   data    = respicar_socio,
-  formula = cbind(Positive, Total - Positive) ~ urban_percent, 
+  formula = cbind(Positive, Total - Positive) ~ urban_percent_tenth, 
   random  = ~(1|subregion),
   family  = "binomial")
 
@@ -37,7 +37,8 @@ lmtest::lrtest(urban_percent_glm, urban_percent_glm_re$mer) # <2e-16 (reject nul
 urban_percent_re <- tbl_regression(urban_percent_glm_re$mer, 
                                 exponentiate = TRUE, 
                                 intercept= FALSE,
-                                tidy_fun = broom.mixed::tidy)
+                                tidy_fun = broom.mixed::tidy) %>% 
+    add_glance_source_note(include = c("logLik"))
 
 urban_percent_re %>%
     as_flex_table() %>%
@@ -70,7 +71,8 @@ lmtest::lrtest(gdp_glm, gdp_glm_re$mer) # <2e-16 (reject null hyp of no clusteri
 gdp_re_model <- tbl_regression(gdp_glm_re$mer, 
                                    exponentiate = TRUE, 
                                    intercept= FALSE, 
-                                   tidy_fun = broom.mixed::tidy)
+                                   tidy_fun = broom.mixed::tidy) %>% 
+    add_glance_source_note(include = c("logLik"))
 
 gdp_re_model %>%
     as_flex_table() %>%
@@ -82,7 +84,7 @@ gdp_re_model %>%
 # gini model, no RE
 gini_glm <- glm(
     data    = respicar_socio,
-    formula = cbind(Positive, Total - Positive) ~ gini, 
+    formula = cbind(Positive, Total - Positive) ~ gini_tenth, 
     family  = "binomial")
 
 tidy(gini_glm, exp=TRUE, conf.int=TRUE) # OR: 1.02
@@ -91,7 +93,7 @@ summary(gini_glm) # p-val (Wald approx): <2e-16
 # gini model w/ RE
 gini_glm_re <- gamm4(
     data    = respicar_socio,
-    formula = cbind(Positive, Total - Positive) ~ gini, 
+    formula = cbind(Positive, Total - Positive) ~ gini_tenth, 
     random  = ~(1|subregion),
     family  = "binomial")
 
@@ -102,7 +104,8 @@ lmtest::lrtest(gini_glm, gini_glm_re$mer) # <2e-16 (reject null hyp of no cluste
 gini_re_model <- tbl_regression(gini_glm_re$mer, 
                                exponentiate = TRUE, 
                                intercept= FALSE, 
-                               tidy_fun = broom.mixed::tidy)
+                               tidy_fun = broom.mixed::tidy) %>% 
+    add_glance_source_note(include = c("logLik"))
 
 gini_re_model %>%
     as_flex_table() %>%
@@ -135,7 +138,9 @@ lmtest::lrtest(hh_glm, hh_glm_re$mer) # <2e-16 (reject null hyp of no clustering
 hh_re_model <- tbl_regression(hh_glm_re$mer, 
                                exponentiate = TRUE, 
                                intercept= FALSE, 
-                               tidy_fun = broom.mixed::tidy)
+                               tidy_fun = broom.mixed::tidy) %>% 
+    add_glance_source_note(include = c("logLik"))
+
 
 hh_re_model %>%
     as_flex_table() %>%
@@ -146,7 +151,7 @@ hh_re_model %>%
 
 female_ed_glm <- glm(
     data    = respicar_socio,
-    formula = cbind(Positive, Total - Positive) ~ female_ed, 
+    formula = cbind(Positive, Total - Positive) ~ female_ed_tenth, 
     family  = "binomial")
 
 tidy(female_ed_glm, exp=TRUE, conf.int=TRUE) # OR: 0.991
@@ -155,7 +160,7 @@ summary(female_ed_glm) # p-val (Wald approx): <2e-16
 # female ed model w/ RE
 female_ed_glm_re <- gamm4(
     data    = respicar_socio,
-    formula = cbind(Positive, Total - Positive) ~ female_ed, 
+    formula = cbind(Positive, Total - Positive) ~ female_ed_tenth, 
     random  = ~(1|subregion),
     family  = "binomial")
 
@@ -167,7 +172,8 @@ lmtest::lrtest(female_ed_glm, female_ed_glm_re$mer) # <2e-16 (reject null hyp of
 ed_re_model <- tbl_regression(female_ed_glm_re$mer, 
                                exponentiate = TRUE,
                                intercept= FALSE, 
-                               tidy_fun = broom.mixed::tidy)
+                               tidy_fun = broom.mixed::tidy) %>% 
+    add_glance_source_note(include = c("logLik"))
 
 ed_re_model %>%
     as_flex_table() %>%

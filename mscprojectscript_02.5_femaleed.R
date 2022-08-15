@@ -43,6 +43,6 @@ na_female_ed <- tibble(filter(respicar_socio, is.na(female_ed)))
 
 check_socio_na(na_female_ed)
 
-respicar_socio %<>% mutate(female_ed = female_ed/10)
-summary(respicar_socio$female_ed)
+respicar_socio %<>% mutate(female_ed_tenth = female_ed/10)
+summary(respicar_socio$female_ed_tenth)
 
