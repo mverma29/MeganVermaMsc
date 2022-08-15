@@ -324,7 +324,22 @@ ggplot (respicar_socio, aes(x = carriage)) +
   geom_histogram(binwidth = 0.02, center = 0.02/2)
 # fairly normal distribution ?
 
-boxplot(carriage ~ subregion, data = respicar_socio)
+boxplot_subregion <- ggplot(respicar_socio, aes (subregion, carriage)) + 
+    geom_boxplot() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) + 
+    xlab("UN Subregion") + 
+    ylab("Carriage Rate")
+
+ggsave(
+    filename = "outputs/boxplot_subregion.png",
+    plot     = boxplot_subregion, 
+    device   = png,
+    width    = 13,
+    height   = 7,
+    units    = 'in',
+    res      = 600
+)
+
 # potentially some correlation there
 
 
