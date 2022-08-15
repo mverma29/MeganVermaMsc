@@ -162,13 +162,33 @@ world <- mutate(
   )
 )
 
-na_region <- world %>% filter(is.na(region)) #countries not in study
+cntries  <- st_read("https://ec.europa.eu/eurostat/cache/GISCO/distribution/v2/countries/geojson/CNTR_RG_20M_2016_3035.geojson",
+                    stringsAsFactors = FALSE)
 
-# aggregate world geometry into subregions
-subworld <- world %>% 
-  group_by(region) %>%
-  # Mock the data field
-  summarise(data=n())
+
+subworld <- cntries %>%
+    mutate(region = countrycode::countrycode(id,
+                                             origin = 'iso2c',
+                                             destination = 'un.regionsub.name')) 
+
+subworld %<>% mutate(
+    region = case_when(id == "AQ"    ~ "Antarctica",
+                       id == "CP"    ~ "Western Europe",
+                       id == "EL"    ~ "Southern Europe",
+                       id == "UK"    ~ "Northern Europe",
+                       is.na(region) ~ "Disputed Territory",
+                       TRUE          ~ region)
+)
+
+subworld %<>%
+    group_by(region) %>%
+    summarise(n = n()) %>%
+    filter(!is.na(region)) %>%
+    select(-n)
+
+subworld %<>% filter(region != "Antarctica") %>%
+    st_transform(crs = '+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0')
+
 
 
 # merge map data with subregion
@@ -180,21 +200,11 @@ world_with_subregion_carriage <-
 
 
 
-# re-map onto subregions
-
-
-# combine geometries of subregions to make better borders
-subregions <- world_with_subregion_carriage %>% 
-    group_by(region) %>% 
-    summarise(region, geometry) %>% 
-    st_as_sf()
-
-subregions <- st_union(subregions, by_feature=TRUE)
 
 subregion_map <- ggplot(data = world_with_subregion_carriage) +
     geom_sf(aes(geometry       = geometry, #world map geometry (polygons)
                 fill           = carriage_subregion),
-            lwd                = 0) + #color map w/ cont. values of total cases
+            size = 0.1) + #color map w/ cont. values of total cases
     scale_fill_gradient(
         low                      = "yellow",
         high                     = "red",
@@ -204,20 +214,15 @@ subregion_map <- ggplot(data = world_with_subregion_carriage) +
     ) + #set color fill
     theme_bw() + #theme of dark text on light background
     theme(legend.position      = 'bottom') +
-    ggtitle("Worldwide Streptococcus pneumoniae Carriage, by UN Subregion")+ 
-    geom_sf(
-    data                       = subregions,
-    mapping                    = aes(geometry = `geometry`),
-    fill                       = NA
-)
+    ggtitle("Worldwide Streptococcus pneumoniae Carriage, by UN Subregion") 
 
-
+    
 ggsave(
   filename = "outputs/subregion_map.png",
   plot     = subregion_map,
   device   = png,
   width    = 7,
-  height   = 3,
+  height   = 4,
   units    = 'in',
   res      = 600
 )
