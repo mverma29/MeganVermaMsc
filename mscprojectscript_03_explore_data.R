@@ -482,3 +482,125 @@ ggsave(
 )
 
 
+
+
+# descriptive stats by UN subregion------
+
+desc_aus_nz <- filter(respicar_socio, `subregion`=="Australia and New Zealand")
+summary(desc_aus_nz)
+
+desc_c_asia <- filter(respicar_socio, `subregion`=="Central Asia")
+summary(desc_c_asia)
+
+desc_e_asia <- filter(respicar_socio, `subregion`=="Eastern Asia")
+summary(desc_e_asia)
+
+desc_e_europe <- filter(respicar_socio, `subregion`=="Eastern Europe")
+summary(desc_e_europe)
+
+desc_l_a <- filter(respicar_socio, `subregion`=="Latin America and the Caribbean")
+summary(desc_l_a)
+
+desc_mel <- filter(respicar_socio, `subregion`=="Melanesia")
+summary(desc_mel)
+
+desc_n_africa <- filter(respicar_socio, `subregion`=="Northern Africa")
+summary(desc_n_africa)
+
+desc_n_amer <- filter(respicar_socio, `subregion`=="Northern America")
+summary(desc_n_amer)
+
+desc_n_europe <- filter(respicar_socio, `subregion`=="Northern Europe")
+summary(desc_n_europe)
+
+desc_se_asia <- filter(respicar_socio, `subregion`=="South-eastern Asia")
+summary(desc_se_asia)
+
+desc_s_asia <- filter(respicar_socio, `subregion`=="Southern Asia")
+summary(desc_s_asia)
+
+desc_s_europe <- filter(respicar_socio, `subregion`=="Southern Europe")
+summary(desc_s_europe)
+
+desc_ss_africa <- filter(respicar_socio, `subregion`=="Sub-Saharan Africa")
+summary(desc_ss_africa)
+
+desc_w_asia <- filter(respicar_socio, `subregion`=="Western Asia")
+summary(desc_w_asia)
+
+desc_w_euro <- filter(respicar_socio, `subregion`=="Western Europe")
+summary(desc_w_euro)
+
+
+
+
+
+
+# descriptive stats for table 1/2-----
+summary(respicar_socio)
+sum(respicar_socio$Total)
+
+age_under_5 <- filter(respicar_socio, `Age`=="<5y")
+sum(age_under_5$Total)
+
+age_5_17 <- filter(respicar_socio, `Age`=="5-17y")
+sum(age_5_17$Total)
+
+age_18_plus <- filter(respicar_socio, `Age`=="18+y")
+sum(age_18_plus$Total)
+
+sum(ethnic_minority$Total)
+
+ethnic_majority <- filter(respicar_socio, `Ethnic Minority`=="No")
+sum(ethnic_majority$Total)
+
+cross_sectional <- filter(respicar_socio, `Design`=="Cross-sectional")
+sum(cross_sectional$Total)
+
+cohort <- filter(respicar_socio, `Design`=="Longitudinal")
+sum(cohort$Total)
+
+unknown_design <- filter(respicar_socio, `Design`=="Unknown design")
+sum(unknown_design$Total)
+
+group_sampling <- filter(respicar_socio, `Sampling strategy`=="Group")
+sum(group_sampling$Total)
+
+outpatient_sampling <- filter(respicar_socio, `Sampling strategy`=="Outpatients")
+sum(outpatient_sampling$Total)
+
+random_sampling <- filter(respicar_socio, `Sampling strategy`=="Random/community")
+sum(random_sampling$Total)
+
+trial_sampling <- filter(respicar_socio, `Sampling strategy`=="Trial arm")
+sum(trial_sampling$Total)
+
+other_sampling <- filter(respicar_socio, `Sampling strategy`=="Other")
+sum(other_sampling$Total)
+
+us_studies <- filter(respicar_socio, `Country`=="United States")
+sum(us_studies$Total)
+
+brazil_studies <- filter(respicar_socio, `Country`=="Brazil")
+sum(brazil_studies$Total)
+
+israel_studies <- filter(respicar_socio, `Country`=="Israel")
+sum(israel_studies$Total)
+
+portugal_studies <- filter(respicar_socio, `Country`=="Portugal")
+sum(portugal_studies$Total)
+
+france_studies <- filter(respicar_socio, `Country`=="France")
+sum(france_studies$Total)
+
+norway_studies <- filter(respicar_socio, `Country`=="Norway")
+sum(norway_studies$Total)
+
+other_studies <- respicar_socio %>% 
+    filter(!`Country` %in% c("United States","Brazil", "Israel", 
+                        "Portugal","France","Norway"))
+
+sum(other_studies$Total)
+
+
+
