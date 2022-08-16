@@ -29,8 +29,9 @@ tidy(
     exp      = TRUE,
     conf.int = TRUE,
     pvals    = TRUE,
-    digits   = 3
-) 
+    digits   = 3) %>%
+    select(-effect, -group) %>%
+    mutate(term = sub(pattern = "^X", replacement = "", x = term))
 
 # lrtest of null hypothesis of no correlation by subregion
 lmtest::lrtest(full_glm_no_re, full_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
