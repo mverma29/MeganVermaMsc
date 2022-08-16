@@ -80,7 +80,8 @@ world_with_carriage <- merge (
 
 country_map <- ggplot(data = world_with_carriage) +
   geom_sf(aes(geometry   = geometry, #world map geometry (polygons)
-              fill       = carriage_country)) + #color map w/ cont. values of total cases
+              fill       = carriage_country),
+          size = 0.1) + #color map w/ cont. values of total cases
   scale_fill_gradient(
     low                = "yellow",
     high               = "red",
@@ -99,7 +100,7 @@ ggsave(
   plot     = country_map,
   device   = png,
   width    = 7,
-  height   = 3,
+  height   = 4,
   units    = 'in',
   res      = 600
 )
