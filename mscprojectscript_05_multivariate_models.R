@@ -85,7 +85,7 @@ chosen_model_re <- buildgamm4 (
         urban_percent_tenth + log_gdp * gini_tenth + mean_hh + female_ed_tenth + (1 | subregion),
     family  = "binomial"
 )
-    
+
 summary(chosen_model_re@model) 
 
 # make output table 
@@ -116,8 +116,8 @@ broom::glance(chosen_model_no_re@model)
 # make output table 
 
 chosen_mod_no_re <- tbl_regression(chosen_model_no_re@model, 
-                                exponentiate = TRUE, 
-                                tidy_fun = broom.mixed::tidy) %>% 
+                                   exponentiate = TRUE, 
+                                   tidy_fun = broom.mixed::tidy) %>% 
     add_glance_source_note(include = c("logLik"))
 
 
