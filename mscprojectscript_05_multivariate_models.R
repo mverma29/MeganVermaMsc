@@ -14,8 +14,6 @@ tidy(
     digits   = 3
 ) 
 
-# full p-val of model? 
-summary(full_glm_no_re)$coefficients[1,4] #<0.001
 
 # full model (without interaction, WITH RE for subregion correlation)----
 
