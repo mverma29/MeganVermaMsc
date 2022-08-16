@@ -1,6 +1,20 @@
 # Megan Verma 
 # 8/16/2022 
 
+# summaries/tidying------
+# view(respicar) 
+summary(respicar_socio) 
+
+summary(respicar_socio$female_ed) # max is >1 
+
+excess_ed <- respicar_socio %>% 
+  filter(`female_ed` > 100) # 155 datasets with ed > 100% 
+
+t1              <- table(respicar_socio$Country)
+study_countries <- as.data.frame(t1)
+# 76 countries, most from US then portugal/israel/brazil (44 & 22 each)
+names(respicar)
+
 # covariate staleness-----
 
 staleness_socio <- get_staleness_socio(respicar_socio)
@@ -111,6 +125,9 @@ sum(age_5_17$Total)
 age_18_plus <- filter(respicar_socio, `Age`=="18+y")
 sum(age_18_plus$Total)
 
+
+ethnic_minority <- filter(respicar_socio, `Ethnic Minority`=="Yes")
+# 62 studies in ethnic minority groups 
 sum(ethnic_minority$Total)
 
 ethnic_majority <- filter(respicar_socio, `Ethnic Minority`=="No")
@@ -139,6 +156,14 @@ sum(trial_sampling$Total)
 
 other_sampling <- filter(respicar_socio, `Sampling strategy`=="Other")
 sum(other_sampling$Total)
+
+
+
+# 376 entries (studies) if we take out ethnic minority
+# 438 datasets
+# Cross-sectional:312
+# Longitudinal   :125
+# Unknown design :  1
 
 us_studies <- filter(respicar_socio, `Country`=="United States")
 sum(us_studies$Total)

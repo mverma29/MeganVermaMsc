@@ -1,6 +1,12 @@
 # Megan Verma 
 # 8/16/2022 
 
+
+respicar_israel    <- filter(respicar_socio,`Country` == "Israel")
+# 22 studies in Israel, 1993-2009
+respicar_palestine <- filter(respicar_socio,`Country` == "Palestinian Territories")
+# 5 studies in Palestine, 2009 only
+
 # facetwrap plot of each covariate by UN subregion -------
 
 facet_urban_percent <- ggplot(data = respicar_socio,

@@ -1,46 +1,6 @@
 # Megan Verma 
 # 7/25/2022 
 
-if(!dir.exists('outputs')){dir.create('outputs')}
-
-# summaries/tidying------
-# view(respicar) 
-summary(respicar_socio) 
-
-summary(respicar_socio$female_ed) # max is >1 
-
-excess_ed <- respicar_socio %>% 
-  filter(`female_ed` > 100) # 155 datasets with ed > 100% 
-
-t1              <- table(respicar_socio$Country)
-study_countries <- as.data.frame(t1)
-# 76 countries, most from US then portugal/israel/brazil (44 & 22 each)
-names(respicar)
-
-# change certain character variables to factor
-respicar_socio$Country             <- as.factor(respicar_socio$Country)
-respicar_socio$`ISO 3166-1`        <- as.factor(respicar_socio$`ISO 3166-1`)
-respicar_socio$Continent           <- as.factor(respicar_socio$Continent)
-respicar_socio$Age                 <- as.factor(respicar_socio$Age)
-respicar_socio$`Ethnic Minority`   <- as.factor(respicar_socio$`Ethnic Minority`)
-respicar_socio$Design              <- as.factor(respicar_socio$Design)
-respicar_socio$`Sampling strategy` <- as.factor(respicar_socio$`Sampling strategy`)
-# respicar_socio$`subregion`         <- as.factor(respicar_socio$`subregion`)
-
-summary(respicar_socio)
-ethnic_minority <- filter(respicar_socio, `Ethnic Minority`=="Yes")
-# 62 studies in ethnic minority groups 
-
-# 376 entries (studies) if we take out ethnic minority
-# 438 datasets
-# Cross-sectional:312
-# Longitudinal   :125
-# Unknown design :  1
-
-respicar_israel    <- filter(respicar_socio,`Country` == "Israel")
-# 22 studies in Israel, 1993-2009
-respicar_palestine <- filter(respicar_socio,`Country` == "Palestinian Territories")
-# 5 studies in Palestine, 2009 only
 
 # make carriage variable
 respicar_socio     <- respicar_socio %>% 
@@ -137,7 +97,6 @@ respicar_subregion <- respicar_subregion %>%
     )
   )
 
-na_subregion <- respicar_subregion %>% filter(is.na(region))
 
 respicar_subregion <- respicar_subregion %>%
   dplyr::group_by(`region`) %>%
