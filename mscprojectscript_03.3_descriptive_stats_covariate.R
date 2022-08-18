@@ -192,5 +192,9 @@ other_studies <- respicar_socio %>%
 
 sum(other_studies$Total)
 
+# check what country has the most individuals sampled
+country_stats <- respicar_socio %>% 
+    group_by(`Country`) %>% 
+    summarize(.groups="keep", Total)
 
 
