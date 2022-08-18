@@ -23,6 +23,9 @@ staleness_socio <- get_staleness_socio(respicar_socio)
 
 summary(staleness_socio) # max: -23 (23 years in the future)
 
+stale_studies <- staleness_socio %>% distinct(id) #208 studies with at least
+# one stale covariate 
+
 # look at the total datasets with vars of 5+ years of staleness, for each var: 
 
 staleness_urban <- covariate_staleness_socio("urban_percent")
