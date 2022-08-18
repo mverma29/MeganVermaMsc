@@ -37,8 +37,6 @@ female_ed %<>% fill_socio
 respicar_socio <- merge_socio(x = respicar_socio, 
                               y = female_ed)
 names(respicar_socio)
-sum(is.na(respicar_socio$female_ed))
-# 9/443 missing values for female ed (2.0%) 
 na_female_ed <- tibble(filter(respicar_socio, is.na(female_ed)))
 
 check_socio_na(na_female_ed)
