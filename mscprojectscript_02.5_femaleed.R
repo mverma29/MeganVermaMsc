@@ -32,15 +32,20 @@ female_ed_twn <- read_ods('data/e104-5.ods', sheet = 1, range = 'A3:D21') %>%
 
 female_ed %<>% bind_rows(female_ed_twn)
 
-female_ed %<>% fill_socio
+respicar_unfilled <- merge_socio(x = respicar_unfilled, 
+                              y = female_ed)
 
+# fill in most recent year for covariate values that don't match
+
+female_ed %<>% fill_socio
 respicar_socio <- merge_socio(x = respicar_socio, 
                               y = female_ed)
-names(respicar_socio)
+
 na_female_ed <- tibble(filter(respicar_socio, is.na(female_ed)))
 
 check_socio_na(na_female_ed)
 
 respicar_socio %<>% mutate(female_ed_tenth = female_ed/10)
 summary(respicar_socio$female_ed_tenth)
+
 

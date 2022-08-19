@@ -117,13 +117,16 @@ gdp_per_cap_extra <- left_join(gdp_data_extra, pop_extra) %>%
 
 gdp_data %<>% bind_rows(gdp_per_cap_extra)
 
-gdp_data %<>% fill_socio
 
+respicar_unfilled <- merge_socio(x = respicar_unfilled, 
+                              y = gdp_data)
+
+# fill in most recent year for covariate values that don't match
+
+gdp_data %<>% fill_socio
 respicar_socio <- merge_socio(x = respicar_socio, 
                               y = gdp_data)
-names(respicar_socio)
-sum(is.na(respicar_socio$gdp_usd))
-# 0/439 missing values for gdp
+
 na_gdp <- tibble(filter(respicar_socio, is.na(gdp_usd)))
 check_socio_na(na_gdp)
 

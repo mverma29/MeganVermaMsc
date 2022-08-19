@@ -76,19 +76,21 @@ respicar <- respicar %>%
     arrange(.by_group = TRUE) %>%
     ungroup
 
-urban_percent %<>% fill_socio
-
-respicar_socio <- merge_socio(x = respicar, 
+respicar_unfilled <- merge_socio(x = respicar, 
                               y = urban_percent)
 
-names(respicar_socio)
+names(respicar_unfilled)
 
-sum(is.na(respicar_socio$urban_percent))
+
+# fill in most recent year for covariate values that don't match
+urban_percent %<>% fill_socio
+respicar_socio <- merge_socio(x = respicar, 
+                              y = urban_percent)
 
 na_urban_percent <- tibble(filter(respicar_socio, is.na(urban_percent)))
 
 check_socio_na(na_urban_percent)
 
-respicar_socio %<>% mutate(urban_percent_tenth= urban_percent/10)
+respicar_socio %<>% mutate(urban_percent_tenth = urban_percent/10)
 summary(respicar_socio$urban_percent_tenth)
 
