@@ -48,4 +48,9 @@ na_unfilled_gini <- tibble(filter(respicar_unfilled, is.na(gini)))
 na_unfilled_hh <- tibble(filter(respicar_unfilled, is.na(mean_hh)))
 na_unfilled_ed <- tibble(filter(respicar_unfilled, is.na(female_ed)))
 
+# mutate to tenths in respicar_unfilled 
+respicar_unfilled %<>% mutate(urban_percent_tenth = urban_percent/10)
+respicar_unfilled %<>% mutate(gini_tenth = gini/10)
+respicar_unfilled %<>% mutate(female_ed_tenth = female_ed/10)
+
 
