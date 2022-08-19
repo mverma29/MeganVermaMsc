@@ -140,7 +140,9 @@ pairs_plot <- ggpairs(
     title = "Sociodemographic Covariates and Carriage", 
     labeller = label_wrap_gen(10)) + 
     theme(strip.placement = "outside", text = element_text(size = 10)) +
-    theme_bw()
+    theme_bw() +
+    theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue"))
+    
 
 ggsave(
     filename = "outputs/pairsplot.png",
