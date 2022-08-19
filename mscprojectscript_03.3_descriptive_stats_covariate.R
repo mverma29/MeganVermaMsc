@@ -141,7 +141,8 @@ pairs_plot <- ggpairs(
     labeller = label_wrap_gen(10)) + 
     theme(strip.placement = "outside", text = element_text(size = 10)) +
     theme_bw() +
-    theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue"))
+    theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue")) +
+    theme(plot.title = element_text(hjust = 0.5))
     
 
 ggsave(
