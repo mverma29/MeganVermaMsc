@@ -23,7 +23,9 @@ staleness_socio <- get_staleness_socio(respicar_socio)
 
 summary(staleness_socio) # max: -23 (23 years in the future)
 
-stale_studies <- staleness_socio %>% distinct(id) #208 studies with at least
+stale_studies <- staleness_socio %>% 
+    filter(staleness != 0) %>% 
+               distinct(id) #196 studies with at least
 # one stale covariate 
 
 # look at the total datasets with vars of 5+ years of staleness, for each var: 
@@ -195,6 +197,6 @@ sum(other_studies$Total)
 # check what country has the most individuals sampled
 country_stats <- respicar_socio %>% 
     group_by(`Country`) %>% 
-    summarize(.groups="keep", Total)
+    summarize(.groups="keep", sum(Total))
 
 
