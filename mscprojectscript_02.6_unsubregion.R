@@ -18,6 +18,14 @@ respicar_socio <- mutate(respicar_socio,
                                             yes  = "Eastern Asia",
                                             no   = subregion))
 
+respicar_unfilled <- mutate(respicar_unfilled,
+                         subregion = countrycode(sourcevar   = `ISO 3166-1`,
+                                                 origin      = 'iso3n', 
+                                                 destination = 'un.regionsub.name'),
+                         subregion = ifelse(test = `ISO 3166-1` == 158, # Taiwan
+                                            yes  = "Eastern Asia",
+                                            no   = subregion))
+
 na_subregion <- tibble(filter(respicar_socio, is.na(subregion)))
 check_socio_na(na_subregion)
 
