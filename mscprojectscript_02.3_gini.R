@@ -108,13 +108,15 @@ gini %<>% anti_join(distinct(gini_data_extra, iso_code))
 
 gini %<>% bind_rows(gini_data_extra)
 
-gini %<>% fill_socio
 
+respicar_unfilled <- merge_socio(x = respicar_unfilled, 
+                              y = gini)
+
+# fill in most recent year for covariate values that don't match
+
+gini %<>% fill_socio
 respicar_socio <- merge_socio(x = respicar_socio, 
                               y = gini)
-names(respicar_socio)
-sum(is.na(respicar_socio$gini))
-# 0/439 missing values for gini
 na_gini <- tibble(filter(respicar_socio, is.na(gini)))
 
 check_socio_na(na_gini)

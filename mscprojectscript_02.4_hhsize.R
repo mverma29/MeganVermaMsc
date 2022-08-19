@@ -117,14 +117,16 @@ hh_data %<>% anti_join(distinct(hh_data_extra, iso_code))
 
 hh_data %<>% bind_rows(hh_data_extra)
 
-hh_data %<>% fill_socio
 
+respicar_unfilled <- merge_socio(x = respicar_unfilled, 
+                              y = hh_data)
+
+# fill in most recent year for covariate values that don't match
+
+hh_data %<>% fill_socio
 respicar_socio <- merge_socio(x = respicar_socio, 
                               y = hh_data)
 
-sum(is.na(respicar_socio$mean_hh))
-
-# 0/439 are missing
 na_hh <- tibble(filter(respicar_socio, is.na(mean_hh)))
 
 check_socio_na(na_hh)

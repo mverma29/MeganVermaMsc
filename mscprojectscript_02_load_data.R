@@ -28,7 +28,8 @@ source("mscprojectscript_02.5_femaleed.R")
 source("mscprojectscript_02.6_unsubregion.R")
 
 # mutate GDP to log GDP 
-respicar_socio %<>% mutate(log_gdp = log10(gdp_usd))
+respicar_socio     %<>% mutate(log_gdp = log10(gdp_usd))
+respicar_unfilled  %<>% mutate(log_gdp = log10(gdp_usd))
 
 
 # change certain character variables to factor
@@ -39,3 +40,12 @@ respicar_socio$Age                 <- as.factor(respicar_socio$Age)
 respicar_socio$`Ethnic Minority`   <- as.factor(respicar_socio$`Ethnic Minority`)
 respicar_socio$Design              <- as.factor(respicar_socio$Design)
 respicar_socio$`Sampling strategy` <- as.factor(respicar_socio$`Sampling strategy`)
+
+# check how many values of respicar_unfilled are unfilled
+na_unfilled_urban <- tibble(filter(respicar_unfilled, is.na(urban_percent)))
+na_unfilled_gdp <- tibble(filter(respicar_unfilled, is.na(gdp_usd)))
+na_unfilled_gini <- tibble(filter(respicar_unfilled, is.na(gini)))
+na_unfilled_hh <- tibble(filter(respicar_unfilled, is.na(mean_hh)))
+na_unfilled_ed <- tibble(filter(respicar_unfilled, is.na(female_ed)))
+
+

@@ -6,7 +6,7 @@
 respicar_socio     <- respicar_socio %>% 
   mutate(carriage = Positive/Total)
 
-summary(respicar_socio)
+respicar_unfilled %<>% mutate(carriage = Positive/Total)
 
 # country map carriage-----
 

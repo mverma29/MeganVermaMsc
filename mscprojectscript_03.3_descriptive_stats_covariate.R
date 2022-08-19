@@ -119,8 +119,9 @@ ggsave("outputs/scatter_female_ed_carriage.png")
 
 # pairs plots-----
 
-pairs_plot <- ggpairs(
-    respicar_socio,
+# w/ unfilled covariate respicar data
+pairs_plot_unfilled <- ggpairs(
+    respicar_unfilled,
     columns = c(
         "urban_percent",
         "log_gdp",
@@ -146,8 +147,45 @@ pairs_plot <- ggpairs(
     
 
 ggsave(
+    filename = "outputs/pairsplotunfilled.png",
+    plot     = pairs_plot_unfilled,
+    device   = png,
+    width    = 7,
+    height   = 7,
+    units    = 'in',
+    res      = 600
+)
+
+# w/ filled covariate respicar data
+pairs_plot_filled <- ggpairs(
+    respicar_socio,
+    columns = c(
+        "urban_percent",
+        "log_gdp",
+        "gini",
+        "mean_hh",
+        "female_ed",
+        "carriage"
+    ),
+    columnLabels = c(
+        "Urban Population",
+        "Log10 GDP per capita",
+        "Gini Coefficient",
+        "Average Household Size",
+        "Female Secondary Education Enrollment",
+        "Carriage"
+    ),
+    title = "Sociodemographic Covariates and Carriage", 
+    labeller = label_wrap_gen(10)) + 
+    theme(strip.placement = "outside", text = element_text(size = 10)) +
+    theme_bw() +
+    theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue")) +
+    theme(plot.title = element_text(hjust = 0.5))
+
+
+ggsave(
     filename = "outputs/pairsplot.png",
-    plot     = pairs_plot,
+    plot     = pairs_plot_filled,
     device   = png,
     width    = 7,
     height   = 7,
