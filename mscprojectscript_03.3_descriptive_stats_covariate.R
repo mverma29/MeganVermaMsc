@@ -117,6 +117,41 @@ ggsave("outputs/scatter_female_ed_carriage.png")
 
 
 
+# pairs plots-----
+
+pairs_plot <- ggpairs(
+    respicar_socio,
+    columns = c(
+        "urban_percent",
+        "log_gdp",
+        "gini",
+        "mean_hh",
+        "female_ed",
+        "carriage"
+    ),
+    columnLabels = c(
+        "Urban Population",
+        "Log10 GDP per capita",
+        "Gini Coefficient",
+        "Average Household Size",
+        "Female Secondary Education Enrollment",
+        "Carriage"
+    ),
+    title = "Sociodemographic Covariates and Carriage", 
+    labeller = label_wrap_gen(10)) + 
+    theme(strip.placement = "outside", text = element_text(size = 10)) +
+    theme_bw()
+
+ggsave(
+    filename = "outputs/pairsplot.png",
+    plot     = pairs_plot,
+    device   = png,
+    width    = 7,
+    height   = 7,
+    units    = 'in',
+    res      = 600
+)
+
 # descriptive stats by covariate for table 1/2-----
 summary(respicar_socio)
 sum(respicar_socio$Total)
