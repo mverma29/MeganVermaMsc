@@ -203,9 +203,10 @@ unfilled_covariates <- respicar_unfilled %>% select(c(
     "female_ed",
     "carriage")) 
 
-correlation_matrix_unfilled <- cor(unfilled_covariates, use = "complete.obs") 
-round(correlation_matrix_unfilled, 2)
 
+correlation_matrix_unfilled <- rcorr(as.matrix(unfilled_covariates))
+correlation_matrix_unfilled
+                                     
 
 filled_covariates <- respicar_socio %>% select(c(
     "urban_percent",
@@ -215,8 +216,8 @@ filled_covariates <- respicar_socio %>% select(c(
     "female_ed",
     "carriage")) 
 
-correlation_matrix_filled <- cor(filled_covariates, use = "complete.obs") 
-round(correlation_matrix_filled, 2)
+correlation_matrix_filled <- rcorr(as.matrix(filled_covariates))
+correlation_matrix_filled
 
 # descriptive stats by covariate for table 1/2-----
 summary(respicar_socio)
