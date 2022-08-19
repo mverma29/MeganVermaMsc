@@ -193,6 +193,31 @@ ggsave(
     res      = 600
 )
 
+# correlation matrix 
+
+unfilled_covariates <- respicar_unfilled %>% select(c(
+    "urban_percent",
+    "log_gdp",
+    "gini",
+    "mean_hh",
+    "female_ed",
+    "carriage")) 
+
+correlation_matrix_unfilled <- cor(unfilled_covariates, use = "complete.obs") 
+round(correlation_matrix_unfilled, 2)
+
+
+filled_covariates <- respicar_socio %>% select(c(
+    "urban_percent",
+    "log_gdp",
+    "gini",
+    "mean_hh",
+    "female_ed",
+    "carriage")) 
+
+correlation_matrix_filled <- cor(filled_covariates, use = "complete.obs") 
+round(correlation_matrix_filled, 2)
+
 # descriptive stats by covariate for table 1/2-----
 summary(respicar_socio)
 sum(respicar_socio$Total)
