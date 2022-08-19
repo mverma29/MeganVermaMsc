@@ -41,10 +41,10 @@ facet_gdp <- ggplot(data = respicar_socio,
   geom_point(data = select(respicar_socio,-subregion),
              alpha = 0.1,
              pch = 16) + 
-  ggtitle("Log GDP and Carriage, by UN Subregion") + 
+  ggtitle("Log10 GDP Per Capita and Carriage, by UN Subregion") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue")) + 
-  xlab("Log GDP (USD)") + 
+  xlab("Log10 GDP Per Capita (current USD)") + 
   ylab("Carriage Rate")
 
 ggsave(
