@@ -32,6 +32,7 @@ library(lubridate)
 library(magrittr)
 library(broom)
 library(broom.mixed)
+library(GGally)
 
 # formatting data
 library(gtsummary)
