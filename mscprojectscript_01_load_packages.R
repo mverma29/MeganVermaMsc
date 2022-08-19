@@ -24,6 +24,7 @@ library(lmtest)
 library(mgcv)
 library(gamm4)
 library(buildmer)
+library(Hmisc)
 
 # tidyverse and related
 library(tidyverse)
@@ -46,6 +47,7 @@ conflict_prefer('alpha', 'ggplot2')
 conflict_prefer('multinom', 'mgcv')
 conflict_prefer('year', 'lubridate')
 conflict_prefer("summ", "jtools")
+conflict_prefer("summarize", "dplyr")
 
 
 fill_socio <- function(x){
