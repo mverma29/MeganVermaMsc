@@ -34,6 +34,7 @@ library(magrittr)
 library(broom)
 library(broom.mixed)
 library(GGally)
+library(patchwork)
 
 # formatting data
 library(gtsummary)

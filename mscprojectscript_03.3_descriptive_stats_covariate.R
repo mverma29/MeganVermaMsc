@@ -45,76 +45,85 @@ staleness_female_ed <- covariate_staleness_socio("female_ed")
 
 
 # carriage and urban percent
-ggplot(respicar_socio, aes(y = carriage, x = urban_percent)) +
+p1 <- ggplot(respicar_socio, aes(y = carriage, x = urban_percent)) +
   geom_point(size          = 2) +
   ylab("Carriage") +
   xlab("Urban Population (Percent)") +
   #scale_x_log10() +
   #scale_y_log10() + 
   # there may be some relationship--less carriage in higher urbanized populations??
-  geom_smooth(method       = 'lm')
+  geom_smooth(method       = 'lm') + 
+    theme_bw()
 
 ggsave("outputs/scatter_urban_percent_carriage.png")
 
 
 # carriage and GDP
-ggplot(respicar_socio, aes(y = carriage, x = log_gdp)) +
+p2 <- ggplot(respicar_socio, aes(y = carriage, x = log_gdp)) +
   geom_point(size = 2) +
   ylab("Carriage") +
   xlab("Log GDP (USD) per capita") +
   # scale_x_log10() +
   # scale_y_log10() + # carriage decreases as gdp inc
-  geom_smooth(method = 'lm')
+  geom_smooth(method = 'lm') + 
+    theme_bw()
 
 ggsave("outputs/scatter_gdp_carriage.png")
 
 # carriage and Gini
-ggplot(respicar_socio, aes(y = carriage, x = gini)) +
+p3 <- ggplot(respicar_socio, aes(y = carriage, x = gini)) +
   geom_point(size = 2) +
   ylab("Carriage") +
   xlab("Gini Coefficient of Inequality (Percent)") +
   # scale_x_log10() +
   #scale_y_log10() + # when gini is higher (more unequal), carriage is higher
-  geom_smooth(method = 'lm')
+  geom_smooth(method = 'lm') + 
+    theme_bw()
 
 ggsave("outputs/scatter_gini_carriage.png")
 
 
 # carriage and HH size 
-ggplot(respicar_socio, aes(y = carriage,x = mean_hh)) + 
+p4 <- ggplot(respicar_socio, aes(y = carriage,x = mean_hh)) + 
   geom_point(size=2) + 
   ylab("Carriage") + 
   xlab("Average Household Size") +
   #scale_x_log10() +
   #scale_y_log10() + # when average hh size increases, carriage increases
-  geom_smooth(method = 'lm')
+  geom_smooth(method = 'lm') + 
+    theme_bw()
 
 ggsave("outputs/scatter_hh_carriage.png")
 
 
 # carriage and female education
-ggplot(respicar_socio, aes(y = carriage,x = female_ed)) + 
+p5 <- ggplot(respicar_socio, aes(y = carriage,x = female_ed)) + 
   geom_point(size=2) + 
   ylab("Carriage") + 
   xlab("Female Secondary Education Rate (Percent)") +
   #scale_x_log10() + 
   #scale_y_log10() + # when female ed increases, carriage decreases
-  geom_smooth(method = 'lm')
+  geom_smooth(method = 'lm') + 
+    theme_bw()
 
 ggsave("outputs/scatter_female_ed_carriage.png")
 
+scatter <- p1 + p2 + p3 + p4 + p5 + plot_annotation(
+    title =
+        "Covariates and Carriage",
+    tag_levels = 'A',
+    theme = theme(plot.tag = element_text(size = 4), 
+                  plot.title = element_text(size= 18, hjust = 0.5)))
 
-# carriage and UN subregion (not useful?)
-# ggplot(respicar_subregion, aes(y = carriage_subregion,x = subregion)) + 
-#     geom_point(size=2) + 
-#     ylab("Carriage") + 
-#     xlab("UN Subregion") +
-#     #scale_x_log10() + 
-#     #scale_y_log10() + # when carriage is...
-#     geom_smooth(method = 'lm') + 
-#     geom_text( aes(label = subregion), hjust = 1, vjust = -1)
-
-
+ggsave(
+    filename = "outputs/scatterplot.png",
+    plot     = scatter,
+    device   = png,
+    width    = 12,
+    height   = 7,
+    units    = 'in',
+    res      = 600
+)
 
 
 # pairs plots-----
