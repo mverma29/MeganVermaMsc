@@ -14,6 +14,14 @@ tidy(
     digits   = 3
 ) 
 
+full_glm_no_re_tbl <- tbl_regression(full_glm_no_re, 
+                                exponentiate = TRUE, 
+                                tidy_fun = broom.mixed::tidy) 
+
+full_glm_no_re_tbl %>%
+    as_flex_table() %>%
+    save_as_docx(path = "outputs/full_glm_no_re.docx")
+
 
 # full model (without interaction, WITH RE for subregion correlation)----
 
@@ -32,6 +40,15 @@ tidy(
     digits   = 3) %>%
     select(-effect, -group) %>%
     mutate(term = sub(pattern = "^X", replacement = "", x = term))
+
+full_glm_re_tbl <- tbl_regression(full_glm_re$mer, 
+                                     exponentiate = TRUE, 
+                                     tidy_fun = broom.mixed::tidy) 
+
+full_glm_re_tbl %>%
+    as_flex_table() %>%
+    save_as_docx(path = "outputs/full_glm_re.docx")
+
 
 # lrtest of null hypothesis of no correlation by subregion
 lmtest::lrtest(full_glm_no_re, full_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
@@ -53,6 +70,15 @@ tidy(
     pvals   = TRUE,
     digits  = 3
 ) 
+
+full_glm_no_re_interaction_tbl <- tbl_regression(full_glm_no_re_interaction, 
+                                     exponentiate = TRUE, 
+                                     tidy_fun = broom.mixed::tidy) 
+
+full_glm_no_re_interaction_tbl %>%
+    as_flex_table() %>%
+    save_as_docx(path = "outputs/full_glm_no_re_interaction.docx")
+
 
 # full model (with interaction), WITH RE for subregion correlation----
 
