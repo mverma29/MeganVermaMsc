@@ -38,6 +38,22 @@ staleness_female_ed <- covariate_staleness_socio("female_ed")
 
 
 
+# how many are not exactly matched for each covariate?----
+respicar_unfilled_urban <- respicar_unfilled %>% 
+    filter(is.na(urban_percent)) # 7 obs
+
+respicar_unfilled_gdp <- respicar_unfilled %>% 
+    filter(is.na(gdp_usd)) # 2 obs
+
+respicar_unfilled_gini <- respicar_unfilled %>% 
+    filter(is.na(gini)) # 201 obs
+
+respicar_unfilled_hh <- respicar_unfilled %>% 
+    filter(is.na(mean_hh)) # 340 obs
+
+respicar_unfilled_ed <- respicar_unfilled %>% 
+    filter(is.na(female_ed)) # 121 obs
+
 # exploratory analysis covariates: scatter plots -------
 
 
