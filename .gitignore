@@ -12,3 +12,7 @@ data/appendix_summary.csv
 outputs/*.png
 
 outputs/*.docx
+
+outputs/filled_matrix.csv
+
+outputs/unfilled_matrix.csv
