@@ -18,17 +18,18 @@ urban_percent_glm <- glm(
     formula = cbind(Positive, Total - Positive) ~ urban_percent_tenth, 
     family  = "binomial")
 
-tidy(urban_percent_glm, exp=TRUE, conf.int=TRUE) # OR: 0.987
+tidy(urban_percent_glm, exp=TRUE, conf.int=TRUE) # OR: 0.882
 summary(urban_percent_glm) # p-val (Wald approx): <2e-16
 
+# urban_percent model, RE
 urban_percent_glm_re <- gamm4(
   data    = respicar_socio,
   formula = cbind(Positive, Total - Positive) ~ urban_percent_tenth, 
   random  = ~(1|subregion),
   family  = "binomial")
 
-tidy(urban_percent_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 0.995
-summary(urban_percent_glm_re$mer) # p-val (Wald approx): <2e-16
+tidy(urban_percent_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 0.970
+summary(urban_percent_glm_re$mer) # p-val (Wald approx): <0.001
     
 
 lmtest::lrtest(urban_percent_glm, urban_percent_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
@@ -53,7 +54,7 @@ gdp_glm <- glm(
     formula = cbind(Positive, Total - Positive) ~ log_gdp, 
     family  = "binomial")
 
-tidy(gdp_glm, exp=TRUE, conf.int=TRUE) # OR: 0.578
+tidy(gdp_glm, exp=TRUE, conf.int=TRUE) # OR: 0.581
 summary(urban_percent_glm) # p-val (Wald approx): <2e-16
 
 # gdp model w/ RE
@@ -87,7 +88,7 @@ gini_glm <- glm(
     formula = cbind(Positive, Total - Positive) ~ gini_tenth, 
     family  = "binomial")
 
-tidy(gini_glm, exp=TRUE, conf.int=TRUE) # OR: 1.02
+tidy(gini_glm, exp=TRUE, conf.int=TRUE) # OR: 1.17
 summary(gini_glm) # p-val (Wald approx): <2e-16
 
 # gini model w/ RE
@@ -97,7 +98,7 @@ gini_glm_re <- gamm4(
     random  = ~(1|subregion),
     family  = "binomial")
 
-tidy(gini_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 0.989
+tidy(gini_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 0.891
 lmtest::lrtest(gini_glm, gini_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
 
 # make table of model outputs
@@ -120,7 +121,7 @@ hh_glm <- glm(
     formula = cbind(Positive, Total - Positive) ~ mean_hh, 
     family  = "binomial")
 
-tidy(hh_glm, exp=TRUE, conf.int=TRUE) # OR: 1.32
+tidy(hh_glm, exp=TRUE, conf.int=TRUE) # OR: 1.31
 summary(hh_glm) # p-val (Wald approx): <2e-16
 
 # HH model w/ RE
@@ -130,7 +131,7 @@ hh_glm_re <- gamm4(
     random  = ~(1|subregion),
     family  = "binomial")
 
-tidy(hh_glm_re$mer, exp=TRUE, conf.int=TRUE) #OR: 1.36
+tidy(hh_glm_re$mer, exp=TRUE, conf.int=TRUE) #OR: 1.33
 lmtest::lrtest(hh_glm, hh_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
 
 
@@ -154,7 +155,7 @@ female_ed_glm <- glm(
     formula = cbind(Positive, Total - Positive) ~ female_ed_tenth, 
     family  = "binomial")
 
-tidy(female_ed_glm, exp=TRUE, conf.int=TRUE) # OR: 0.991
+tidy(female_ed_glm, exp=TRUE, conf.int=TRUE) # OR: 0.915
 summary(female_ed_glm) # p-val (Wald approx): <2e-16
 
 # female ed model w/ RE
