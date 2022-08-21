@@ -218,7 +218,7 @@ ggsave(
     res      = 600
 )
 
-# correlation matrix 
+# correlation matrix-------
 
 unfilled_covariates <- respicar_unfilled %>% select(c(
     "urban_percent",
@@ -228,6 +228,10 @@ unfilled_covariates <- respicar_unfilled %>% select(c(
     "female_ed",
     "carriage")) 
 
+corr_unfilled <- cor(unfilled_covariates, use="complete.obs") %>% 
+    as.data.frame()
+write_csv(corr_unfilled,
+          file = "outputs/corr_unfilled.csv")
 
 correlation_matrix_unfilled <- rcorr(as.matrix(unfilled_covariates))
 correlation_matrix_unfilled
@@ -240,6 +244,12 @@ filled_covariates <- respicar_socio %>% select(c(
     "mean_hh",
     "female_ed",
     "carriage")) 
+
+corr_filled <- cor(filled_covariates, use="complete.obs") %>% 
+    as.data.frame()
+write_csv(corr_filled,
+          file = "outputs/corr_filled.csv")
+
 
 correlation_matrix_filled <- rcorr(as.matrix(filled_covariates))
 correlation_matrix_filled
