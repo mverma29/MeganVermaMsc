@@ -16,3 +16,7 @@ outputs/*.docx
 outputs/filled_matrix.csv
 
 outputs/unfilled_matrix.csv
+
+outputs/corr_filled.csv
+
+outputs/corr_unfilled.csv
