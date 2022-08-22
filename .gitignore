@@ -20,3 +20,5 @@ outputs/unfilled_matrix.csv
 outputs/corr_filled.csv
 
 outputs/corr_unfilled.csv
+
+scraps/*
