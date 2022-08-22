@@ -228,7 +228,7 @@ unfilled_covariates <- respicar_unfilled %>% select(c(
     "female_ed",
     "carriage")) 
 
-corr_unfilled <- cor(unfilled_covariates, use="complete.obs") %>% 
+corr_unfilled <- cor(unfilled_covariates, use="pairwise.complete.obs") %>% 
     as.data.frame()
 write_csv(corr_unfilled,
           file = "outputs/corr_unfilled.csv")
