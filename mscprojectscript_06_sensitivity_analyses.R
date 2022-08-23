@@ -322,7 +322,7 @@ exp(1.87534 + 4*(-0.57044)) # OR is 0.6660304
 
 
 
-# excluding ethnic minorities 
+# excluding ethnic minorities--------- 
 
 respicar_no_minority <- filter(respicar_socio, `Ethnic Minority`=="No") #376 obs
 
@@ -403,4 +403,73 @@ exp(0.489454 + 3*(-0.154219)) # OR is 1.027159
 
 # OR for gini_tenth when GDP per capita is 10000 for stepwise 
 exp(0.489454 + 4*(-0.154219)) # OR is 0.8803621
+
+
+# only cross-sectional data --------- 
+
+respicar_x_sectional <- filter(respicar_socio, `Design`=="Cross-sectional") #312 obs
+
+# full model, with RE, without interaction 
+full_glm_x_sectional <- gamm4(
+    data    = respicar_x_sectional,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + log_gdp + gini_tenth + mean_hh + female_ed_tenth,
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+tidy(
+    x        = full_glm_x_sectional$mer,
+    exp      = TRUE,
+    conf.int = TRUE,
+    pvals    = TRUE,
+    digits   = 3) %>%
+    select(-effect, -group) %>%
+    mutate(term = sub(pattern = "^X", replacement = "", x = term))
+
+# full glm w/ interaction, RE
+
+full_glm_interaction_x_sectional <- gamm4(
+    data    = respicar_x_sectional,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + log_gdp*gini_tenth + mean_hh + female_ed_tenth,
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+tidy(
+    full_glm_interaction_x_sectional$mer,
+    exp     = TRUE,
+    conf.int = TRUE,
+    pvals   = TRUE,
+    digits  = 3
+) 
+
+full_glm_interaction_x_sectional_tbl <- tbl_regression(full_glm_interaction_x_sectional$mer, 
+                                                       exponentiate = TRUE, 
+                                                       tidy_fun = broom.mixed::tidy)
+full_glm_interaction_x_sectional_tbl %>%
+    as_flex_table() %>%
+    save_as_docx(path = "outputs/full_glm_interaction_x_sectional.docx")
+
+# lrtest of interaction of gini and log gdp
+lmtest::lrtest(full_glm_x_sectional$mer, full_glm_interaction_x_sectional$mer) #no evidence for an interaction
+
+# stepwise model, with RE & without interaction 
+
+stepwise_x_sectional <- buildgamm4 (
+    data    = respicar_x_sectional,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + log_gdp + gini_tenth + mean_hh + female_ed_tenth + (1 | subregion),
+    family  = "binomial"
+)
+
+summary(stepwise_x_sectional@model) # drops out urban percent & gini
+
+# make output table 
+stepwise_x_sectional_tbl <- tbl_regression(stepwise_x_sectional@model, 
+                                           exponentiate = TRUE, 
+                                           tidy_fun = broom.mixed::tidy)
+
+stepwise_x_sectional_tbl %>%
+    as_flex_table() %>%
+    save_as_docx(path = "outputs/stepwise_x_sectional.docx")
 
