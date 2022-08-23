@@ -14,3 +14,6 @@ source("mscprojectscript_04_univariate_models.R", verbose = TRUE)
 
 # Multivariate mixed effect models 
 source("mscprojectscript_05_multivariate_models.R")
+
+# Sensitivity analyses
+source("mscprojectscript_06_sensitivity_analyses.R")
