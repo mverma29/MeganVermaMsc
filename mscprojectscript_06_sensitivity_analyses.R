@@ -320,3 +320,87 @@ exp(1.87534 + 3*(-0.57044)) # OR is 1.178238
 # OR for gini_tenth when GDP per capita is 10000 for stepwise 
 exp(1.87534 + 4*(-0.57044)) # OR is 0.6660304
 
+
+
+# excluding ethnic minorities 
+
+respicar_no_minority <- filter(respicar_socio, `Ethnic Minority`=="No") #376 obs
+
+# full model, with RE, without interaction 
+full_glm_no_minority <- gamm4(
+    data    = respicar_no_minority,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + log_gdp + gini_tenth + mean_hh + female_ed_tenth,
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+tidy(
+    x        = full_glm_no_minority$mer,
+    exp      = TRUE,
+    conf.int = TRUE,
+    pvals    = TRUE,
+    digits   = 3) %>%
+    select(-effect, -group) %>%
+    mutate(term = sub(pattern = "^X", replacement = "", x = term))
+
+# full_glm_no_minority_tbl <- tbl_regression(full_glm_no_minority$mer, 
+#                                   exponentiate = TRUE, 
+#                                   tidy_fun = broom.mixed::tidy)
+# full_glm_no_minority_tbl %>%
+#     as_flex_table() %>%
+#     save_as_docx(path = "outputs/full_glm_no_minority.docx")
+
+# full model, with RE, with interaction 
+
+full_glm_interaction_no_minority <- gamm4(
+    data    = respicar_no_minority,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + log_gdp*gini_tenth + mean_hh + female_ed_tenth,
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+tidy(
+    full_glm_interaction_no_minority$mer,
+    exp     = TRUE,
+    conf.int = TRUE,
+    pvals   = TRUE,
+    digits  = 3
+) 
+
+full_glm_interaction_no_minority_tbl <- tbl_regression(full_glm_interaction_no_minority$mer, 
+                                              exponentiate = TRUE, 
+                                              tidy_fun = broom.mixed::tidy)
+full_glm_interaction_no_minority_tbl %>%
+    as_flex_table() %>%
+    save_as_docx(path = "outputs/full_glm_interaction_no_minority.docx")
+
+# lrtest of interaction of gini and log gdp
+lmtest::lrtest(full_glm_no_minority$mer, full_glm_interaction_no_minority$mer) # <2 e-16(reject null hyp of no interaction)
+
+
+# stepwise model, with RE & interaction 
+
+stepwise_no_minority <- buildgamm4 (
+    data    = respicar_no_minority,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + log_gdp * gini_tenth + mean_hh + female_ed_tenth + (1 | subregion),
+    family  = "binomial"
+)
+
+summary(stepwise_no_minority@model) #still drops out urban percent
+
+# make output table 
+stepwise_no_minority_tbl <- tbl_regression(stepwise_no_minority@model, 
+                                  exponentiate = TRUE, 
+                                  tidy_fun = broom.mixed::tidy)
+
+stepwise_no_minority_tbl %>%
+    as_flex_table() %>%
+    save_as_docx(path = "outputs/stepwise_no_minority.docx")
+
+# OR for gini_tenth when GDP per capita is 1000 for stepwise 
+exp(0.489454 + 3*(-0.154219)) # OR is 1.027159
+
+# OR for gini_tenth when GDP per capita is 10000 for stepwise 
+exp(0.489454 + 4*(-0.154219)) # OR is 0.8803621
+
