@@ -191,7 +191,11 @@ ggsave(
 # explore carriage ------
 # carriage histogram
 carriage_hist <- ggplot (respicar_socio, aes(x = carriage)) +
-  geom_histogram(binwidth = 0.02, center = 0.02/2)
+  geom_histogram(binwidth = 0.02, center = 0.02/2) + 
+    theme_bw() + 
+    ggtitle("Distribution of Carriage Rates") + 
+    theme(plot.title = element_text(hjust = 0.5)) + 
+    xlab("Carriage")
 # fairly normal distribution ?
 
 ggsave(
