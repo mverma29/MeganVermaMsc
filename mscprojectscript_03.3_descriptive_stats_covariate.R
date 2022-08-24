@@ -36,7 +36,21 @@ staleness_gini <- covariate_staleness_socio("gini")
 staleness_hh <- covariate_staleness_socio("mean_hh")
 staleness_female_ed <- covariate_staleness_socio("female_ed")
 
+# desc stats staleness (for appendix table)
+urban_stale_stat <- staleness_socio %>% filter(`variable`=="urban_percent")
+summary(urban_stale_stat)
 
+gdp_stale_stat <- staleness_socio %>% filter(`variable`=="gdp_usd")
+summary(gdp_stale_stat)
+
+gini_stale_stat <- staleness_socio %>% filter(`variable`=="gini")
+summary(gini_stale_stat)
+
+hh_stale_stat <- staleness_socio %>% filter(`variable`=="mean_hh")
+summary(hh_stale_stat)
+
+ed_stale_stat <- staleness_socio %>% filter(`variable`=="female_ed")
+summary(ed_stale_stat)
 
 # how many are not exactly matched for each covariate?----
 respicar_unfilled_urban <- respicar_unfilled %>% 
