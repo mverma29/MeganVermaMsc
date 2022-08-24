@@ -215,3 +215,31 @@ exp(0.50737 + 3*(-0.15645)) # OR is 1.04 (still)
 exp(coef(full_glm_re_interaction$gam)['gini_tenth'] + 4 * coef(full_glm_re_interaction$gam)['log_gdp:gini_tenth'])
 exp(0.50737 + 4*(-0.15645)) # OR is 0.89 (still)
 
+
+# add in column in dataset for gini:GDP interaction--------
+
+respicar_socio$interaction <-  respicar_socio$gini_tenth * respicar_socio$log_gdp
+
+#repeat stepwise to ensure interaction wont be dropped 
+
+chosen_model_re_new <- buildgamm4 (
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + log_gdp + gini_tenth + mean_hh + female_ed_tenth + interaction + (1 | subregion),
+    family  = "binomial"
+)
+
+summary(chosen_model_re_new@model) 
+
+
+# make output table 
+chosen_mod_re_new_tbl <- tbl_regression(chosen_model_re_new@model, 
+                                exponentiate = TRUE, 
+                                tidy_fun = broom.mixed::tidy) 
+
+chosen_mod_re_new_tbl %>%
+    as_flex_table() %>%
+    save_as_docx(path = "outputs/chosen_mod_re_new.docx")
+
+# same as stepwise, confirmed that interaction is not dropped
+
