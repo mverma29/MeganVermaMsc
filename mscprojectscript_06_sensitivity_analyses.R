@@ -545,6 +545,17 @@ stepwise_x_sectional <- buildgamm4 (
 
 summary(stepwise_x_sectional@model) # drops out urban percent & gini
 
+# stepwise model, with RE & with interaction 
+
+stepwise_x_sectional_interaction <- buildgamm4 (
+    data    = respicar_x_sectional,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + log_gdp*gini_tenth + mean_hh + female_ed_tenth + (1 | subregion),
+    family  = "binomial"
+)
+
+summary(stepwise_x_sectional_interaction@model) # drops out urban percent & gini
+
 # make output table 
 stepwise_x_sectional_tbl <- tbl_regression(stepwise_x_sectional@model, 
                                            exponentiate = TRUE, 
