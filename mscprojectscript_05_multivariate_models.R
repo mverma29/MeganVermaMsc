@@ -53,7 +53,9 @@ full_glm_re_tbl %>%
 # lrtest of null hypothesis of no correlation by subregion
 lmtest::lrtest(full_glm_no_re, full_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
 
-
+# calculate MSE 
+summ_full_glm_re <- summary(full_glm_re$mer)
+mean(summ_full_glm_re$residuals^2)
 
 # full model (with interaction), without RE for subregion correlation ----
 
@@ -111,8 +113,11 @@ lmtest::lrtest(full_glm_no_re_interaction, full_glm_re_interaction$mer) # <2e-16
 # lrtest of interaction of gini and log gdp
 lmtest::lrtest(full_glm_re$mer, full_glm_re_interaction$mer) # <2e-16 (reject null hyp of no interaction)
 
+# calculate MSE 
+summ_full_glm_re_interaction <- summary(full_glm_re_interaction$mer)
+mean(summ_full_glm_re_interaction$residuals^2)
 
-# AIC comparison/model-building with buildgamm4 function-------
+# stepwise regression with buildgamm4 function-------
 
 chosen_model_re <- buildgamm4 (
     data    = respicar_socio,
@@ -137,6 +142,12 @@ chosen_mod_re %>%
 # AIC: 35678
 
 
+# calculate MSE 
+summ_chosen_mod_re <- summary(chosen_model_re@model)
+mean(summ_chosen_mod_re$residuals^2)
+
+
+# no RE 
 chosen_model_no_re<- buildgamm4 (
     data    = respicar_socio,
     formula = cbind(Positive, Total - Positive) ~
@@ -242,4 +253,82 @@ chosen_mod_re_new_tbl %>%
     save_as_docx(path = "outputs/chosen_mod_re_new.docx")
 
 # same as stepwise, confirmed that interaction is not dropped
+
+
+
+# MSE experiment-----
+
+# "current model (full, no interaction)" has MSE of 72.58
+
+# drop urban percent
+no_u_p <- gamm4(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~
+         log_gdp + gini_tenth + mean_hh + female_ed_tenth,
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+summ_no_u_p <- summary(no_u_p$mer)
+mean(summ_no_u_p$residuals^2)
+
+# deltaMSE
+72.58445-72.58458 # -0.00013
+
+
+# drop GDP 
+no_gdp <- gamm4(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + gini_tenth + mean_hh + female_ed_tenth,
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+summ_no_gdp <- summary(no_gdp$mer)
+mean(summ_no_gdp$residuals^2)
+
+# deltaMSE
+72.6-72.58458 # 0.01542
+
+
+# drop Gini 
+no_gini <- gamm4(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + log_gdp + mean_hh + female_ed_tenth,
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+summ_no_gini <- summary(no_gini$mer)
+mean(summ_no_gini$residuals^2)
+
+# deltaMSE
+72.66586-72.58458 # 0.08128
+
+# drop meanhh 
+no_hh <- gamm4(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + log_gdp + gini_tenth + female_ed_tenth,
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+summ_no_hh <- summary(no_hh$mer)
+mean(summ_no_hh$residuals^2)
+
+# deltaMSE
+74.50835-72.58458 # 1.92377
+
+# drop female ed 
+no_ed <- gamm4(
+    data    = respicar_socio,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + log_gdp + gini_tenth + mean_hh,
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+summ_no_ed <- summary(no_ed$mer)
+mean(summ_no_ed$residuals^2)
+
+# deltaMSE
+72.85638-72.58458 # 0.2718
 
