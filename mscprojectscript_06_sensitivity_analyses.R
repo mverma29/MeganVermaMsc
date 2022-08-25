@@ -490,6 +490,14 @@ exp(48.082 + 4*(-10.983)) # OR is 63.434
 
 respicar_x_sectional <- filter(respicar_socio, `Design`=="Cross-sectional") #312 obs
 
+# full model, without RE, without interaction 
+full_glm_x_sectional_no_re <- glm(
+    data    = respicar_x_sectional,
+    formula = cbind(Positive, Total - Positive) ~
+        urban_percent_tenth + log_gdp + gini_tenth + mean_hh + female_ed_tenth,
+    family  = "binomial")
+
+
 # full model, with RE, without interaction 
 full_glm_x_sectional <- gamm4(
     data    = respicar_x_sectional,
@@ -506,6 +514,9 @@ tidy(
     digits   = 3) %>%
     select(-effect, -group) %>%
     mutate(term = sub(pattern = "^X", replacement = "", x = term))
+
+# lrt of RE 
+lmtest::lrtest(full_glm_x_sectional$mer, full_glm_x_sectional_no_re) # <2.2e-16-- evidence for RE 
 
 # full glm w/ interaction, RE
 
@@ -532,7 +543,7 @@ full_glm_interaction_x_sectional_tbl %>%
     save_as_docx(path = "outputs/full_glm_interaction_x_sectional.docx")
 
 # lrtest of interaction of gini and log gdp
-lmtest::lrtest(full_glm_x_sectional$mer, full_glm_interaction_x_sectional$mer) #no evidence for an interaction
+lmtest::lrtest(full_glm_x_sectional$mer, full_glm_interaction_x_sectional$mer) #0.47-- no evidence for an interaction
 
 # stepwise model, with RE & without interaction 
 
