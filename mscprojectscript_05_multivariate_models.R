@@ -274,12 +274,14 @@ mean(summ_no_u_p$residuals^2)
 # deltaMSE
 72.58445-72.58458 # -0.00013
 
+# now final model is the one minus urban pop (same as stepwise)
+# MSE full = 72.58445
 
 # drop GDP 
 no_gdp <- gamm4(
     data    = respicar_socio,
     formula = cbind(Positive, Total - Positive) ~
-        urban_percent_tenth + gini_tenth + mean_hh + female_ed_tenth,
+        gini_tenth + mean_hh + female_ed_tenth,
     random  = ~(1|subregion),
     family  = "binomial")
 
@@ -287,14 +289,14 @@ summ_no_gdp <- summary(no_gdp$mer)
 mean(summ_no_gdp$residuals^2)
 
 # deltaMSE
-72.6-72.58458 # 0.01542
+72.90097-72.58445 # 0.31652
 
 
 # drop Gini 
 no_gini <- gamm4(
     data    = respicar_socio,
     formula = cbind(Positive, Total - Positive) ~
-        urban_percent_tenth + log_gdp + mean_hh + female_ed_tenth,
+        log_gdp + mean_hh + female_ed_tenth,
     random  = ~(1|subregion),
     family  = "binomial")
 
@@ -302,13 +304,13 @@ summ_no_gini <- summary(no_gini$mer)
 mean(summ_no_gini$residuals^2)
 
 # deltaMSE
-72.66586-72.58458 # 0.08128
+72.68273-72.58445 # 0.09828
 
 # drop meanhh 
 no_hh <- gamm4(
     data    = respicar_socio,
     formula = cbind(Positive, Total - Positive) ~
-        urban_percent_tenth + log_gdp + gini_tenth + female_ed_tenth,
+        log_gdp + gini_tenth + female_ed_tenth,
     random  = ~(1|subregion),
     family  = "binomial")
 
@@ -316,13 +318,13 @@ summ_no_hh <- summary(no_hh$mer)
 mean(summ_no_hh$residuals^2)
 
 # deltaMSE
-74.50835-72.58458 # 1.92377
+74.92395-72.58445 # 2.3395
 
 # drop female ed 
 no_ed <- gamm4(
     data    = respicar_socio,
     formula = cbind(Positive, Total - Positive) ~
-        urban_percent_tenth + log_gdp + gini_tenth + mean_hh,
+        log_gdp + gini_tenth + mean_hh,
     random  = ~(1|subregion),
     family  = "binomial")
 
@@ -330,5 +332,5 @@ summ_no_ed <- summary(no_ed$mer)
 mean(summ_no_ed$residuals^2)
 
 # deltaMSE
-72.85638-72.58458 # 0.2718
+72.82798-72.58445 # 0.24353
 
