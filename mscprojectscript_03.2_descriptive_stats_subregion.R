@@ -113,10 +113,10 @@ facet_ed <- ggplot(data = respicar_socio,
   geom_point(data = select(respicar_socio,-subregion),
              alpha = 0.1,
              pch = 16) + 
-  ggtitle("Female Secondary Education Enrollment and Carriage, by UN Subregion") + 
+  ggtitle("Female Secondary Education Enrolment and Carriage, by UN Subregion") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   theme(strip.background = element_rect(fill="lightblue", size=1, color="darkblue")) + 
-  xlab("Female Secondary Education Enrollment (Percent)") + 
+  xlab("Female Secondary Education Enrolment (Percent)") + 
   ylab("Carriage Rate")
 
 ggsave(

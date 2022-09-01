@@ -68,6 +68,19 @@ respicar_unfilled_hh <- respicar_unfilled %>%
 respicar_unfilled_ed <- respicar_unfilled %>% 
     filter(is.na(female_ed)) # 121 obs
 
+# how many total unfilled? 
+respicar_unfilled$count_na <- rowSums(is.na(respicar_unfilled[,18:22]))
+sum(respicar_unfilled$count_na) #671 
+
+
+respicar_unfilled %<>% mutate(na = case_when(
+    count_na = TRUE ~ 1, 
+    count_na == 0 ~ 0)) 
+
+sum(respicar_unfilled$count_na == 0) #23 
+sum(respicar_unfilled$na) # 438-23 = 415 studies with at least one unfilled value
+
+
 # exploratory analysis covariates: scatter plots -------
 
 
@@ -174,7 +187,7 @@ pairs_plot_unfilled <- ggpairs(
         "Log10 GDP per capita",
         "Gini Coefficient",
         "Average Household Size",
-        "Female Secondary Education Enrollment",
+        "Female Secondary Education Enrolment",
         "Carriage"
     ),
     title = "Sociodemographic Covariates and Carriage", 
@@ -211,7 +224,7 @@ pairs_plot_filled <- ggpairs(
         "Log10 GDP per capita",
         "Gini Coefficient",
         "Average Household Size",
-        "Female Secondary Education Enrollment",
+        "Female Secondary Education Enrolment",
         "Carriage"
     ),
     title = "Sociodemographic Covariates and Carriage", 
