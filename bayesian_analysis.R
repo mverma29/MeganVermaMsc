@@ -1,4 +1,4 @@
-# Bayesian models (no RE)
+# Bayesian LINEAR models (no RE)
 
 # Megan Verma, 10/5/2022
 
@@ -15,6 +15,7 @@ respicar_socio     <- respicar_socio %>%
     mutate(carriage = Positive/Total)
 
 library(rethinking)
+
 # Univariate models:------
 
 # urban percent----
@@ -35,6 +36,10 @@ m1 <- quap(alist(
     sigma ~ dexp(1) #restrict to positive SDs, avg displacement is 1
 ) ,
 data = respicar_socio)
+
+# prior here is 50% prior prob that the effect size is between -0.33 and +0.33
+# prior is a N(0, 0.5) then the inner 50% is the 25%ile to the 75%ile
+qnorm(p= c(0.25, 0.75), sd=0.5)
 
 # simulate from priors 
 # plot lines over the range of 2 standard deviations for both outcome & predictor
@@ -262,3 +267,24 @@ plot(precis(m3))
 plot(precis(m4))
 plot(precis(m5))
 
+
+
+# multivariate models:------
+m_full <- quap(alist(
+    carriage_scaled ~ dnorm(mu , sigma) ,
+    mu <- a + bU*urban_percent_scaled + bGDP*log_gdp + bG*gini_scaled + 
+        bH*mean_hh_scaled + bF*female_ed_scaled,
+    a ~ dnorm(0 , 0.2) , #restrict intercept to 0.2 SDs
+    bU ~ dnorm(0 , 0.5) , #restrict to not extreme relationships
+    bGDP ~ dnorm(0 , 0.5) , 
+    bG ~ dnorm(0 , 0.5) ,
+    bH ~ dnorm(0 , 0.5) ,
+    bF ~ dnorm(0 , 0.5) ,
+    sigma ~ dexp(1) #restrict to positive SDs, avg displacement is 1
+) ,
+data = respicar_socio)
+
+precis(m_full)
+# urban population has negative association with carriage
+# GDP / Gini have barely any association 
+# mean hh / female ed has positive association with carriage 
