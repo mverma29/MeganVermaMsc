@@ -15,6 +15,7 @@ respicar_socio     <- respicar_socio %>%
     mutate(carriage = Positive/Total)
 
 library(rethinking)
+conflict_prefer("stan", "rethinking")
 
 # Univariate models:------
 
@@ -288,3 +289,49 @@ precis(m_full)
 # urban population has negative association with carriage
 # GDP / Gini have barely any association 
 # mean hh / female ed has positive association with carriage 
+
+
+
+# Bayesian LOGISTIC models 
+
+# univariate: 
+# urban percent----
+
+# standardize variables (tenth of urban percent)
+respicar_socio$urban_percent_scaled <- scale(respicar_socio$urban_percent_tenth)
+
+summary(respicar_socio$urban_percent_scaled) # -2.4 to 1.6
+
+
+# make data list for model
+dat_list <- list(
+    Positive = respicar_socio$Positive,
+    Total = respicar_socio$Total,
+    urban_percent = respicar_socio$urban_percent_scaled)
+
+# model
+mUP <- ulam(alist(Positive ~ dbinom(Total, p),
+                  logit(p) <- a + b*urban_percent,
+                  a ~ dnorm(0 , 1.5),
+                  b ~ dnorm(0, 0.5)),
+            data = dat_list ,
+            chains = 4,
+            cores = 4,
+            log_lik = TRUE
+)
+
+precis(mUP , depth = 2) # on the logistic scale 
+
+# logit scale
+post <- extract.samples(mUP)
+
+# outcome scale (relative, ORs)
+outcome_slope <- inv_logit(post$b)
+dens(outcome_slope , adj = 0.1) 
+
+precis(outcome_slope) # OR of 0.43 for b on the logistic scale (much more drastic)
+
+# posterior predictions
+p_post <- link(mUP , data = dat_list)
+p_mu <- apply(p_post , 2 , mean)
+p_ci <- apply(p_post , 2 , PI)
