@@ -345,17 +345,7 @@ post <- extract.samples(mUP)
 post$exp_b <- exp(post$b)
 dens(post$exp_b)
 
-#logit scale parameters
-logit_a <- post$a
-logit_b <- post$b
-precis(list(logit_a = logit_a , logit_b = logit_b))
-
-# relative scale (OR) parameters
-outcome_a <- mean(exp(post$a))
-outcome_b <- mean(exp(post$b))
-precis(list(outcome_a = outcome_a , outcome_b = outcome_b)) # OR of 0.88- matches GLM 
-
-# gdp---------
+precis(post)
 
 
 # make data list for model
