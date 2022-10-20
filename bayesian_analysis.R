@@ -312,32 +312,36 @@ precis(m_full)
 
 # make data list for model
 dat_list <- list(
-    Positive = respicar_socio$Positive,
-    Total = respicar_socio$Total,
-    urban_percent = respicar_socio$urban_percent_tenth)
-
-# model
-mUP <- ulam(alist(Positive ~ dbinom(Total, p),
-                  logit(p) <- a + b*urban_percent,
-                  a ~ dnorm(0 , 1000),
-                  b ~ dnorm(0, 1000)),
-            data = dat_list ,
-            chains = 4,
-            cores = 4,
-            log_lik = TRUE
+  Positive = respicar_socio$Positive,
+  Total = respicar_socio$Total,
+  urban_percent = respicar_socio$urban_percent_tenth
 )
 
-# sample from prior 
-set.seed(1999)
-prior <- extract.prior( mUP , n=1e4 )
-p <- inv_logit( prior$a )
-dens( p , adj=0.1 )
+# model
+mUP <- ulam(
+  alist(
+    Positive ~ dbinom(Total, p),
+    logit(p) <- a + b * urban_percent,
+    a ~ dnorm(0 , 1000),
+    b ~ dnorm(0, 1000)
+  ),
+  data = dat_list ,
+  chains = 4,
+  cores = 4,
+  log_lik = TRUE
+)
 
-# posterior 
-precis(mUP , depth = 2) # on the logistic scale 
-# sample posterior  
-post <- extract.samples(mUP) 
-# make relative scale b parameter column 
+# sample from prior
+set.seed(1999)
+prior <- extract.prior(mUP , n = 1e4)
+p <- inv_logit(prior$a)
+dens(p , adj = 0.1)
+
+# posterior
+precis(mUP , depth = 2) # on the logistic scale
+# sample posterior
+post <- extract.samples(mUP)
+# make relative scale b parameter column
 post$exp_b <- exp(post$b)
 dens(post$exp_b)
 
@@ -349,7 +353,183 @@ precis(list(logit_a = logit_a , logit_b = logit_b))
 # relative scale (OR) parameters
 outcome_a <- mean(exp(post$a))
 outcome_b <- mean(exp(post$b))
-precis(list(outcome_a = outcome_a , outcome_b = outcome_b))
+precis(list(outcome_a = outcome_a , outcome_b = outcome_b)) # OR of 0.88- matches GLM 
+
+# gdp---------
+
+
+# make data list for model
+dat_list <- list(
+  Positive = respicar_socio$Positive,
+  Total = respicar_socio$Total,
+  log_gdp = respicar_socio$log_gdp
+)
+
+# model
+mGDP <- ulam(
+  alist(
+    Positive ~ dbinom(Total, p),
+    logit(p) <- a + b * log_gdp,
+    a ~ dnorm(0 , 1000),
+    # really flat priors
+    b ~ dnorm(0, 1000)
+  ),
+  data = dat_list ,
+  chains = 4,
+  cores = 4,
+  log_lik = TRUE
+)
+
+# posterior
+precis(mGDP , depth = 2) # on the logistic scale
+# sample posterior
+post <- extract.samples(mGDP)
+# make relative scale b parameter column
+post$exp_b <- exp(post$b)
+dens(post$exp_b)
+
+#logit scale parameters
+logit_a <- post$a
+logit_b <- post$b
+precis(list(logit_a = logit_a , logit_b = logit_b))
+
+# relative scale (OR) parameters
+outcome_a <- mean(exp(post$a))
+outcome_b <- mean(exp(post$b))
+precis(list(outcome_a = outcome_a , outcome_b = outcome_b)) # OR of 0.58
+
+
+
+
+
+
+
+# gini----
+  
+  
+# make data list for model
+dat_list <- list(
+  Positive = respicar_socio$Positive,
+  Total = respicar_socio$Total,
+  gini = respicar_socio$gini_tenth
+)
+
+# model
+mGINI <- ulam(
+  alist(
+    Positive ~ dbinom(Total, p),
+    logit(p) <- a + b * gini,
+    a ~ dnorm(0 , 1000),
+    b ~ dnorm(0, 1000)
+  ),
+  data = dat_list ,
+  chains = 4,
+  cores = 4,
+  log_lik = TRUE
+)
+
+# posterior
+precis(mGINI , depth = 2) # on the logistic scale
+# sample posterior
+post <- extract.samples(mGINI)
+# make relative scale b parameter column
+post$exp_b <- exp(post$b)
+dens(post$exp_b)
+
+#logit scale parameters
+logit_a <- post$a
+logit_b <- post$b
+precis(list(logit_a = logit_a , logit_b = logit_b))
+
+# relative scale (OR) parameters
+outcome_a <- mean(exp(post$a))
+outcome_b <- mean(exp(post$b))
+precis(list(outcome_a = outcome_a , outcome_b = outcome_b)) # OR of 1.17
+
+# mean hh -----
+
+# make data list for model
+dat_list <- list(
+  Positive = respicar_socio$Positive,
+  Total = respicar_socio$Total,
+  hh = respicar_socio$mean_hh
+)
+
+# model
+mHH<- ulam(
+  alist(
+    Positive ~ dbinom(Total, p),
+    logit(p) <- a + b * hh,
+    a ~ dnorm(0 , 1000),
+    b ~ dnorm(0, 1000)
+  ),
+  data = dat_list ,
+  chains = 4,
+  cores = 4,
+  log_lik = TRUE
+)
+
+# posterior
+precis(mHH , depth = 2) # on the logistic scale
+# sample posterior
+post <- extract.samples(mHH)
+# make relative scale b parameter column
+post$exp_b <- exp(post$b)
+dens(post$exp_b)
+
+#logit scale parameters
+logit_a <- post$a
+logit_b <- post$b
+precis(list(logit_a = logit_a , logit_b = logit_b))
+
+# relative scale (OR) parameters
+outcome_a <- mean(exp(post$a))
+outcome_b <- mean(exp(post$b))
+precis(list(outcome_a = outcome_a , outcome_b = outcome_b)) # OR of 1.31
+
+# female_ed-----
+
+# make data list for model
+dat_list <- list(
+  Positive = respicar_socio$Positive,
+  Total = respicar_socio$Total,
+  ed = respicar_socio$female_ed_tenth
+)
+
+# model
+mED<- ulam(
+  alist(
+    Positive ~ dbinom(Total, p),
+    logit(p) <- a + b * ed,
+    a ~ dnorm(0 , 1000),
+    b ~ dnorm(0, 1000)
+  ),
+  data = dat_list ,
+  chains = 4,
+  cores = 4,
+  log_lik = TRUE
+)
+
+# posterior
+precis(mED , depth = 2) # on the logistic scale
+# sample posterior
+post <- extract.samples(mED)
+# make relative scale b parameter column
+post$exp_b <- exp(post$b)
+dens(post$exp_b)
+
+#logit scale parameters
+logit_a <- post$a
+logit_b <- post$b
+precis(list(logit_a = logit_a , logit_b = logit_b))
+
+# relative scale (OR) parameters
+outcome_a <- mean(exp(post$a))
+outcome_b <- mean(exp(post$b))
+precis(list(outcome_a = outcome_a , outcome_b = outcome_b)) # 0.91
+
+
+
 
 
 
