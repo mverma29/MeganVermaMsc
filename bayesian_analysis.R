@@ -351,8 +351,8 @@ precis(post)
 # make data list for model
 dat_list <- list(
   Positive = respicar_socio$Positive,
-  Total = respicar_socio$Total,
-  log_gdp = respicar_socio$log_gdp
+  Total    = respicar_socio$Total,
+  log_gdp  = respicar_socio$log_gdp
 )
 
 # model
