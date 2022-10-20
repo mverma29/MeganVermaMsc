@@ -2,8 +2,6 @@
 
 # Megan Verma, 10/5/2022
 
-setwd("C:/git_megan/MeganVermaMsc")
-
 # Load all packages required for analysis
 source("mscprojectscript_01_load_packages.R")
 
@@ -13,6 +11,17 @@ source("mscprojectscript_02_load_data.R")
 # make carriage variable
 respicar_socio     <- respicar_socio %>% 
     mutate(carriage = Positive/Total)
+
+if (!require(cmdstanr)){
+    install.packages("cmdstanr", 
+                     repos = c("https://mc-stan.org/r-packages/",
+                               getOption("repos")))
+}
+
+if (!require(rethinking)){
+    install.packages(c("coda","mvtnorm","devtools","loo","dagitty","shape"))
+    devtools::install_github("rmcelreath/rethinking")
+}
 
 library(rethinking)
 conflict_prefer("stan", "rethinking")
@@ -26,15 +35,14 @@ respicar_socio$urban_percent_scaled <- scale(respicar_socio$urban_percent_tenth)
 
 respicar_socio$carriage_scaled <- scale(respicar_socio$carriage)
 
-summary(respicar_socio$urban_percent_scaled) # -2.4 to 1.6
 
 # compute approximate quadratic posterior dist
 m1 <- quap(alist(
     carriage_scaled ~ dnorm(mu , sigma) ,
     mu <- a + bU * urban_percent_scaled ,
-    a ~ dnorm(0 , 0.2) , #restrict intercept to 0.2 SDs
-    bU ~ dnorm(0 , 0.5) , #restrict to not extreme relationships
-    sigma ~ dexp(1) #restrict to positive SDs, avg displacement is 1
+    a ~ dnorm(0 , 1000) , #restrict intercept to 0.2 SDs
+    bU ~ dnorm(0 , 1000) , #restrict to not extreme relationships
+    sigma ~ dexp(10) #restrict to positive SDs, avg displacement is 1
 ) ,
 data = respicar_socio)
 
@@ -48,7 +56,10 @@ set.seed(10)
 prior <- extract.prior(m1)
 mu <- link(m1 , post = prior , 
            data = list(urban_percent_scaled = c(-2, 2)))
-plot(NULL , xlim = c(-2, 2) , ylim = c(-2, 2))
+
+post <- extract.samples(m1)
+
+plot(NULL , xlim = c(-2, 2) , ylim = c(-5000, 5000))
 for (i in 1:50)
     lines(c(-2, 2) , mu[i, ] , col = col.alpha("black", 0.4))
 
@@ -56,10 +67,10 @@ for (i in 1:50)
 # compute percentile interval of mean
 U_seq <- seq(from           = -2.4 ,
              to             = 1.6 ,
-             length.out     = 30)
+             length.out     = 100)
 mu <- link(m1 , data      = list(urban_percent_scaled = U_seq))
 mu.mean <- apply(mu , 2, mean)
-mu.PI <- apply(mu , 2 , PI)
+mu.PI   <- apply(mu , 2 , PI)
 
 # plot it all
 plot(carriage_scaled ~ urban_percent_scaled ,
