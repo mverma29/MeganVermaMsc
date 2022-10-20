@@ -2,7 +2,7 @@
 
 # Megan Verma, 10/5/2022
 
-setwd("/Users/meganverma/Desktop/git/MeganVermaMsc")
+setwd("C:/git_megan/MeganVermaMsc")
 
 # Load all packages required for analysis
 source("mscprojectscript_01_load_packages.R")
@@ -292,7 +292,8 @@ precis(m_full)
 
 
 
-# Bayesian LOGISTIC models 
+
+# Bayesian LOGISTIC models: ------
 
 # univariate: 
 # urban percent----
@@ -320,6 +321,12 @@ mUP <- ulam(alist(Positive ~ dbinom(Total, p),
             log_lik = TRUE
 )
 
+# sample from prior 
+set.seed(1999)
+prior <- extract.prior( mUP , n=1e4 )
+p <- inv_logit( prior$a )
+dens( p , adj=0.1 )
+
 precis(mUP , depth = 2) # on the logistic scale 
 
 # logit scale
@@ -335,3 +342,20 @@ precis(outcome_slope) # OR of 0.43 for b on the logistic scale (much more drasti
 p_post <- link(mUP , data = dat_list)
 p_mu <- apply(p_post , 2 , mean)
 p_ci <- apply(p_post , 2 , PI)
+
+# try with brms 
+ 
+library(brms)
+
+# logistic 
+urban_brms <-
+  brm(data = respicar_socio, 
+      family = binomial,
+      bf(Positive | trials(Total) ~ a + b,
+         a ~ 0 , 
+         b ~ 0 + urban_percent_scaled,
+         nl = TRUE),
+      prior = c(prior(normal(0, 1.5), nlpar = a),
+                prior(normal(0, 1.5), nlpar = d)),
+      iter = 4000, warmup = 1000, cores = 4, chains = 4,
+      seed = 11)
