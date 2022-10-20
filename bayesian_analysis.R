@@ -528,7 +528,75 @@ outcome_a <- mean(exp(post$a))
 outcome_b <- mean(exp(post$b))
 precis(list(outcome_a = outcome_a , outcome_b = outcome_b)) # 0.91
 
+# multivariate model -------
 
+# make data list for model
+dat_list <- list(
+  Positive = respicar_socio$Positive,
+  Total = respicar_socio$Total,
+  urban_percent = respicar_socio$urban_percent_tenth,
+  log_gdp = respicar_socio$log_gdp,
+  gini = respicar_socio$gini_tenth,
+  hh = respicar_socio$mean_hh,
+  ed = respicar_socio$female_ed_tenth
+)
+
+
+# model
+mFULL<- ulam(
+  alist(
+    Positive ~ dbinom(Total, p),
+    logit(p) <- a + bu*urban_percent + bg*log_gdp + bgini*gini + bh*hh + be*ed,
+    a ~ dnorm(0 , 1000),
+    bu ~ dnorm(0, 1000),
+    bg ~ dnorm(0, 1000),
+    bgini ~ dnorm(0, 1000),
+    bh ~ dnorm(0, 1000),
+    be ~ dnorm(0, 1000)
+  ),
+  data = dat_list ,
+  chains = 4,
+  cores = 4,
+  log_lik = TRUE
+)
+
+
+# posterior
+precis(mFULL , depth = 2) # on the logistic scale
+# sample posterior
+post <- extract.samples(mFULL)
+# make relative scale b parameter column
+post$exp_bu <- exp(post$bu)
+post$exp_bg <- exp(post$bu)
+post$exp_bgini <- exp(post$bu)
+post$exp_bh <- exp(post$bu)
+post$exp_be <- exp(post$bu)
+
+#logit scale parameters
+logit_a <- post$a
+logit_bu <- post$bu
+logit_bg <- post$bg
+logit_bgini<- post$bgini
+logit_bh <- post$bh
+logit_be<- post$be
+
+precis(list(logit_a = logit_a , logit_b = logit_b))
+
+# relative scale (OR) parameters
+outcome_a <- mean(exp(post$a))
+outcome_bu <- mean(exp(post$bu))
+outcome_bg <- mean(exp(post$bg))
+outcome_bgini <- mean(exp(post$bgini))
+outcome_bh <- mean(exp(post$bh))
+outcome_be <- mean(exp(post$be))
+
+precis(list(outcome_a = outcome_a,
+            outcome_bu = outcome_bu, # 0.95
+            outcome_bg = outcome_bg, # 0.85
+            outcome_bgini = outcome_bgini, #0.96
+            outcome_bh = outcome_bh, # 1.33
+            outcome_be = outcome_be #1.06
+            )) # 0.91
 
 
 
