@@ -309,23 +309,18 @@ precis(m_full)
 # univariate: 
 # urban percent----
 
-# standardize variables (tenth of urban percent)
-respicar_socio$urban_percent_scaled <- scale(respicar_socio$urban_percent_tenth)
-
-summary(respicar_socio$urban_percent_scaled) # -2.4 to 1.6
-
 
 # make data list for model
 dat_list <- list(
     Positive = respicar_socio$Positive,
     Total = respicar_socio$Total,
-    urban_percent = respicar_socio$urban_percent_scaled)
+    urban_percent = respicar_socio$urban_percent_tenth)
 
 # model
 mUP <- ulam(alist(Positive ~ dbinom(Total, p),
                   logit(p) <- a + b*urban_percent,
-                  a ~ dnorm(0 , 1.5),
-                  b ~ dnorm(0, 0.5)),
+                  a ~ dnorm(0 , 1000),
+                  b ~ dnorm(0, 1000)),
             data = dat_list ,
             chains = 4,
             cores = 4,
@@ -338,35 +333,23 @@ prior <- extract.prior( mUP , n=1e4 )
 p <- inv_logit( prior$a )
 dens( p , adj=0.1 )
 
+# posterior 
 precis(mUP , depth = 2) # on the logistic scale 
+# sample posterior  
+post <- extract.samples(mUP) 
+# make relative scale b parameter column 
+post$exp_b <- exp(post$b)
+dens(post$exp_b)
 
-# logit scale
-post <- extract.samples(mUP)
+#logit scale parameters
+logit_a <- post$a
+logit_b <- post$b
+precis(list(logit_a = logit_a , logit_b = logit_b))
 
-# outcome scale (relative, ORs)
-outcome_slope <- inv_logit(post$b)
-dens(outcome_slope , adj = 0.1) 
+# relative scale (OR) parameters
+outcome_a <- mean(exp(post$a))
+outcome_b <- mean(exp(post$b))
+precis(list(outcome_a = outcome_a , outcome_b = outcome_b))
 
-precis(outcome_slope) # OR of 0.43 for b on the logistic scale (much more drastic)
 
-# posterior predictions
-p_post <- link(mUP , data = dat_list)
-p_mu <- apply(p_post , 2 , mean)
-p_ci <- apply(p_post , 2 , PI)
 
-# try with brms 
- 
-library(brms)
-
-# logistic 
-urban_brms <-
-  brm(data = respicar_socio, 
-      family = binomial,
-      bf(Positive | trials(Total) ~ a + b,
-         a ~ 0 , 
-         b ~ 0 + urban_percent_scaled,
-         nl = TRUE),
-      prior = c(prior(normal(0, 1.5), nlpar = a),
-                prior(normal(0, 1.5), nlpar = d)),
-      iter = 4000, warmup = 1000, cores = 4, chains = 4,
-      seed = 11)
