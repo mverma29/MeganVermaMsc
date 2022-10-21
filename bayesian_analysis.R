@@ -304,7 +304,7 @@ precis(m_full)
 
 
 
-# Bayesian LOGISTIC models: ------
+# Bayesian LOGISTIC univariate models: ------
 
 # univariate: 
 # urban percent----
@@ -340,13 +340,14 @@ dens(p , adj = 0.1)
 # posterior
 precis(mUP , depth = 2) # on the logistic scale
 # sample posterior
-post <- extract.samples(mUP)
+postUP <- extract.samples(mUP)
 # make relative scale b parameter column
-post$exp_b <- exp(post$b)
-dens(post$exp_b)
+postUP$exp_b <- exp(postUP$b)
+dens(postUP$exp_b) 
 
-precis(post)
+precis(postUP) # OR= 0.88
 
+# gdp-------- 
 
 # make data list for model
 dat_list <- list(
@@ -373,25 +374,11 @@ mGDP <- ulam(
 # posterior
 precis(mGDP , depth = 2) # on the logistic scale
 # sample posterior
-post <- extract.samples(mGDP)
+postGDP <- extract.samples(mGDP)
 # make relative scale b parameter column
-post$exp_b <- exp(post$b)
-dens(post$exp_b)
-
-#logit scale parameters
-logit_a <- post$a
-logit_b <- post$b
-precis(list(logit_a = logit_a , logit_b = logit_b))
-
-# relative scale (OR) parameters
-outcome_a <- mean(exp(post$a))
-outcome_b <- mean(exp(post$b))
-precis(list(outcome_a = outcome_a , outcome_b = outcome_b)) # OR of 0.58
-
-
-
-
-
+postGDP$exp_b <- exp(postGDP$b)
+dens(postGDP$exp_b)
+precis(postGDP) # OR 0.58
 
 
 # gini----
@@ -421,20 +408,11 @@ mGINI <- ulam(
 # posterior
 precis(mGINI , depth = 2) # on the logistic scale
 # sample posterior
-post <- extract.samples(mGINI)
+postGINI <- extract.samples(mGINI)
 # make relative scale b parameter column
-post$exp_b <- exp(post$b)
-dens(post$exp_b)
-
-#logit scale parameters
-logit_a <- post$a
-logit_b <- post$b
-precis(list(logit_a = logit_a , logit_b = logit_b))
-
-# relative scale (OR) parameters
-outcome_a <- mean(exp(post$a))
-outcome_b <- mean(exp(post$b))
-precis(list(outcome_a = outcome_a , outcome_b = outcome_b)) # OR of 1.17
+postGINI$exp_b <- exp(postGINI$b)
+dens(postGINI$exp_b)
+precis(postGINI) # OR 1.17 
 
 # mean hh -----
 
@@ -462,20 +440,11 @@ mHH<- ulam(
 # posterior
 precis(mHH , depth = 2) # on the logistic scale
 # sample posterior
-post <- extract.samples(mHH)
+postHH <- extract.samples(mHH)
 # make relative scale b parameter column
-post$exp_b <- exp(post$b)
-dens(post$exp_b)
-
-#logit scale parameters
-logit_a <- post$a
-logit_b <- post$b
-precis(list(logit_a = logit_a , logit_b = logit_b))
-
-# relative scale (OR) parameters
-outcome_a <- mean(exp(post$a))
-outcome_b <- mean(exp(post$b))
-precis(list(outcome_a = outcome_a , outcome_b = outcome_b)) # OR of 1.31
+postHH$exp_b <- exp(postHH$b)
+dens(postHH$exp_b)
+precis(postHH) # OR 1.31 
 
 # female_ed-----
 
@@ -503,20 +472,11 @@ mED<- ulam(
 # posterior
 precis(mED , depth = 2) # on the logistic scale
 # sample posterior
-post <- extract.samples(mED)
+postED <- extract.samples(mED)
 # make relative scale b parameter column
-post$exp_b <- exp(post$b)
-dens(post$exp_b)
-
-#logit scale parameters
-logit_a <- post$a
-logit_b <- post$b
-precis(list(logit_a = logit_a , logit_b = logit_b))
-
-# relative scale (OR) parameters
-outcome_a <- mean(exp(post$a))
-outcome_b <- mean(exp(post$b))
-precis(list(outcome_a = outcome_a , outcome_b = outcome_b)) # 0.91
+postED$exp_b <- exp(postED$b)
+dens(postED$exp_b)
+precis(postED) # OR 0.91
 
 # multivariate model -------
 
@@ -557,37 +517,12 @@ precis(mFULL , depth = 2) # on the logistic scale
 post <- extract.samples(mFULL)
 # make relative scale b parameter column
 post$exp_bu <- exp(post$bu)
-post$exp_bg <- exp(post$bu)
-post$exp_bgini <- exp(post$bu)
-post$exp_bh <- exp(post$bu)
-post$exp_be <- exp(post$bu)
+post$exp_bg <- exp(post$bg)
+post$exp_bgini <- exp(post$bgini)
+post$exp_bh <- exp(post$bh)
+post$exp_be <- exp(post$be)
 
-#logit scale parameters
-logit_a <- post$a
-logit_bu <- post$bu
-logit_bg <- post$bg
-logit_bgini<- post$bgini
-logit_bh <- post$bh
-logit_be<- post$be
-
-precis(list(logit_a = logit_a , logit_b = logit_b))
-
-# relative scale (OR) parameters
-outcome_a <- mean(exp(post$a))
-outcome_bu <- mean(exp(post$bu))
-outcome_bg <- mean(exp(post$bg))
-outcome_bgini <- mean(exp(post$bgini))
-outcome_bh <- mean(exp(post$bh))
-outcome_be <- mean(exp(post$be))
-
-precis(list(outcome_a = outcome_a,
-            outcome_bu = outcome_bu, # 0.95
-            outcome_bg = outcome_bg, # 0.85
-            outcome_bgini = outcome_bgini, #0.96
-            outcome_bh = outcome_bh, # 1.33
-            outcome_be = outcome_be #1.06
-            )) # 0.91
-
+precis(post) #matches previous frequentist model 
 
 
 
