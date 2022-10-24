@@ -514,15 +514,66 @@ mFULL<- ulam(
 # posterior
 precis(mFULL , depth = 2) # on the logistic scale
 # sample posterior
-post <- extract.samples(mFULL)
+post           <- extract.samples(mFULL)
 # make relative scale b parameter column
-post$exp_bu <- exp(post$bu)
-post$exp_bg <- exp(post$bg)
+post$exp_bu    <- exp(post$bu)
+post$exp_bg    <- exp(post$bg)
 post$exp_bgini <- exp(post$bgini)
-post$exp_bh <- exp(post$bh)
-post$exp_be <- exp(post$be)
+post$exp_bh    <- exp(post$bh)
+post$exp_be    <- exp(post$be)
 
 precis(post) #matches previous frequentist model 
+
+
+
+
+
+# multivariate model with Gini/GDP interaction-------
+
+# make data list for model
+dat_list <- list(
+    Positive = respicar_socio$Positive,
+    Total = respicar_socio$Total,
+    urban_percent = respicar_socio$urban_percent_tenth,
+    log_gdp = respicar_socio$log_gdp,
+    gini = respicar_socio$gini_tenth,
+    hh = respicar_socio$mean_hh,
+    ed = respicar_socio$female_ed_tenth
+)
+
+
+# model
+mFULLint<- ulam(
+    alist(
+        Positive ~ dbinom(Total, p),
+        logit(p) <- a + bu*urban_percent + bg*log_gdp * bgini*gini + bh*hh + be*ed,
+        a ~ dnorm(0 , 1000),
+        bu ~ dnorm(0, 1000),
+        bg ~ dnorm(0, 1000),
+        bgini ~ dnorm(0, 1000),
+        bh ~ dnorm(0, 1000),
+        be ~ dnorm(0, 1000)
+    ),
+    data = dat_list ,
+    chains = 4,
+    cores = 4,
+    log_lik = TRUE
+)
+
+
+# posterior
+precis(mFULLint , depth = 2) # on the logistic scale
+# sample posterior
+postint           <- extract.samples(mFULLint)
+# make relative scale b parameter column
+postint$exp_bu    <- exp(postint$bu)
+postint$exp_bg    <- exp(postint$bg)
+postint$exp_bgini <- exp(postint$bgini)
+postint$exp_bh    <- exp(postint$bh)
+postint$exp_be    <- exp(postint$be)
+
+precis(postint) # doesn't match previous frequentist model 
+
 
 
 
