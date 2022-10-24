@@ -12,3 +12,5 @@ data/appendix_summary.csv
 outputs/*
 
 scraps/*
+
+full_respicar_socio.RData
