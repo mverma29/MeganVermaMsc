@@ -167,8 +167,8 @@ chosen_mod_no_re <- tbl_regression(chosen_model_no_re@model,
     add_glance_source_note(include = c("logLik"))
 
 
-as_flex_table(chosen_mod_no_re) %>%
-    flextable::save_as_docx(path = "outputs/chosen_mod_no_re.docx")
+# as_flex_table(chosen_mod_no_re) %>%
+#     flextable::save_as_docx(path = "outputs/chosen_mod_no_re.docx")
 
 tidy(
     chosen_model_no_re@model,
@@ -218,7 +218,7 @@ summary(glht(full_glm_re_interaction$gam,
              linfct = c("log_gdp + log_gdp:gini_tenth = 0"))) #0.23225
 
 # should give you the OR for gini_tenth when GDP per capita is 1000 for stepwise 
-exp(coef(chosen_model_re)['gini_tenth'] + 3 * coef(chosen_model_re)['log_gdp:gini_tenth'])
+# exp(coef(chosen_model_re)['gini_tenth'] + 3 * coef(chosen_model_re)['log_gdp:gini_tenth'])
 # not working, do manually
 exp(0.50737 + 3*(-0.15645)) # OR is 1.04 (still)
 
