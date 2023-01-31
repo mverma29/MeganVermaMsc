@@ -43,7 +43,179 @@ respicar_eth_maj_5_carriage <- respicar_eth_maj_5 %>%
 
 # range: 85.3% (The Gambia) to 3.13% (Saudi Arabia)
 
-# models---- 
+# univariate models------ 
+
+# urban percent ----------
+# urban_percent model, no RE
+urban_percent_glm <- glm(
+    data    = respicar_eth_maj_5,
+    formula = cbind(Positive, Total - Positive) ~ urban_percent_tenth, 
+    family  = "binomial")
+
+tidy(urban_percent_glm, exp=TRUE, conf.int=TRUE) # OR: 0.866
+summary(urban_percent_glm) # p-val (Wald approx): <2e-16
+
+# urban_percent model, RE
+urban_percent_glm_re <- gamm4(
+    data    = respicar_eth_maj_5,
+    formula = cbind(Positive, Total - Positive) ~ urban_percent_tenth, 
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+tidy(urban_percent_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 1.02
+summary(urban_percent_glm_re$mer) # p-val (Wald approx): 0.00321
+
+
+lmtest::lrtest(urban_percent_glm, urban_percent_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
+
+# make table of model outputs
+urban_percent_re <- tbl_regression(urban_percent_glm_re$mer, 
+                                   exponentiate = TRUE, 
+                                   intercept= FALSE,
+                                   tidy_fun = broom.mixed::tidy) %>% 
+    add_glance_source_note(include = c("logLik"))
+
+urban_percent_re %>%
+    as_flex_table() %>%
+    flextable::save_as_docx(path = "outputs/urban_percent_re.docx")
+
+
+# GDP -----------
+
+# gdp model, no RE
+gdp_glm <- glm(
+    data    = respicar_eth_maj_5,
+    formula = cbind(Positive, Total - Positive) ~ log_gdp, 
+    family  = "binomial")
+
+tidy(gdp_glm, exp=TRUE, conf.int=TRUE) # OR: 0.540
+summary(urban_percent_glm) # p-val (Wald approx): <2e-16
+
+# gdp model w/ RE
+gdp_glm_re <- gamm4(
+    data    = respicar_eth_maj_5,
+    formula = cbind(Positive, Total - Positive) ~ log_gdp, 
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+tidy(gdp_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 0.705
+
+lmtest::lrtest(gdp_glm, gdp_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
+
+# make table of model outputs
+gdp_re_model <- tbl_regression(gdp_glm_re$mer, 
+                               exponentiate = TRUE, 
+                               intercept= FALSE, 
+                               tidy_fun = broom.mixed::tidy) %>% 
+    add_glance_source_note(include = c("logLik"))
+
+gdp_re_model %>%
+    as_flex_table() %>%
+    flextable::save_as_docx(path = "outputs/gdp_re_model.docx")
+
+
+# Gini-------
+
+# gini model, no RE
+gini_glm <- glm(
+    data    = respicar_eth_maj_5,
+    formula = cbind(Positive, Total - Positive) ~ gini_tenth, 
+    family  = "binomial")
+
+tidy(gini_glm, exp=TRUE, conf.int=TRUE) # OR: 1.27
+summary(gini_glm) # p-val (Wald approx): <2e-16
+
+# gini model w/ RE
+gini_glm_re <- gamm4(
+    data    = respicar_eth_maj_5,
+    formula = cbind(Positive, Total - Positive) ~ gini_tenth, 
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+tidy(gini_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 1.04
+lmtest::lrtest(gini_glm, gini_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
+
+# make table of model outputs
+gini_re_model <- tbl_regression(gini_glm_re$mer, 
+                                exponentiate = TRUE, 
+                                intercept= FALSE, 
+                                tidy_fun = broom.mixed::tidy) %>% 
+    add_glance_source_note(include = c("logLik"))
+
+gini_re_model %>%
+    as_flex_table() %>%
+    flextable::save_as_docx(path = "outputs/gini_re_model.docx")
+
+
+# HH size------
+
+# HH model, no RE
+hh_glm <- glm(
+    data    = respicar_eth_maj_5,
+    formula = cbind(Positive, Total - Positive) ~ mean_hh, 
+    family  = "binomial")
+
+tidy(hh_glm, exp=TRUE, conf.int=TRUE) # OR: 1.35
+summary(hh_glm) # p-val (Wald approx): <2e-16
+
+# HH model w/ RE
+hh_glm_re <- gamm4(
+    data    = respicar_eth_maj_5,
+    formula = cbind(Positive, Total - Positive) ~ mean_hh, 
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+tidy(hh_glm_re$mer, exp=TRUE, conf.int=TRUE) #OR: 1.17
+lmtest::lrtest(hh_glm, hh_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
+
+
+# make table of model outputs
+hh_re_model <- tbl_regression(hh_glm_re$mer, 
+                              exponentiate = TRUE, 
+                              intercept= FALSE, 
+                              tidy_fun = broom.mixed::tidy) %>% 
+    add_glance_source_note(include = c("logLik"))
+
+
+hh_re_model %>%
+    as_flex_table() %>%
+    flextable::save_as_docx(path = "outputs/hh_re_model.docx")
+
+
+# female ed------
+
+female_ed_glm <- glm(
+    data    = respicar_eth_maj_5,
+    formula = cbind(Positive, Total - Positive) ~ female_ed_tenth, 
+    family  = "binomial")
+
+tidy(female_ed_glm, exp=TRUE, conf.int=TRUE) # OR: 0.913
+summary(female_ed_glm) # p-val (Wald approx): <2e-16
+
+# female ed model w/ RE
+female_ed_glm_re <- gamm4(
+    data    = respicar_eth_maj_5,
+    formula = cbind(Positive, Total - Positive) ~ female_ed_tenth, 
+    random  = ~(1|subregion),
+    family  = "binomial")
+
+tidy(female_ed_glm_re$mer, exp=TRUE, conf.int=TRUE) # OR: 0.988
+lmtest::lrtest(female_ed_glm, female_ed_glm_re$mer) # <2e-16 (reject null hyp of no clustering)
+
+
+# make table of model outputs
+ed_re_model <- tbl_regression(female_ed_glm_re$mer, 
+                              exponentiate = TRUE,
+                              intercept= FALSE, 
+                              tidy_fun = broom.mixed::tidy) %>% 
+    add_glance_source_note(include = c("logLik"))
+
+ed_re_model %>%
+    as_flex_table() %>%
+    flextable::save_as_docx(path = "outputs/ed_re_model.docx")
+
+
+# multivariate models---- 
 
 # test for RE (no interaction)---- 
 
