@@ -320,3 +320,14 @@ stepwise_sensitivity_re_interaction_tbl %>%
     as_flex_table() %>%
     save_as_docx(path = "outputs/stepwise_sensitivity_re_interaction.docx")
 
+# effect of interaction??? 
+# should give you the OR for gini_tenth when GDP per capita is 1000 for stepwise 
+exp(coef(stepwise_sensitivity_re_interaction$gam)['gini_tenth'] + 3 * coef(stepwise_sensitivity_re_interaction$gam)['log_gdp:gini_tenth'])
+exp(-0.828 + 3*(0.820)) # OR is 5.114093
+
+# should give you the OR for gini_tenth when GDP per capita is 10000 for stepwise 
+exp(-0.828 + 4*(0.820)) # OR is 11.61155
+
+# same for GDP per cap of $1
+exp(-0.828 + .1*(0.820)) # OR is 5.114093
+
