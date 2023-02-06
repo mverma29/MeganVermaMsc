@@ -226,6 +226,7 @@ full_glm_sensitivity_no_re <- glm(
         urban_percent_tenth + log_gdp + gini_tenth + mean_hh + female_ed_tenth,
     family  = "binomial")
 
+tidy(full_glm_sensitivity_no_re, exp=TRUE, conf.int=TRUE) 
 
 # full model, with RE, without interaction 
 full_glm_sensitivity_re <- gamm4(
@@ -325,9 +326,19 @@ stepwise_sensitivity_re_interaction_tbl %>%
 exp(coef(stepwise_sensitivity_re_interaction$gam)['gini_tenth'] + 3 * coef(stepwise_sensitivity_re_interaction$gam)['log_gdp:gini_tenth'])
 exp(-0.828 + 3*(0.820)) # OR is 5.114093
 
-# should give you the OR for gini_tenth when GDP per capita is 10000 for stepwise 
+# should give you the OR for gini_tenth when GDP per capita is 10000 for stepwise (median GDP in this dataset is $8,369)
 exp(-0.828 + 4*(0.820)) # OR is 11.61155
 
-# same for GDP per cap of $1
-exp(-0.828 + .1*(0.820)) # OR is 5.114093
+# same direction for GDP per cap of $100 -- lowest GDP per cap is $191
+exp(-0.828 + 2*(0.820)) # OR is 2.252408
+
+# for GDP of $10, almost 1
+exp(-0.828 + 1*(0.820)) # OR is 0.9920319
+
+# for GDP of $1, negative relationship 
+exp(-0.828 + 0*(0.820)) # OR is 0.4369223
+
+
+
+
 
